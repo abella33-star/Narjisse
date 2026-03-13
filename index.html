@@ -102,11 +102,6 @@ body::before{
 ::-webkit-scrollbar-thumb{background:var(--gold)}
 @media(max-width:600px){.ebox{padding:1.3rem .9rem}.fl{padding:0 .3rem}}
 
-/* ── MUSIC BTN ── */
-#mbtn{position:fixed;bottom:70px;right:16px;width:38px;height:38px;background:rgba(8,6,4,.85);border:1px solid rgba(201,168,76,.25);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:998;transition:border-color .3s,opacity .3s,transform .3s;opacity:.5;font-size:1rem;color:var(--gold);padding:0;line-height:1}
-#mbtn:hover{border-color:var(--gold);opacity:1;transform:scale(1.08)}
-#mbtn.muted{opacity:.3;color:var(--dim)}
-
 /* ── COUNTDOWN ── */
 .cdw{margin-top:3.2rem;text-align:center;opacity:0;animation:fI 2s 7.8s forwards}
 .cdw-label{font-family:'Cinzel',serif;font-size:.52rem;letter-spacing:.55em;color:var(--gold);opacity:.55;margin-bottom:1.3rem}
@@ -120,9 +115,6 @@ body::before{
 </style>
 </head>
 <body>
-
-<audio id="bgm" loop preload="none"></audio>
-<button id="mbtn" onclick="toggleMusic()" title="Una Mattina — Ludovico Einaudi">♫</button>
 
 <div class="bar bar-t"></div>
 <div class="bar bar-b"></div>
@@ -356,58 +348,6 @@ body::before{
 </div>
 
 <script>
-// ══ MUSIC ══
-// Place ton fichier audio ici (ex: './una-mattina.mp3' ou une URL directe)
-const MUSIC_SRC = './una-mattina.mp3';
-
-let musicReady = false;
-let musicMuted = false;
-
-function initMusic() {
-  if (musicReady || !MUSIC_SRC) return;
-  const a = document.getElementById('bgm');
-  a.src = MUSIC_SRC;
-  a.volume = 0;
-  a.play().then(() => {
-    musicReady = true;
-    fadeVolume(a, 0, 0.32);
-    document.getElementById('mbtn').classList.remove('muted');
-  }).catch(() => {});
-}
-
-function fadeVolume(a, from, to) {
-  let v = from;
-  const step = to > from ? 0.015 : -0.015;
-  const tick = setInterval(() => {
-    v += step;
-    if ((step > 0 && v >= to) || (step < 0 && v <= to)) {
-      a.volume = Math.max(0, Math.min(1, to));
-      clearInterval(tick);
-      if (to === 0) a.pause();
-    } else {
-      a.volume = Math.max(0, Math.min(1, v));
-    }
-  }, 60);
-}
-
-function toggleMusic() {
-  const a = document.getElementById('bgm');
-  const btn = document.getElementById('mbtn');
-  if (!musicReady) { initMusic(); return; }
-  if (!a.paused) {
-    fadeVolume(a, a.volume, 0);
-    btn.textContent = '♪';
-    btn.classList.add('muted');
-    musicMuted = true;
-  } else {
-    a.play();
-    fadeVolume(a, 0, 0.32);
-    btn.textContent = '♫';
-    btn.classList.remove('muted');
-    musicMuted = false;
-  }
-}
-
 // ══ COUNTDOWN — 15 février 2027 ══
 function updateCountdown() {
   const target = new Date('2027-02-15T00:00:00');
@@ -468,7 +408,6 @@ function go(target){
 }
 
 function goReveal(target){
-  initMusic();
   const rv = reveals[target];
   if(!rv){ go(target); return; }
   const ov = document.getElementById('ov');
