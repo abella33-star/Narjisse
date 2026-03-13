@@ -101,9 +101,28 @@ body::before{
 ::-webkit-scrollbar-track{background:var(--bg)}
 ::-webkit-scrollbar-thumb{background:var(--gold)}
 @media(max-width:600px){.ebox{padding:1.3rem .9rem}.fl{padding:0 .3rem}}
+
+/* ── MUSIC BTN ── */
+#mbtn{position:fixed;bottom:70px;right:16px;width:38px;height:38px;background:rgba(8,6,4,.85);border:1px solid rgba(201,168,76,.25);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:998;transition:border-color .3s,opacity .3s,transform .3s;opacity:.5;font-size:1rem;color:var(--gold);padding:0;line-height:1}
+#mbtn:hover{border-color:var(--gold);opacity:1;transform:scale(1.08)}
+#mbtn.muted{opacity:.3;color:var(--dim)}
+
+/* ── COUNTDOWN ── */
+.cdw{margin-top:3.2rem;text-align:center;opacity:0;animation:fI 2s 7.8s forwards}
+.cdw-label{font-family:'Cinzel',serif;font-size:.52rem;letter-spacing:.55em;color:var(--gold);opacity:.55;margin-bottom:1.3rem}
+.cdw-rule{width:100px;height:1px;background:linear-gradient(to right,transparent,rgba(201,168,76,.25),transparent);margin:0 auto 1.8rem}
+.cdw-nums{display:flex;gap:2.2rem;justify-content:center;flex-wrap:wrap}
+.cdw-unit{display:flex;flex-direction:column;align-items:center;gap:.35rem}
+.cdw-n{font-family:'Cinzel',serif;font-size:clamp(1.6rem,4.5vw,2.5rem);color:var(--gold-l);line-height:1;min-width:2ch;text-align:center}
+.cdw-u{font-family:'IM Fell English',serif;font-style:italic;font-size:.68rem;color:var(--dim);letter-spacing:.12em}
+.cdw-sep{font-family:'Cinzel',serif;font-size:clamp(1.2rem,3vw,1.8rem);color:rgba(201,168,76,.2);align-self:flex-start;padding-top:.2rem}
+.cdw-sub{margin-top:1.4rem;font-family:'IM Fell English',serif;font-style:italic;font-size:.83rem;color:var(--dim);letter-spacing:.05em}
 </style>
 </head>
 <body>
+
+<audio id="bgm" loop preload="none"></audio>
+<button id="mbtn" onclick="toggleMusic()" title="Una Mattina — Ludovico Einaudi">♫</button>
 
 <div class="bar bar-t"></div>
 <div class="bar bar-b"></div>
@@ -307,9 +326,107 @@ body::before{
   </div>
   <div class="fsig">— Allan</div>
   <div class="fdate">15 février 2020 · 15 février 2025 · Pour l'éternité · Inchallah</div>
+
+  <div class="cdw">
+    <div class="cdw-rule"></div>
+    <p class="cdw-label">NOTRE PROCHAIN 15 FÉVRIER</p>
+    <div class="cdw-nums">
+      <div class="cdw-unit">
+        <span class="cdw-n" id="cd-d">--</span>
+        <span class="cdw-u">jours</span>
+      </div>
+      <span class="cdw-sep">·</span>
+      <div class="cdw-unit">
+        <span class="cdw-n" id="cd-h">--</span>
+        <span class="cdw-u">heures</span>
+      </div>
+      <span class="cdw-sep">·</span>
+      <div class="cdw-unit">
+        <span class="cdw-n" id="cd-m">--</span>
+        <span class="cdw-u">minutes</span>
+      </div>
+      <span class="cdw-sep">·</span>
+      <div class="cdw-unit">
+        <span class="cdw-n" id="cd-s">--</span>
+        <span class="cdw-u">secondes</span>
+      </div>
+    </div>
+    <p class="cdw-sub">15 février 2027 — nos 7 ans — inchallah</p>
+  </div>
 </div>
 
 <script>
+// ══ MUSIC ══
+// Place ton fichier audio ici (ex: './una-mattina.mp3' ou une URL directe)
+const MUSIC_SRC = './una-mattina.mp3';
+
+let musicReady = false;
+let musicMuted = false;
+
+function initMusic() {
+  if (musicReady || !MUSIC_SRC) return;
+  const a = document.getElementById('bgm');
+  a.src = MUSIC_SRC;
+  a.volume = 0;
+  a.play().then(() => {
+    musicReady = true;
+    fadeVolume(a, 0, 0.32);
+    document.getElementById('mbtn').classList.remove('muted');
+  }).catch(() => {});
+}
+
+function fadeVolume(a, from, to) {
+  let v = from;
+  const step = to > from ? 0.015 : -0.015;
+  const tick = setInterval(() => {
+    v += step;
+    if ((step > 0 && v >= to) || (step < 0 && v <= to)) {
+      a.volume = Math.max(0, Math.min(1, to));
+      clearInterval(tick);
+      if (to === 0) a.pause();
+    } else {
+      a.volume = Math.max(0, Math.min(1, v));
+    }
+  }, 60);
+}
+
+function toggleMusic() {
+  const a = document.getElementById('bgm');
+  const btn = document.getElementById('mbtn');
+  if (!musicReady) { initMusic(); return; }
+  if (!a.paused) {
+    fadeVolume(a, a.volume, 0);
+    btn.textContent = '♪';
+    btn.classList.add('muted');
+    musicMuted = true;
+  } else {
+    a.play();
+    fadeVolume(a, 0, 0.32);
+    btn.textContent = '♫';
+    btn.classList.remove('muted');
+    musicMuted = false;
+  }
+}
+
+// ══ COUNTDOWN — 15 février 2027 ══
+function updateCountdown() {
+  const target = new Date('2027-02-15T00:00:00');
+  const now = new Date();
+  const diff = target - now;
+  const pad = n => String(n).padStart(2, '0');
+  const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = pad(v); };
+  if (diff <= 0) {
+    ['cd-d','cd-h','cd-m','cd-s'].forEach(id => set(id, 0));
+    return;
+  }
+  set('cd-d', Math.floor(diff / 86400000));
+  set('cd-h', Math.floor((diff % 86400000) / 3600000));
+  set('cd-m', Math.floor((diff % 3600000) / 60000));
+  set('cd-s', Math.floor((diff % 60000) / 1000));
+}
+updateCountdown();
+setInterval(updateCountdown, 1000);
+
 const answers = {
   1: ['15/02/2020','15-02-2020','15 02 2020','15022020'],
   2: ['ma vie','mavie'],
@@ -336,6 +453,7 @@ let cur = 'intro';
 function norm(s){ return s.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' '); }
 
 function go(target){
+  initMusic();
   const ov = document.getElementById('ov');
   ov.classList.add('on');
   setTimeout(()=>{
