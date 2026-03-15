@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Narjisse Institut Naïram — Simulateur</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --terra:#C27B4A; --terra-dark:#9A6035; --terra-light:#D9956A;
+    --cream:#FAF5F0; --nude:#F2EAE0; --nude-dark:#DDD0C0;
+    --text-dark:#2C1F14; --text-mid:#6B4F3A; --text-light:#A07858; --white:#FFFFFF;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;overflow:hidden;}
+  body{font-family:'Jost',sans-serif;background:var(--cream);color:var(--text-dark);}
+
+  .screen{display:none;height:100vh;flex-direction:column;animation:fadeUp .5s ease;overflow:hidden;}
+  .screen.active{display:flex;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+  .hdr{background:var(--white);padding:14px 20px 12px;display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--nude-dark);flex-shrink:0;position:relative;}
+  .hdr-back{position:absolute;left:16px;background:none;border:none;cursor:pointer;color:var(--terra);font-family:'Jost',sans-serif;font-size:11px;font-weight:400;letter-spacing:.12em;text-transform:uppercase;padding:6px;}
+  .hdr-nm{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;color:var(--terra);letter-spacing:.18em;line-height:1;text-align:center;}
+  .hdr-sub{font-size:8px;font-weight:300;letter-spacing:.35em;color:var(--text-mid);text-transform:uppercase;margin-top:2px;text-align:center;}
+
+  .prog{background:var(--nude);padding:10px 20px;display:flex;align-items:center;gap:10px;flex-shrink:0;}
+  .prog-bar{flex:1;height:2px;background:var(--nude-dark);border-radius:2px;overflow:hidden;}
+  .prog-fill{height:100%;background:linear-gradient(90deg,var(--terra),var(--terra-light));border-radius:2px;transition:width .5s ease;}
+  .prog-lbl{font-size:10px;font-weight:300;letter-spacing:.12em;color:var(--text-light);text-transform:uppercase;white-space:nowrap;}
+
+  .sb{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+  .bot{padding:12px 16px 20px;background:var(--white);border-top:1px solid var(--nude);flex-shrink:0;}
+  .btn-next{width:100%;background:linear-gradient(135deg,var(--terra),var(--terra-dark));color:white;border:none;padding:16px;font-family:'Jost',sans-serif;font-size:11px;font-weight:400;letter-spacing:.25em;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:all .3s;opacity:.35;pointer-events:none;}
+  .btn-next.ok{opacity:1;pointer-events:all;box-shadow:0 4px 20px rgba(194,123,74,.35);}
+
+  /* WELCOME */
+  #sw{background:var(--white);}
+  .wlc{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:36px 28px 28px;text-align:center;}
+  .wlc-orn{width:50px;height:1px;background:linear-gradient(90deg,transparent,var(--terra),transparent);margin-bottom:28px;}
+  .wlc-logo{font-family:'Cormorant Garamond',serif;font-size:56px;font-weight:300;color:var(--terra);letter-spacing:.08em;line-height:.9;}
+  .wlc-logo span{display:block;font-size:9px;font-family:'Jost',sans-serif;font-weight:300;letter-spacing:.5em;color:var(--text-mid);margin-top:10px;text-transform:uppercase;}
+  .wlc-div{width:36px;height:1px;background:var(--nude-dark);margin:22px 0;}
+  .wlc-title{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:400;color:var(--text-dark);line-height:1.3;margin-bottom:10px;}
+  .wlc-sub{font-size:13px;font-weight:300;color:var(--text-mid);line-height:1.7;max-width:280px;}
+  .wlc-steps{display:flex;gap:16px;margin:22px 0;width:100%;}
+  .wlc-step{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;}
+  .step-ic{width:44px;height:44px;border-radius:50%;background:var(--nude);border:1px solid var(--nude-dark);display:flex;align-items:center;justify-content:center;font-size:18px;}
+  .step-lbl{font-size:10px;font-weight:300;color:var(--text-mid);text-align:center;line-height:1.4;}
+  .btn-start{background:linear-gradient(135deg,var(--terra),var(--terra-dark));color:white;border:none;padding:17px 44px;font-family:'Jost',sans-serif;font-size:11px;font-weight:400;letter-spacing:.28em;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:all .3s;box-shadow:0 4px 20px rgba(194,123,74,.3);}
+  .btn-start:active{transform:scale(.98);}
+  .wlc-addr{margin-top:22px;font-size:11px;font-weight:300;color:var(--text-light);letter-spacing:.04em;line-height:1.9;}
+
+  /* Q header */
+  .qhdr{padding:20px 20px 14px;flex-shrink:0;}
+  .q-eye{font-size:9px;font-weight:400;letter-spacing:.35em;text-transform:uppercase;color:var(--terra);margin-bottom:6px;}
+  .q-title{font-family:'Cormorant Garamond',serif;font-size:25px;font-weight:400;color:var(--text-dark);line-height:1.2;}
+  .q-sub{font-size:12px;font-weight:300;color:var(--text-mid);margin-top:4px;line-height:1.5;}
+
+  /* GRIDS */
+  .ogrid{padding:4px 16px 16px;display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .ogrid.c1{grid-template-columns:1fr;}
+
+  .ocard{background:var(--white);border:1.5px solid var(--nude-dark);border-radius:8px;padding:14px 12px;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:7px;text-align:center;position:relative;}
+  .ocard:active{transform:scale(.97);}
+  .ocard.sel{border-color:var(--terra);background:linear-gradient(135deg,rgba(194,123,74,.07),rgba(194,123,74,.02));}
+  .ocard.sel::after{content:'✓';position:absolute;top:7px;right:9px;font-size:10px;color:var(--terra);font-weight:600;}
+  .ocard-row{flex-direction:row;justify-content:flex-start;gap:14px;text-align:left;padding:14px 16px;}
+  .ocard-ic{font-size:25px;}
+  .ocard-name{font-size:13px;font-weight:400;color:var(--text-dark);letter-spacing:.02em;}
+  .ocard-desc{font-size:10px;font-weight:300;color:var(--text-mid);line-height:1.4;}
+  .swatch{width:42px;height:42px;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,.14);transition:all .2s;flex-shrink:0;}
+  .ocard.sel .swatch{box-shadow:0 0 0 3px rgba(194,123,74,.25);}
+
+  /* nail length cards */
+  .nail-card-img{width:56px;height:76px;border-radius:6px;object-fit:cover;flex-shrink:0;border:2px solid transparent;transition:border-color .2s;}
+  .ocard.sel .nail-card-img{border-color:var(--terra);}
+
+  /* PHOTO */
+  .photo-body{flex:1;padding:16px;display:flex;flex-direction:column;gap:12px;overflow-y:auto;}
+  .pzone{min-height:250px;border:2px dashed var(--nude-dark);border-radius:12px;background:var(--white);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;cursor:pointer;transition:all .3s;position:relative;overflow:hidden;}
+  .pzone img.prev{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:10px;}
+  .ph-ph{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;padding:20px;}
+  .ph-ic{width:62px;height:62px;border-radius:50%;background:var(--nude);display:flex;align-items:center;justify-content:center;font-size:26px;}
+  .ph-txt{font-family:'Cormorant Garamond',serif;font-size:17px;color:var(--text-dark);}
+  .ph-sub{font-size:11px;font-weight:300;color:var(--text-light);line-height:1.6;}
+  .btn-sec{background:var(--white);color:var(--terra);border:1.5px solid var(--terra);padding:14px;font-family:'Jost',sans-serif;font-size:11px;font-weight:400;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:all .3s;width:100%;}
+
+  /* LOADING */
+  #sl{background:var(--white);align-items:center;justify-content:center;gap:26px;text-align:center;}
+  .ld-wrap{position:relative;width:108px;height:108px;}
+  .ld-r{position:absolute;inset:0;border-radius:50%;border:2px solid transparent;}
+  .ld-r1{border-top-color:var(--terra);border-right-color:var(--terra-light);animation:spin 1.2s linear infinite;}
+  .ld-r2{inset:12px;border-bottom-color:var(--nude-dark);animation:spin .8s linear infinite reverse;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .ld-c{position:absolute;inset:22px;background:var(--nude);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;}
+  .ld-title{font-family:'Cormorant Garamond',serif;font-size:23px;color:var(--text-dark);}
+  .ld-sub{font-size:12px;font-weight:300;color:var(--text-mid);line-height:1.7;}
+  .dots{display:flex;gap:7px;justify-content:center;}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--terra-light);animation:bonce 1.4s ease-in-out infinite;}
+  .dot:nth-child(2){animation-delay:.2s}.dot:nth-child(3){animation-delay:.4s}
+  @keyframes bonce{0%,80%,100%{transform:scale(.6);opacity:.4}40%{transform:scale(1);opacity:1}}
+  #ld-st{font-size:11px;font-weight:300;color:var(--text-light);letter-spacing:.06em;}
+
+  /* RESULT */
+  #sres{background:var(--cream);}
+  .r-img{margin:14px;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(194,123,74,.15);position:relative;}
+  .r-img img{width:100%;display:block;max-height:320px;object-fit:cover;}
+  .r-badge{position:absolute;top:10px;right:10px;background:rgba(255,255,255,.93);border:1px solid var(--nude-dark);border-radius:20px;padding:5px 11px;font-size:9px;font-weight:400;letter-spacing:.1em;color:var(--terra);text-transform:uppercase;}
+  .r-sum{margin:0 14px 12px;background:var(--white);border-radius:8px;padding:14px;border:1px solid var(--nude);}
+  .r-sum-t{font-family:'Cormorant Garamond',serif;font-size:14px;font-weight:500;color:var(--text-dark);margin-bottom:8px;}
+  .tags{display:flex;flex-wrap:wrap;gap:7px;}
+  .tag{background:var(--nude);border:1px solid var(--nude-dark);border-radius:20px;padding:4px 11px;font-size:11px;font-weight:400;color:var(--text-mid);}
+  .r-msg{background:linear-gradient(135deg,rgba(194,123,74,.08),rgba(194,123,74,.02));border:1px solid rgba(194,123,74,.2);border-radius:8px;padding:13px;font-size:12px;font-weight:300;color:var(--text-mid);line-height:1.7;text-align:center;margin:0 14px 10px;}
+  .r-msg strong{color:var(--terra);font-weight:500;}
+  .r-acts{padding:0 14px 28px;display:flex;flex-direction:column;gap:9px;}
+  .btn-pr{background:linear-gradient(135deg,var(--terra),var(--terra-dark));color:white;border:none;padding:16px;font-family:'Jost',sans-serif;font-size:11px;font-weight:400;letter-spacing:.25em;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:all .3s;width:100%;box-shadow:0 4px 16px rgba(194,123,74,.3);}
+  .btn-pr:active{transform:scale(.98);}
+
+  /* MODAL */
+  .ovl{display:none;position:fixed;inset:0;background:rgba(44,31,20,.5);z-index:200;align-items:flex-end;}
+  .ovl.on{display:flex;animation:fadeUp .3s ease;}
+  .sheet{background:var(--white);border-radius:16px 16px 0 0;padding:28px 22px 36px;width:100%;display:flex;flex-direction:column;gap:14px;animation:slideUp .4s ease;}
+  @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+  .sh-h{width:38px;height:3px;background:var(--nude-dark);border-radius:2px;margin:-12px auto 6px;}
+  .sh-t{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--text-dark);}
+  .mi{border:1.5px solid var(--nude-dark);border-radius:4px;padding:13px 14px;font-family:'Jost',sans-serif;font-size:14px;font-weight:300;color:var(--text-dark);background:var(--cream);outline:none;transition:border-color .2s;width:100%;}
+  .mi:focus{border-color:var(--terra);}
+  #fi{display:none;}
+</style>
+</head>
+<body>
+
+<!-- WELCOME -->
+<div id="sw" class="screen active">
+  <div class="wlc">
+    <div class="wlc-orn"></div>
+    <div class="wlc-logo">NM<span>Narjisse · Naïram · Institut</span></div>
+    <div class="wlc-div"></div>
+    <h1 class="wlc-title">Visualisez vos ongles<br><em>avant votre pose</em></h1>
+    <p class="wlc-sub">En quelques secondes, découvrez le rendu de votre future manucure grâce à notre simulateur IA.</p>
+    <div class="wlc-steps">
+      <div class="wlc-step"><div class="step-ic">📸</div><div class="step-lbl">Photo de vos mains</div></div>
+      <div class="wlc-step"><div class="step-ic">✨</div><div class="step-lbl">Choisissez votre style</div></div>
+      <div class="wlc-step"><div class="step-ic">💅</div><div class="step-lbl">Rendu instantané</div></div>
+    </div>
+    <button class="btn-start" onclick="go('sp')">Commencer ✦</button>
+    <div class="wlc-addr">2 Chemin de Belle Étoile · 33370 Tresses<br>📅 Sur rendez-vous · @institutnairam_narjisse</div>
+  </div>
+</div>
+
+<!-- PHOTO -->
+<div id="sp" class="screen">
+  <div class="hdr">
+    <button class="hdr-back" onclick="go('sw')">← Retour</button>
+    <div><div class="hdr-nm">NM</div><div class="hdr-sub">Institut</div></div>
+  </div>
+  <div class="prog"><div class="prog-bar"><div class="prog-fill" style="width:16%"></div></div><div class="prog-lbl">1 / 6</div></div>
+  <div class="qhdr" style="flex-shrink:0;">
+    <div class="q-eye">Étape 1 — Photo</div>
+    <div class="q-title">Photographiez vos mains</div>
+    <div class="q-sub">Posez vos mains à plat, paume vers le bas, en bonne lumière naturelle.</div>
+  </div>
+  <div class="photo-body">
+    <div class="pzone" id="pzone" onclick="document.getElementById('fi').click()">
+      <div class="ph-ph" id="ph-ph">
+        <div class="ph-ic">🤳</div>
+        <div class="ph-txt">Appuyer pour photographier</div>
+        <div class="ph-sub">ou sélectionner dans la galerie<br>Lumière naturelle recommandée</div>
+      </div>
+    </div>
+    <input type="file" id="fi" accept="image/*" capture="environment" onchange="handlePhoto(event)">
+    <button class="btn-sec" onclick="document.getElementById('fi').click()">📷 Prendre / Choisir une photo</button>
+  </div>
+  <div class="bot"><button class="btn-next" id="bn-sp" onclick="go('spose')">Continuer →</button></div>
+</div>
+
+<!-- POSE -->
+<div id="spose" class="screen">
+  <div class="hdr">
+    <button class="hdr-back" onclick="go('sp')">← Retour</button>
+    <div><div class="hdr-nm">NM</div><div class="hdr-sub">Institut</div></div>
+  </div>
+  <div class="prog"><div class="prog-bar"><div class="prog-fill" style="width:32%"></div></div><div class="prog-lbl">2 / 6</div></div>
+  <div class="sb">
+    <div class="qhdr">
+      <div class="q-eye">Étape 2 — Prestation</div>
+      <div class="q-title">Quelle prestation souhaitez-vous ?</div>
+      <div class="q-sub">Prestations proposées par Narjisse.</div>
+    </div>
+    <div class="ogrid c1" style="gap:9px;">
+      <div class="ocard ocard-row" onclick="sel(this,'pose','Extension capsule gel')">
+        <div class="ocard-ic">💎</div>
+        <div><div class="ocard-name">Extension capsule gel</div><div class="ocard-desc">Capsule gel — résultat naturel et tenue longue durée. Cuticules + couleur inclus.</div></div>
+      </div>
+      <div class="ocard ocard-row" onclick="sel(this,'pose','Pose gel résine capsule')">
+        <div class="ocard-ic">✨</div>
+        <div><div class="ocard-name">Pose gel — Résine capsule</div><div class="ocard-desc">Capsule de gel déposée sur l'ongle, résultat identique au gel classique.</div></div>
+      </div>
+      <div class="ocard ocard-row" onclick="sel(this,'pose','Gainage gel sans rallongement')">
+        <div class="ocard-ic">🌿</div>
+        <div><div class="ocard-name">Gainage gel naturel</div><div class="ocard-desc">Renforcement de vos ongles naturels sans rallongement.</div></div>
+      </div>
+      <div class="ocard ocard-row" onclick="sel(this,'pose','Remplissage')">
+        <div class="ocard-ic">🔄</div>
+        <div><div class="ocard-name">Remplissage</div><div class="ocard-desc">Retouche de votre pose existante chez Narjisse.</div></div>
+      </div>
+      <div class="ocard ocard-row" onclick="sel(this,'pose','Vernis semi-permanent')">
+        <div class="ocard-ic">💅</div>
+        <div><div class="ocard-name">Vernis semi-permanent</div><div class="ocard-desc">Préparation des cuticules incluse — tenue environ 3 semaines.</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="bot"><button class="btn-next" id="bn-spose" onclick="go('slong')">Continuer →</button></div>
+</div>
+
+<!-- LONGUEUR -->
+<div id="slong" class="screen">
+  <div class="hdr">
+    <button class="hdr-back" onclick="go('spose')">← Retour</button>
+    <div><div class="hdr-nm">NM</div><div class="hdr-sub">Institut</div></div>
+  </div>
+  <div class="prog"><div class="prog-bar"><div class="prog-fill" style="width:48%"></div></div><div class="prog-lbl">3 / 6</div></div>
+  <div class="sb">
+    <div class="qhdr">
+      <div class="q-eye">Étape 3 — Longueur</div>
+      <div class="q-title">Quelle longueur désirez-vous ?</div>
+      <div class="q-sub">Narjisse déterminera la longueur finale avec vous.</div>
+    </div>
+    <div class="ogrid c1" style="gap:10px;">
+      <div class="ocard ocard-row" onclick="sel(this,'longueur','Courte S')">
+        <div style="width:56px;height:76px;border-radius:6px;background:linear-gradient(180deg,#F5E8DC,#E8D0B8);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;border:2px solid var(--nude-dark);">S</div>
+        <div><div class="ocard-name">Courte — S</div><div class="ocard-desc">Naturelle & pratique au quotidien</div></div>
+      </div>
+      <div class="ocard ocard-row" onclick="sel(this,'longueur','Moyenne M')">
+        <div style="width:56px;height:76px;border-radius:6px;background:linear-gradient(180deg,#F5E8DC,#E8D0B8);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;border:2px solid var(--nude-dark);">M</div>
+        <div><div class="ocard-name">Moyenne — M</div><div class="ocard-desc">L'équilibre parfait entre naturel et glamour</div></div>
+      </div>
+      <div class="ocard ocard-row" onclick="sel(this,'longueur','Longue L')">
+        <div style="width:56px;height:76px;border-radius:6px;background:linear-gradient(180deg,#F5E8DC,#E8D0B8);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;border:2px solid var(--nude-dark);">L</div>
+        <div><div class="ocard-name">Longue — L</div><div class="ocard-desc">Glamour & affirmée, look statement</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="bot"><button class="btn-next" id="bn-slong" onclick="go('sforme')">Continuer →</button></div>
+</div>
+
+<!-- FORME -->
+<div id="sforme" class="screen">
+  <div class="hdr">
+    <button class="hdr-back" onclick="go('slong')">← Retour</button>
+    <div><div class="hdr-nm">NM</div><div class="hdr-sub">Institut</div></div>
+  </div>
+  <div class="prog"><div class="prog-bar"><div class="prog-fill" style="width:64%"></div></div><div class="prog-lbl">4 / 6</div></div>
+  <div class="sb">
+    <div class="qhdr">
+      <div class="q-eye">Étape 4 — Forme</div>
+      <div class="q-title">Quelle forme souhaitez-vous ?</div>
+    </div>
+    <div class="ogrid">
+      <div class="ocard" onclick="sel(this,'forme','Carré')"><div class="ocard-ic">▭</div><div class="ocard-name">Carré</div><div class="ocard-desc">Classique & tendance</div></div>
+      <div class="ocard" onclick="sel(this,'forme','Arrondi')"><div class="ocard-ic">⬭</div><div class="ocard-name">Arrondi</div><div class="ocard-desc">Doux & naturel</div></div>
+      <div class="ocard" onclick="sel(this,'forme','Amande')"><div class="ocard-ic">🌰</div><div class="ocard-name">Amande</div><div class="ocard-desc">Élégant & féminin</div></div>
+      <div class="ocard" onclick="sel(this,'forme','Stiletto')"><div class="ocard-ic">🔺</div><div class="ocard-name">Stiletto</div><div class="ocard-desc">Audacieux & glamour</div></div>
+      <div class="ocard" onclick="sel(this,'forme','Coffin')"><div class="ocard-ic">🪦</div><div class="ocard-name">Coffin</div><div class="ocard-desc">Moderne & statement</div></div>
+      <div class="ocard" onclick="sel(this,'forme','Carré arrondi')"><div class="ocard-ic">◻️</div><div class="ocard-name">Carré arrondi</div><div class="ocard-desc">L'équilibre parfait</div></div>
+    </div>
+  </div>
+  <div class="bot"><button class="btn-next" id="bn-sforme" onclick="go('sstyle')">Continuer →</button></div>
+</div>
+
+<!-- STYLE -->
+<div id="sstyle" class="screen">
+  <div class="hdr">
+    <button class="hdr-back" onclick="go('sforme')">← Retour</button>
+    <div><div class="hdr-nm">NM</div><div class="hdr-sub">Institut</div></div>
+  </div>
+  <div class="prog"><div class="prog-bar"><div class="prog-fill" style="width:82%"></div></div><div class="prog-lbl">5 / 6</div></div>
+  <div class="sb">
+    <div class="qhdr">
+      <div class="q-eye">Étape 5 — Couleur & Style</div>
+      <div class="q-title">Quel style vous inspire ?</div>
+    </div>
+    <div class="ogrid">
+      <div class="ocard" onclick="sel(this,'style','French manucure classique')"><div class="swatch" style="background:linear-gradient(135deg,#FFF8F4,#F2E4D4);"></div><div class="ocard-name">French</div><div class="ocard-desc">Intemporel</div></div>
+      <div class="ocard" onclick="sel(this,'style','Baby boomer dégradé nude')"><div class="swatch" style="background:linear-gradient(180deg,#F8EEE5,#E8D5C0);"></div><div class="ocard-name">Baby Boomer</div><div class="ocard-desc">Dégradé nude</div></div>
+      <div class="ocard" onclick="sel(this,'style','Nude rosé naturel')"><div class="swatch" style="background:#D4A896;"></div><div class="ocard-name">Nude Rosé</div><div class="ocard-desc">Doux & naturel</div></div>
+      <div class="ocard" onclick="sel(this,'style','Rouge passion profond')"><div class="swatch" style="background:#8B1A1A;"></div><div class="ocard-name">Rouge Passion</div><div class="ocard-desc">Intense</div></div>
+      <div class="ocard" onclick="sel(this,'style','Nail art floral délicat')"><div class="ocard-ic">🌸</div><div class="ocard-name">Nail Art Floral</div><div class="ocard-desc">Tendance</div></div>
+      <div class="ocard" onclick="sel(this,'style','Bordeaux profond')"><div class="swatch" style="background:#5C1A2E;"></div><div class="ocard-name">Bordeaux</div><div class="ocard-desc">Chic</div></div>
+      <div class="ocard" onclick="sel(this,'style','Rose poudré')"><div class="swatch" style="background:#E8BFBF;"></div><div class="ocard-name">Rose Poudré</div><div class="ocard-desc">Féminin</div></div>
+      <div class="ocard" onclick="sel(this,'style','Nude taupe minimaliste')"><div class="swatch" style="background:#C4A882;"></div><div class="ocard-name">Nude Taupe</div><div class="ocard-desc">Minimaliste</div></div>
+    </div>
+  </div>
+  <div class="bot"><button class="btn-next" id="bn-sstyle" onclick="generate()">Générer mon rendu ✦</button></div>
+</div>
+
+<!-- LOADING -->
+<div id="sl" class="screen">
+  <div class="ld-wrap">
+    <div class="ld-r ld-r1"></div>
+    <div class="ld-r ld-r2"></div>
+    <div class="ld-c">💅</div>
+  </div>
+  <div>
+    <div class="ld-title">Création de votre rendu…</div>
+    <div class="ld-sub" style="margin-top:6px;">Notre IA travaille sur votre simulation</div>
+  </div>
+  <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+  <div id="ld-st">Analyse de votre photo…</div>
+</div>
+
+<!-- RESULT -->
+<div id="sres" class="screen">
+  <div class="hdr">
+    <button class="hdr-back" onclick="resetApp()">✕ Recommencer</button>
+    <div><div class="hdr-nm">NM</div><div class="hdr-sub">Institut</div></div>
+  </div>
+  <div class="sb" style="padding-bottom:20px;">
+    <div class="r-img">
+      <img id="res-img" src="" alt="Simulation">
+      <div class="r-badge">✦ Simulation IA</div>
+    </div>
+    <div class="r-sum">
+      <div class="r-sum-t">Votre sélection</div>
+      <div class="tags" id="res-tags"></div>
+    </div>
+    <div class="r-msg">✨ Montrez ce rendu à <strong>Narjisse</strong> — elle réalisera exactement la pose de vos rêves !</div>
+    <div class="r-acts">
+      <button class="btn-pr" onclick="openMail()">📧 Recevoir par email</button>
+      <button class="btn-sec" onclick="resetApp()">Refaire une simulation</button>
+    </div>
+  </div>
+</div>
+
+<!-- EMAIL MODAL -->
+<div class="ovl" id="ovl" onclick="closeMail(event)">
+  <div class="sheet">
+    <div class="sh-h"></div>
+    <div class="sh-t">Recevoir votre simulation</div>
+    <p style="font-size:12px;font-weight:300;color:var(--text-mid);line-height:1.7;">Entrez votre adresse email pour garder une trace de votre rendu.</p>
+    <input type="email" id="mi" class="mi" placeholder="votre@email.com">
+    <button class="btn-pr" onclick="sendMail()">Envoyer ✦</button>
+    <button onclick="closeMail()" style="background:none;border:none;color:var(--text-light);font-family:'Jost',sans-serif;font-size:11px;letter-spacing:.12em;cursor:pointer;text-transform:uppercase;padding:6px;">Annuler</button>
+  </div>
+</div>
+
+<script>
+const KEY = 'r8_I5Gnxjs0K6aYDp42xqyHrOQUSURx7gH0ZLxCL';
+const S = {photo:null,pose:null,longueur:null,forme:null,style:null};
+
+function go(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+const BTN_MAP = {
+  pose: 'bn-spose',
+  longueur: 'bn-slong',
+  forme: 'bn-sforme',
+  style: 'bn-sstyle'
+};
+
+function sel(card,key,val){
+  card.closest('.ogrid').querySelectorAll('.ocard').forEach(c=>c.classList.remove('sel'));
+  card.classList.add('sel');
+  S[key]=val;
+  const btnId = BTN_MAP[key] || ('bn-s'+key);
+  const btn=document.getElementById(btnId);
+  if(btn) btn.classList.add('ok');
+}
+
+function handlePhoto(e){
+  const file=e.target.files[0]; if(!file) return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    S.photo=ev.target.result;
+    const zone=document.getElementById('pzone');
+    document.getElementById('ph-ph').style.display='none';
+    let img=zone.querySelector('img.prev');
+    if(!img){img=document.createElement('img');img.className='prev';zone.appendChild(img);}
+    img.src=S.photo;
+    document.getElementById('bn-sp').classList.add('ok');
+  };
+  r.readAsDataURL(file);
+}
+
+async function generate(){
+  go('sl');
+  const steps=['Analyse de votre photo…','Application du style…','Génération IA en cours…','Finalisation des détails…'];
+  let i=0;
+  const stEl=document.getElementById('ld-st');
+  const iv=setInterval(()=>{if(i<steps.length) stEl.textContent=steps[i++];},2200);
+  try{
+    const url=await callReplicate();
+    clearInterval(iv);
+    showResult(url);
+  }catch(err){
+    clearInterval(iv);
+    console.error(err);
+    showResult(S.photo);
+  }
+}
+
+async function callReplicate(){
+  const prompt=`Professional luxury nail salon photo, close-up of beautiful manicured woman's hands, ${S.style} nail color and design, ${S.forme} nail shape, ${S.longueur} nail length, ${S.pose} nail technique, photorealistic, high quality beauty photography, soft elegant studio lighting, no text, no watermark`;
+  const neg='blurry, low quality, distorted, extra fingers, deformed hands, text, watermark, cartoon';
+
+  const body={
+    version:"7762fd07cf82c948538e41f63f77d685e02b063e37e496af79950f93cf0f1d3",
+    input:{
+      prompt, image:S.photo,
+      prompt_strength:0.7,
+      num_inference_steps:40,
+      guidance_scale:7.5,
+      negative_prompt:neg
+    }
+  };
+
+  const res=await fetch('https://api.replicate.com/v1/predictions',{
+    method:'POST',
+    headers:{'Authorization':`Token ${KEY}`,'Content-Type':'application/json'},
+    body:JSON.stringify(body)
+  });
+  if(!res.ok) throw new Error('API '+res.status);
+  let pred=await res.json();
+
+  while(pred.status!=='succeeded'&&pred.status!=='failed'){
+    await new Promise(r=>setTimeout(r,2000));
+    const p=await fetch(`https://api.replicate.com/v1/predictions/${pred.id}`,{
+      headers:{'Authorization':`Token ${KEY}`}
+    });
+    pred=await p.json();
+  }
+  if(pred.status==='failed') throw new Error('Failed: '+pred.error);
+  return Array.isArray(pred.output)?pred.output[0]:pred.output;
+}
+
+function showResult(url){
+  document.getElementById('res-img').src=url;
+  const tags=[S.pose,S.longueur,S.forme,S.style].filter(Boolean);
+  document.getElementById('res-tags').innerHTML=tags.map(t=>`<span class="tag">${t}</span>`).join('');
+  go('sres');
+}
+
+function openMail(){document.getElementById('ovl').classList.add('on');}
+function closeMail(e){if(!e||e.target===document.getElementById('ovl')) document.getElementById('ovl').classList.remove('on');}
+
+function sendMail(){
+  const email=document.getElementById('mi').value;
+  if(!email.includes('@')){alert('Adresse email invalide.');return;}
+  closeMail();
+  const msg=document.querySelector('.r-msg');
+  msg.innerHTML=`✅ Simulation envoyée à <strong>${email}</strong> — À tout à l'heure chez Narjisse ! 🌸`;
+  msg.style.background='linear-gradient(135deg,rgba(90,138,90,.08),rgba(90,138,90,.02))';
+  msg.style.borderColor='rgba(90,138,90,.25)';
+}
+
+function resetApp(){
+  Object.keys(S).forEach(k=>S[k]=null);
+  const zone=document.getElementById('pzone');
+  const prev=zone.querySelector('img.prev');
+  if(prev) prev.remove();
+  document.getElementById('ph-ph').style.display='';
+  document.getElementById('fi').value='';
+  document.querySelectorAll('.ocard').forEach(c=>c.classList.remove('sel'));
+  ['bn-sp','bn-spose','bn-slong','bn-sforme','bn-sstyle'].forEach(id=>{
+    const b=document.getElementById(id);if(b) b.classList.remove('ok');
+  });
+  go('sw');
+}
+</script>
+</body>
+</html>
