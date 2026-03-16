@@ -1,4 +1,4 @@
-const KEY = 'r8_HX0K5OrMgD2EuY6gW7gFHVj1AcHIE2329IdJc';
+const KEY = 'r8_AQLguPNGCVSycdz6cnclxbfAGKVmI0n4Lb4D7';
 
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
