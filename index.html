@@ -388,17 +388,11 @@ function handlePhoto(e){
 
 async function generate(){
   go('sl');
-  const steps=['Analyse de votre photo…','Application du style…','Génération IA en cours…','Finalisation des détails…'];
-  let i=0;
-  const stEl=document.getElementById('ld-st');
-  const iv=setInterval(()=>{if(i<steps.length) stEl.textContent=steps[i++];},2200);
   try{
     const url=await callReplicate();
-    clearInterval(iv);
     if(url) showResult(url);
     else showError();
   }catch(err){
-    clearInterval(iv);
     console.error(err);
     window._lastError=err.message;
     showError();
@@ -421,35 +415,68 @@ function compressPhoto(dataUrl,maxPx=768){
 }
 
 async function callReplicate(){
-  const prompt=`The same hand as in the photo but with a perfect professional manicure: ${S.style} nail color, ${S.forme} nail shape, ${S.longueur} length, ${S.pose} technique. Keep the exact same hand, skin, background and lighting. Only change the nails. Photorealistic, luxury nail salon quality, sharp focus on nails.`;
+  const prompt=`Beautiful professional manicure: ${S.style} nail color, ${S.forme} nail shape, ${S.longueur} length. Photorealistic, luxury nail salon quality, sharp focus on nails.`;
   const image=await compressPhoto(S.photo);
+  const stEl=document.getElementById('ld-st');
 
-  // 1. Démarre la génération img2img avec la photo de la main
+  // Étape 1 : démarrer la segmentation SAM (détection des ongles)
+  stEl.textContent='Détection des ongles…';
   const startRes=await fetch('/api/start',{
     method:'POST',
     headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({prompt, image})
+    body:JSON.stringify({image})
   });
   if(!startRes.ok){
     const err=await startRes.json().catch(()=>({}));
     throw new Error(err.error||'Start error '+startRes.status);
   }
-  const {id, status:s0, output:o0}=await startRes.json();
-  if(s0==='succeeded'&&o0) return Array.isArray(o0)?o0[0]:o0;
+  const {id:samId}=await startRes.json();
 
-  // 2. Polling via /api/poll
-  const deadline=Date.now()+120000;
-  while(true){
-    if(Date.now()>deadline) throw new Error('Timeout');
+  // Étape 2 : attendre le masque SAM via polling
+  stEl.textContent='Analyse du contour des ongles…';
+  const samDeadline=Date.now()+90000;
+  let mask=null;
+  while(!mask){
+    if(Date.now()>samDeadline) throw new Error('Timeout segmentation');
     await new Promise(r=>setTimeout(r,2500));
-    const pollRes=await fetch(`/api/poll?id=${id}`);
+    const pollRes=await fetch(`/api/poll?id=${samId}`);
+    if(!pollRes.ok) throw new Error('Poll error '+pollRes.status);
+    const {status,output,error}=await pollRes.json();
+    if(status==='succeeded'){
+      if(!output) throw new Error('Pas de masque généré');
+      mask=Array.isArray(output)?output[0]:output;
+    } else if(status==='failed'){
+      throw new Error('Segmentation échouée: '+error);
+    }
+  }
+
+  // Étape 3 : démarrer l'inpainting avec le masque
+  stEl.textContent='Application du style sur vos ongles…';
+  const inpaintRes=await fetch('/api/inpaint',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({image,mask,prompt})
+  });
+  if(!inpaintRes.ok){
+    const err=await inpaintRes.json().catch(()=>({}));
+    throw new Error(err.error||'Inpaint error '+inpaintRes.status);
+  }
+  const {id:inpaintId}=await inpaintRes.json();
+
+  // Étape 4 : attendre le résultat de l'inpainting
+  stEl.textContent='Génération du rendu final…';
+  const inpaintDeadline=Date.now()+120000;
+  while(true){
+    if(Date.now()>inpaintDeadline) throw new Error('Timeout inpainting');
+    await new Promise(r=>setTimeout(r,2500));
+    const pollRes=await fetch(`/api/poll?id=${inpaintId}`);
     if(!pollRes.ok) throw new Error('Poll error '+pollRes.status);
     const {status,output,error}=await pollRes.json();
     if(status==='succeeded'){
       if(!output) throw new Error('No output');
       return Array.isArray(output)?output[0]:output;
     }
-    if(status==='failed') throw new Error('Failed: '+error);
+    if(status==='failed') throw new Error('Inpainting échoué: '+error);
   }
 }
 
