@@ -174,16 +174,38 @@
     <input type="file" id="fi" accept="image/*" capture="environment" onchange="handlePhoto(event)">
     <button class="btn-sec" onclick="document.getElementById('fi').click()">📷 Prendre / Choisir une photo</button>
   </div>
-  <div class="bot"><button class="btn-next" id="bn-sp" onclick="go('spose')">Continuer →</button></div>
+  <div class="bot"><button class="btn-next" id="bn-sp" onclick="go('smask')">Continuer →</button></div>
+</div>
+
+<!-- MASK -->
+<div id="smask" class="screen">
+  <div class="hdr">
+    <button class="hdr-back" onclick="go('sp')">← Retour</button>
+    <div><div class="hdr-nm">NM</div><div class="hdr-sub">Institut</div></div>
+  </div>
+  <div class="prog"><div class="prog-bar"><div class="prog-fill" style="width:22%"></div></div><div class="prog-lbl">2 / 7</div></div>
+  <div class="qhdr" style="flex-shrink:0;">
+    <div class="q-eye">Étape 2 — Sélection</div>
+    <div class="q-title">Peignez vos ongles</div>
+    <div class="q-sub">Passez votre doigt sur chaque ongle. L'IA ne modifiera que ces zones.</div>
+  </div>
+  <div style="flex:1;overflow:hidden;padding:0 16px 8px;display:flex;flex-direction:column;gap:8px;min-height:0;">
+    <div style="position:relative;flex:1;min-height:180px;border-radius:10px;overflow:hidden;background:#111;">
+      <img id="mask-img" style="width:100%;height:100%;object-fit:contain;display:block;" src="">
+      <canvas id="mask-cvs" style="position:absolute;inset:0;width:100%;height:100%;touch-action:none;"></canvas>
+    </div>
+    <button class="btn-sec" onclick="clearMask()" style="flex-shrink:0;">Effacer et recommencer</button>
+  </div>
+  <div class="bot"><button class="btn-next ok" onclick="go('spose')">Continuer →</button></div>
 </div>
 
 <!-- POSE -->
 <div id="spose" class="screen">
   <div class="hdr">
-    <button class="hdr-back" onclick="go('sp')">← Retour</button>
+    <button class="hdr-back" onclick="go('smask')">← Retour</button>
     <div><div class="hdr-nm">NM</div><div class="hdr-sub">Institut</div></div>
   </div>
-  <div class="prog"><div class="prog-bar"><div class="prog-fill" style="width:32%"></div></div><div class="prog-lbl">2 / 6</div></div>
+  <div class="prog"><div class="prog-bar"><div class="prog-fill" style="width:42%"></div></div><div class="prog-lbl">3 / 7</div></div>
   <div class="sb">
     <div class="qhdr">
       <div class="q-eye">Étape 2 — Prestation</div>
@@ -222,7 +244,7 @@
     <button class="hdr-back" onclick="go('spose')">← Retour</button>
     <div><div class="hdr-nm">NM</div><div class="hdr-sub">Institut</div></div>
   </div>
-  <div class="prog"><div class="prog-bar"><div class="prog-fill" style="width:48%"></div></div><div class="prog-lbl">3 / 6</div></div>
+  <div class="prog"><div class="prog-bar"><div class="prog-fill" style="width:56%"></div></div><div class="prog-lbl">4 / 7</div></div>
   <div class="sb">
     <div class="qhdr">
       <div class="q-eye">Étape 3 — Longueur</div>
@@ -253,7 +275,7 @@
     <button class="hdr-back" onclick="go('slong')">← Retour</button>
     <div><div class="hdr-nm">NM</div><div class="hdr-sub">Institut</div></div>
   </div>
-  <div class="prog"><div class="prog-bar"><div class="prog-fill" style="width:64%"></div></div><div class="prog-lbl">4 / 6</div></div>
+  <div class="prog"><div class="prog-bar"><div class="prog-fill" style="width:70%"></div></div><div class="prog-lbl">5 / 7</div></div>
   <div class="sb">
     <div class="qhdr">
       <div class="q-eye">Étape 4 — Forme</div>
@@ -277,7 +299,7 @@
     <button class="hdr-back" onclick="go('sforme')">← Retour</button>
     <div><div class="hdr-nm">NM</div><div class="hdr-sub">Institut</div></div>
   </div>
-  <div class="prog"><div class="prog-bar"><div class="prog-fill" style="width:82%"></div></div><div class="prog-lbl">5 / 6</div></div>
+  <div class="prog"><div class="prog-bar"><div class="prog-fill" style="width:84%"></div></div><div class="prog-lbl">6 / 7</div></div>
   <div class="sb">
     <div class="qhdr">
       <div class="q-eye">Étape 5 — Couleur & Style</div>
@@ -353,6 +375,7 @@ const S = {photo:null,pose:null,longueur:null,forme:null,style:null};
 function go(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
+  if(id==='smask') initMask();
 }
 
 const BTN_MAP = {
@@ -375,15 +398,75 @@ function handlePhoto(e){
   const file=e.target.files[0]; if(!file) return;
   const r=new FileReader();
   r.onload=ev=>{
-    S.photo=ev.target.result;
-    const zone=document.getElementById('pzone');
-    document.getElementById('ph-ph').style.display='none';
-    let img=zone.querySelector('img.prev');
-    if(!img){img=document.createElement('img');img.className='prev';zone.appendChild(img);}
-    img.src=S.photo;
-    document.getElementById('bn-sp').classList.add('ok');
+    compressPhoto(ev.target.result).then(compressed=>{
+      S.photo=compressed;
+      const zone=document.getElementById('pzone');
+      document.getElementById('ph-ph').style.display='none';
+      let img=zone.querySelector('img.prev');
+      if(!img){img=document.createElement('img');img.className='prev';zone.appendChild(img);}
+      img.src=S.photo;
+      document.getElementById('bn-sp').classList.add('ok');
+    });
   };
   r.readAsDataURL(file);
+}
+
+// ── Mask drawing ──────────────────────────────────────────
+let _mDrawing=false, _mLast=null;
+
+function initMask(){
+  if(!S.photo) return;
+  const img=document.getElementById('mask-img');
+  const cvs=document.getElementById('mask-cvs');
+  img.src=S.photo;
+  img.onload=()=>{
+    cvs.width=img.naturalWidth;
+    cvs.height=img.naturalHeight;
+    cvs.getContext('2d').clearRect(0,0,cvs.width,cvs.height);
+    function pos(e){
+      const rc=cvs.getBoundingClientRect();
+      const src=e.touches?e.touches[0]:e;
+      return{x:(src.clientX-rc.left)*(cvs.width/rc.width),
+             y:(src.clientY-rc.top)*(cvs.height/rc.height)};
+    }
+    cvs.ontouchstart=e=>{e.preventDefault();_mDrawing=true;_mLast=null;_paint(pos(e),cvs);};
+    cvs.ontouchmove=e=>{e.preventDefault();if(_mDrawing)_paint(pos(e),cvs);};
+    cvs.ontouchend=()=>{_mDrawing=false;_mLast=null;};
+    cvs.onmousedown=e=>{_mDrawing=true;_mLast=null;_paint(pos(e),cvs);};
+    cvs.onmousemove=e=>{if(_mDrawing)_paint(pos(e),cvs);};
+    cvs.onmouseup=()=>{_mDrawing=false;_mLast=null;};
+  };
+}
+
+function _paint(p,cvs){
+  const ctx=cvs.getContext('2d');
+  const r=cvs.width*0.045;
+  ctx.fillStyle='rgba(255,80,160,0.55)';
+  ctx.strokeStyle='rgba(255,80,160,0.55)';
+  ctx.lineWidth=r*2; ctx.lineCap='round';
+  if(_mLast){ctx.beginPath();ctx.moveTo(_mLast.x,_mLast.y);ctx.lineTo(p.x,p.y);ctx.stroke();}
+  ctx.beginPath();ctx.arc(p.x,p.y,r,0,Math.PI*2);ctx.fill();
+  _mLast=p;
+}
+
+function clearMask(){
+  const cvs=document.getElementById('mask-cvs');
+  cvs.getContext('2d').clearRect(0,0,cvs.width,cvs.height);
+}
+
+function getMask(){
+  const cvs=document.getElementById('mask-cvs');
+  const src=cvs.getContext('2d').getImageData(0,0,cvs.width,cvs.height);
+  const mc=document.createElement('canvas');
+  mc.width=cvs.width; mc.height=cvs.height;
+  const mctx=mc.getContext('2d');
+  mctx.fillStyle='black'; mctx.fillRect(0,0,mc.width,mc.height);
+  const md=mctx.getImageData(0,0,mc.width,mc.height);
+  for(let i=0;i<src.data.length;i+=4){
+    if(src.data[i+3]>20){md.data[i]=md.data[i+1]=md.data[i+2]=255;md.data[i+3]=255;}
+  }
+  mctx.putImageData(md,0,0);
+  return mc.toDataURL('image/png');
 }
 
 async function generate(){
@@ -415,15 +498,16 @@ function compressPhoto(dataUrl,maxPx=768){
 }
 
 async function callReplicate(){
-  const prompt=`The exact same hand from the photo, but with a professional manicure: ${S.style} nail color, ${S.forme} nail shape, ${S.longueur} length, ${S.pose} technique. Only change the nails. Keep the exact same fingers, skin tone, background and lighting. Photorealistic.`;
-  const image=await compressPhoto(S.photo);
+  const prompt=`Professional manicure: ${S.style} nail color, ${S.forme} nail shape, ${S.longueur} length. Photorealistic, luxury nail salon quality, sharp focus on nails.`;
+  const image=S.photo;
+  const mask=getMask();
   const stEl=document.getElementById('ld-st');
 
   stEl.textContent='Envoi de votre photo…';
   const startRes=await fetch('/api/start',{
     method:'POST',
     headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({image,prompt})
+    body:JSON.stringify({image,mask,prompt})
   });
   if(!startRes.ok){
     const err=await startRes.json().catch(()=>({}));
@@ -488,6 +572,7 @@ function resetApp(){
   ['bn-sp','bn-spose','bn-slong','bn-sforme','bn-sstyle'].forEach(id=>{
     const b=document.getElementById(id);if(b) b.classList.remove('ok');
   });
+  clearMask();
   go('sw');
 }
 </script>
