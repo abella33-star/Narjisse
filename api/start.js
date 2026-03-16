@@ -1,6 +1,6 @@
 const KEY = Buffer.from('cjhfS0xhUXZQcXhxcjlhaXRwY0RjSzlWM3E3MW9Ld3ZjODJWZVYycw==', 'base64').toString();
 
-// Utilise flux-dev img2img avec prompt_strength bas pour préserver la main
+// Inpainting avec flux-fill-dev : modifie uniquement la zone masquée (ongles)
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -8,24 +8,17 @@ module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).end();
 
-  const { image, prompt } = req.body;
-  if (!image || !prompt) return res.status(400).json({ error: 'Missing image or prompt' });
+  const { image, mask, prompt } = req.body;
+  if (!image || !prompt) return res.status(400).json({ error: 'Missing required fields' });
 
   try {
-    const r = await fetch('https://api.replicate.com/v1/models/black-forest-labs/flux-dev/predictions', {
+    const input = { image, prompt, num_outputs: 1, output_format: 'webp', output_quality: 90 };
+    if (mask) input.mask = mask;
+
+    const r = await fetch('https://api.replicate.com/v1/models/black-forest-labs/flux-fill-dev/predictions', {
       method: 'POST',
       headers: { 'Authorization': `Token ${KEY}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        input: {
-          image,
-          prompt,
-          prompt_strength: 0.45,
-          num_inference_steps: 28,
-          guidance: 3.5,
-          output_format: 'webp',
-          output_quality: 90
-        }
-      })
+      body: JSON.stringify({ input })
     });
     const pred = await r.json();
     if (!pred.id) throw new Error(pred.detail || JSON.stringify(pred));
