@@ -408,18 +408,33 @@ async function generate(){
 async function callReplicate(){
   const prompt=`Professional luxury nail salon photo, close-up of beautiful manicured woman's hands, ${S.style} nail color and design, ${S.forme} nail shape, ${S.longueur} nail length, ${S.pose} nail technique, photorealistic, high-end beauty photography, soft elegant studio lighting, sharp focus on nails, no text, no watermark`;
 
-  const res=await fetch('/api/replicate',{
+  // 1. Démarre la génération
+  const startRes=await fetch('/api/start',{
     method:'POST',
     headers:{'Content-Type':'application/json'},
     body:JSON.stringify({prompt})
   });
-  if(!res.ok){
-    const err=await res.json().catch(()=>({}));
-    throw new Error(err.error||'API '+res.status);
+  if(!startRes.ok){
+    const err=await startRes.json().catch(()=>({}));
+    throw new Error(err.error||'Start error '+startRes.status);
   }
-  const data=await res.json();
-  if(!data.url) throw new Error('No URL returned');
-  return data.url;
+  const {id, status:s0, output:o0}=await startRes.json();
+  if(s0==='succeeded'&&o0) return Array.isArray(o0)?o0[0]:o0;
+
+  // 2. Polling via /api/poll
+  const deadline=Date.now()+120000;
+  while(true){
+    if(Date.now()>deadline) throw new Error('Timeout');
+    await new Promise(r=>setTimeout(r,2500));
+    const pollRes=await fetch(`/api/poll?id=${id}`);
+    if(!pollRes.ok) throw new Error('Poll error '+pollRes.status);
+    const {status,output,error}=await pollRes.json();
+    if(status==='succeeded'){
+      if(!output) throw new Error('No output');
+      return Array.isArray(output)?output[0]:output;
+    }
+    if(status==='failed') throw new Error('Failed: '+error);
+  }
 }
 
 function showResult(url){
