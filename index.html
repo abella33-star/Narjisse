@@ -4,17 +4,26 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
-<title>Narjisse Institut Naïram — Simulateur</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="NM Institut">
+<meta name="theme-color" content="#FAF5F0">
+<link rel="apple-touch-icon" href="/icon.svg">
+<link rel="icon" type="image/svg+xml" href="/icon.svg">
+<title>Institut Naïram — Simulateur Ongles</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
 <style>
   :root {
     --terra:#C27B4A; --terra-dark:#9A6035; --terra-light:#D9956A;
     --cream:#FAF5F0; --nude:#F2EAE0; --nude-dark:#DDD0C0;
     --text-dark:#2C1F14; --text-mid:#6B4F3A; --text-light:#A07858; --white:#FFFFFF;
   }
-  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-  html,body{height:100%;height:100dvh;overflow:hidden;background:#FAF5F0;}
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased;}
+  html,body{height:100%;height:100dvh;overflow:hidden;background:#FAF5F0;overscroll-behavior:none;}
   body{font-family:'Jost',sans-serif;background:var(--cream);color:var(--text-dark);}
+  button{touch-action:manipulation;-webkit-touch-callout:none;}
+  a{-webkit-touch-callout:none;}
 
   .screen{display:none;height:100vh;height:100dvh;flex-direction:column;animation:fadeUp .5s ease;overflow:hidden;}
   .screen.active{display:flex;}
@@ -147,7 +156,7 @@
       <div class="wlc-step"><div class="step-ic">💅</div><div class="step-lbl">Rendu instantané</div></div>
     </div>
     <button class="btn-start" onclick="go('sp')">Commencer ✦</button>
-    <div class="wlc-addr">2 Chemin de Belle Étoile · 33370 Tresses<br>📅 Sur rendez-vous · @institutnairam_narjisse</div>
+    <div class="wlc-addr">2 Chemin de Belle Étoile · 33370 Tresses<br>📅 Sur rendez-vous · <strong>@institutnairam_narjisse</strong></div>
   </div>
 </div>
 
@@ -174,16 +183,38 @@
     <input type="file" id="fi" accept="image/*" capture="environment" onchange="handlePhoto(event)">
     <button class="btn-sec" onclick="document.getElementById('fi').click()">📷 Prendre / Choisir une photo</button>
   </div>
-  <div class="bot"><button class="btn-next" id="bn-sp" onclick="go('spose')">Continuer →</button></div>
+  <div class="bot"><button class="btn-next" id="bn-sp" onclick="go('smask')">Continuer →</button></div>
+</div>
+
+<!-- MASK -->
+<div id="smask" class="screen">
+  <div class="hdr">
+    <button class="hdr-back" onclick="go('sp')">← Retour</button>
+    <div><div class="hdr-nm">NM</div><div class="hdr-sub">Institut</div></div>
+  </div>
+  <div class="prog"><div class="prog-bar"><div class="prog-fill" style="width:22%"></div></div><div class="prog-lbl">2 / 7</div></div>
+  <div class="qhdr" style="flex-shrink:0;">
+    <div class="q-eye">Étape 2 — Sélection</div>
+    <div class="q-title" id="mask-title">Détection des ongles…</div>
+    <div class="q-sub" id="mask-sub">Analyse de votre photo en cours, veuillez patienter.</div>
+  </div>
+  <div style="flex:1;overflow:hidden;padding:0 16px 8px;display:flex;flex-direction:column;gap:8px;min-height:0;">
+    <div style="position:relative;flex:1;min-height:180px;border-radius:10px;overflow:hidden;background:#111;">
+      <img id="mask-img" style="width:100%;height:100%;object-fit:contain;display:block;" src="">
+      <canvas id="mask-cvs" style="position:absolute;inset:0;width:100%;height:100%;touch-action:none;"></canvas>
+    </div>
+    <button class="btn-sec" onclick="clearMask()" style="flex-shrink:0;">Effacer et recommencer</button>
+  </div>
+  <div class="bot"><button class="btn-next ok" onclick="go('spose')">Continuer →</button></div>
 </div>
 
 <!-- POSE -->
 <div id="spose" class="screen">
   <div class="hdr">
-    <button class="hdr-back" onclick="go('sp')">← Retour</button>
+    <button class="hdr-back" onclick="go('smask')">← Retour</button>
     <div><div class="hdr-nm">NM</div><div class="hdr-sub">Institut</div></div>
   </div>
-  <div class="prog"><div class="prog-bar"><div class="prog-fill" style="width:32%"></div></div><div class="prog-lbl">2 / 6</div></div>
+  <div class="prog"><div class="prog-bar"><div class="prog-fill" style="width:42%"></div></div><div class="prog-lbl">3 / 7</div></div>
   <div class="sb">
     <div class="qhdr">
       <div class="q-eye">Étape 2 — Prestation</div>
@@ -222,7 +253,7 @@
     <button class="hdr-back" onclick="go('spose')">← Retour</button>
     <div><div class="hdr-nm">NM</div><div class="hdr-sub">Institut</div></div>
   </div>
-  <div class="prog"><div class="prog-bar"><div class="prog-fill" style="width:48%"></div></div><div class="prog-lbl">3 / 6</div></div>
+  <div class="prog"><div class="prog-bar"><div class="prog-fill" style="width:56%"></div></div><div class="prog-lbl">4 / 7</div></div>
   <div class="sb">
     <div class="qhdr">
       <div class="q-eye">Étape 3 — Longueur</div>
@@ -253,7 +284,7 @@
     <button class="hdr-back" onclick="go('slong')">← Retour</button>
     <div><div class="hdr-nm">NM</div><div class="hdr-sub">Institut</div></div>
   </div>
-  <div class="prog"><div class="prog-bar"><div class="prog-fill" style="width:64%"></div></div><div class="prog-lbl">4 / 6</div></div>
+  <div class="prog"><div class="prog-bar"><div class="prog-fill" style="width:70%"></div></div><div class="prog-lbl">5 / 7</div></div>
   <div class="sb">
     <div class="qhdr">
       <div class="q-eye">Étape 4 — Forme</div>
@@ -277,47 +308,150 @@
     <button class="hdr-back" onclick="go('sforme')">← Retour</button>
     <div><div class="hdr-nm">NM</div><div class="hdr-sub">Institut</div></div>
   </div>
-  <div class="prog"><div class="prog-bar"><div class="prog-fill" style="width:82%"></div></div><div class="prog-lbl">5 / 6</div></div>
+  <div class="prog"><div class="prog-bar"><div class="prog-fill" style="width:84%"></div></div><div class="prog-lbl">6 / 7</div></div>
   <div class="sb">
     <div class="qhdr">
-      <div class="q-eye">Étape 5 — Couleur & Style</div>
+      <div class="q-eye">Étape 6 — Couleur & Style</div>
       <div class="q-title">Quel style vous inspire ?</div>
+      <div class="q-sub">Les poses réalisées au salon.</div>
     </div>
     <div class="ogrid">
-      <div class="ocard" onclick="sel(this,'style','French manucure classique')"><div class="swatch" style="background:linear-gradient(135deg,#FFF8F4,#F2E4D4);"></div><div class="ocard-name">French</div><div class="ocard-desc">Intemporel</div></div>
-      <div class="ocard" onclick="sel(this,'style','Baby boomer dégradé nude')"><div class="swatch" style="background:linear-gradient(180deg,#F8EEE5,#E8D5C0);"></div><div class="ocard-name">Baby Boomer</div><div class="ocard-desc">Dégradé nude</div></div>
-      <div class="ocard" onclick="sel(this,'style','Nude rosé naturel')"><div class="swatch" style="background:#D4A896;"></div><div class="ocard-name">Nude Rosé</div><div class="ocard-desc">Doux & naturel</div></div>
-      <div class="ocard" onclick="sel(this,'style','Rouge passion profond')"><div class="swatch" style="background:#8B1A1A;"></div><div class="ocard-name">Rouge Passion</div><div class="ocard-desc">Intense</div></div>
-      <div class="ocard" onclick="sel(this,'style','Nail art floral délicat')"><div class="ocard-ic">🌸</div><div class="ocard-name">Nail Art Floral</div><div class="ocard-desc">Tendance</div></div>
-      <div class="ocard" onclick="sel(this,'style','Bordeaux profond')"><div class="swatch" style="background:#5C1A2E;"></div><div class="ocard-name">Bordeaux</div><div class="ocard-desc">Chic</div></div>
-      <div class="ocard" onclick="sel(this,'style','Rose poudré')"><div class="swatch" style="background:#E8BFBF;"></div><div class="ocard-name">Rose Poudré</div><div class="ocard-desc">Féminin</div></div>
-      <div class="ocard" onclick="sel(this,'style','Nude taupe minimaliste')"><div class="swatch" style="background:#C4A882;"></div><div class="ocard-name">Nude Taupe</div><div class="ocard-desc">Minimaliste</div></div>
-      <div class="ocard" onclick="sel(this,'style','Blanc laiteux nacré')"><div class="swatch" style="background:linear-gradient(135deg,#FAFAFA,#F0EDE8);border:1.5px solid #eee;"></div><div class="ocard-name">Blanc Laiteux</div><div class="ocard-desc">Pur & sophistiqué</div></div>
-      <div class="ocard" onclick="sel(this,'style','Glazed donut nacré irisé')"><div class="swatch" style="background:linear-gradient(135deg,#FFF0F0,#FAE8E8);box-shadow:inset 0 0 10px rgba(255,180,180,.5),inset 0 -3px 6px rgba(255,255,255,.9);border:1.5px solid #f0e0e0;"></div><div class="ocard-name">Glazed Donut</div><div class="ocard-desc">Nacré & lumineux</div></div>
-      <div class="ocard" onclick="sel(this,'style','Aura nails nuages pastel')"><div class="swatch" style="background:radial-gradient(ellipse at 30% 40%,rgba(200,150,255,.6),transparent 60%),radial-gradient(ellipse at 70% 60%,rgba(150,200,255,.6),transparent 60%),radial-gradient(ellipse at 50% 50%,rgba(255,180,200,.4),transparent 70%),#F5F0FF;"></div><div class="ocard-name">Aura Nails</div><div class="ocard-desc">Nuage & rêve</div></div>
-      <div class="ocard" onclick="sel(this,'style','Marbre blanc veines dorées')"><div class="swatch" style="background:#F8F6F2;background-image:repeating-linear-gradient(25deg,transparent,transparent 10px,rgba(212,175,55,.25) 10px,rgba(212,175,55,.25) 11px),repeating-linear-gradient(80deg,transparent,transparent 7px,rgba(200,195,185,.2) 7px,rgba(200,195,185,.2) 8px);"></div><div class="ocard-name">Marbre & Or</div><div class="ocard-desc">Luxe intemporel</div></div>
-      <div class="ocard" onclick="sel(this,'style','Chrome holographique irisé')"><div class="swatch" style="background:linear-gradient(135deg,#FF6B6B,#FFD700,#4ECDC4,#A855F7);"></div><div class="ocard-name">Holo Chrome</div><div class="ocard-desc">Arc-en-ciel irisé</div></div>
-      <div class="ocard" onclick="sel(this,'style','Rose gold chrome métallique')"><div class="swatch" style="background:linear-gradient(135deg,#E8A0A0,#D4788A,#C06080);"></div><div class="ocard-name">Rose Gold</div><div class="ocard-desc">Cuivré & précieux</div></div>
-      <div class="ocard" onclick="sel(this,'style','Chrome argenté miroir')"><div class="swatch" style="background:linear-gradient(135deg,#B0B8C8,#D8DDE8,#9098A8);box-shadow:inset 0 0 8px rgba(255,255,255,.6);"></div><div class="ocard-name">Chrome Argent</div><div class="ocard-desc">Miroir métallique</div></div>
-      <div class="ocard" onclick="sel(this,'style','Or chrome doré métallique')"><div class="swatch" style="background:linear-gradient(135deg,#D4AF37,#B8860B,#FFD700);"></div><div class="ocard-name">Or Chrome</div><div class="ocard-desc">Métallique & luxe</div></div>
-      <div class="ocard" onclick="sel(this,'style','Violet chrome profond')"><div class="swatch" style="background:linear-gradient(135deg,#5B1A8A,#1A1A2E);box-shadow:inset 0 0 8px rgba(180,100,255,.4);"></div><div class="ocard-name">Violet Chrome</div><div class="ocard-desc">Audacieux & éclat</div></div>
-      <div class="ocard" onclick="sel(this,'style','Noir mat élégant')"><div class="swatch" style="background:linear-gradient(135deg,#1A1A1A,#2D2D2D);"></div><div class="ocard-name">Noir Mat</div><div class="ocard-desc">Audacieux & moderne</div></div>
-      <div class="ocard" onclick="sel(this,'style','Terracotta terre cuite')"><div class="swatch" style="background:linear-gradient(135deg,#C17754,#A35C3A);"></div><div class="ocard-name">Terracotta</div><div class="ocard-desc">Chaleur & naturel</div></div>
-      <div class="ocard" onclick="sel(this,'style','Corail pêche nacré')"><div class="swatch" style="background:linear-gradient(135deg,#FF8C69,#FFA07A);"></div><div class="ocard-name">Corail Pêche</div><div class="ocard-desc">Estival & lumineux</div></div>
-      <div class="ocard" onclick="sel(this,'style','Bleu ciel pastel doux')"><div class="swatch" style="background:linear-gradient(135deg,#AED9E0,#B8E0F7);"></div><div class="ocard-name">Bleu Ciel</div><div class="ocard-desc">Frais & lumineux</div></div>
-      <div class="ocard" onclick="sel(this,'style','Bleu nuit profond nacré')"><div class="swatch" style="background:linear-gradient(135deg,#1A2A5E,#0D1A3E);box-shadow:inset 0 0 8px rgba(100,150,255,.3);"></div><div class="ocard-name">Bleu Nuit</div><div class="ocard-desc">Mystérieux & élégant</div></div>
-      <div class="ocard" onclick="sel(this,'style','Vert émeraude profond')"><div class="swatch" style="background:linear-gradient(135deg,#1A6B45,#0D4A30);"></div><div class="ocard-name">Vert Émeraude</div><div class="ocard-desc">Intense & naturel</div></div>
-      <div class="ocard" onclick="sel(this,'style','Vert menthe fraîche')"><div class="swatch" style="background:linear-gradient(135deg,#98D8C8,#7BC8B5);"></div><div class="ocard-name">Vert Menthe</div><div class="ocard-desc">Frais & moderne</div></div>
-      <div class="ocard" onclick="sel(this,'style','Lilas pastel doux')"><div class="swatch" style="background:linear-gradient(135deg,#C8A8D8,#B090C8);"></div><div class="ocard-name">Lilas Pastel</div><div class="ocard-desc">Romantique & doux</div></div>
-      <div class="ocard" onclick="sel(this,'style','Dégradé sunset rose orange')"><div class="swatch" style="background:linear-gradient(180deg,#FF6B95,#FF9A6C,#FFD166);"></div><div class="ocard-name">Sunset Ombré</div><div class="ocard-desc">Coucher de soleil</div></div>
-      <div class="ocard" onclick="sel(this,'style','French tip colorée rose vif')"><div class="swatch" style="background:linear-gradient(160deg,#FF6B95 45%,#F5E8E0 45%);border:1.5px solid #eee;"></div><div class="ocard-name">French Colorée</div><div class="ocard-desc">Tips rose vif</div></div>
-      <div class="ocard" onclick="sel(this,'style','French manucure inversée')"><div class="swatch" style="background:linear-gradient(160deg,#F5E8E0 45%,#C8A0B8 45%);border:1.5px solid #eee;"></div><div class="ocard-name">French Inversée</div><div class="ocard-desc">Tendance & moderne</div></div>
-      <div class="ocard" onclick="sel(this,'style','Arabesques dorées sur nude')"><div class="swatch" style="background:#E8D5C0;background-image:repeating-linear-gradient(45deg,transparent,transparent 4px,rgba(212,175,55,.4) 4px,rgba(212,175,55,.4) 5px);"></div><div class="ocard-name">Arabesques Or</div><div class="ocard-desc">Nail art précieux</div></div>
-      <div class="ocard" onclick="sel(this,'style','Nail art géométrique lignes dorées')"><div class="swatch" style="background:#F5EEE6;background-image:linear-gradient(45deg,transparent 40%,rgba(212,175,55,.5) 40%,rgba(212,175,55,.5) 42%,transparent 42%),linear-gradient(-45deg,transparent 55%,rgba(212,175,55,.5) 55%,rgba(212,175,55,.5) 57%,transparent 57%);"></div><div class="ocard-name">Géométrique Or</div><div class="ocard-desc">Lignes fines & luxe</div></div>
-      <div class="ocard" onclick="sel(this,'style','Nail art floral cerisier japonais')"><div class="swatch" style="background:radial-gradient(circle at 35% 40%,#E8A0B0 8px,transparent 8px),radial-gradient(circle at 65% 60%,#E8A0B0 6px,transparent 6px),radial-gradient(circle at 55% 25%,#D4A020 5px,transparent 5px),#F5E8E0;"></div><div class="ocard-name">Floral Cerisier</div><div class="ocard-desc">Délicat & printanier</div></div>
-      <div class="ocard" onclick="sel(this,'style','Galaxie étoilée fond noir pailleté')"><div class="swatch" style="background:linear-gradient(135deg,#1A1A2E,#16213E);background-image:radial-gradient(circle 1.5px at 25% 30%,#FFD700 100%,transparent 0),radial-gradient(circle 1px at 60% 20%,#FFD700 100%,transparent 0),radial-gradient(circle 1px at 75% 60%,#C0C0C0 100%,transparent 0),radial-gradient(circle 1.5px at 40% 75%,#FFD700 100%,transparent 0);"></div><div class="ocard-name">Galaxie Étoilée</div><div class="ocard-desc">Mystère & brillance</div></div>
-      <div class="ocard" onclick="sel(this,'style','Glitter argent pailleté')"><div class="swatch" style="background:linear-gradient(135deg,#C8C8D0,#E0E0E8);background-image:radial-gradient(circle 1px at 20% 30%,rgba(255,255,255,.9) 100%,transparent 0),radial-gradient(circle 1px at 60% 70%,rgba(255,255,255,.9) 100%,transparent 0),radial-gradient(circle 1px at 80% 20%,rgba(255,255,255,.9) 100%,transparent 0);"></div><div class="ocard-name">Glitter Argent</div><div class="ocard-desc">Étincelant & festif</div></div>
-      <div class="ocard" onclick="sel(this,'style','Brown animal print léopard')"><div class="swatch" style="background:linear-gradient(135deg,#8B5E3C,#6B3A1F);background-image:radial-gradient(ellipse 6px 4px at 30% 40%,rgba(0,0,0,.3) 0%,transparent 100%),radial-gradient(ellipse 5px 3px at 65% 65%,rgba(0,0,0,.25) 0%,transparent 100%);"></div><div class="ocard-name">Animal Print</div><div class="ocard-desc">Léopard automne</div></div>
+      <div class="ocard" onclick="sel(this,'style','French manucure classique')">
+        <div class="swatch" style="background:linear-gradient(160deg,#fff 45%,#F5DDD0 45%);border:1.5px solid #eee;"></div>
+        <div class="ocard-name">French Classique</div><div class="ocard-desc">Intemporel & élégant</div>
+      </div>
+      <div class="ocard" onclick="sel(this,'style','Blanc laiteux nacré')">
+        <div class="swatch" style="background:linear-gradient(135deg,#FAFAFA,#F0EDE8);border:1.5px solid #eee;"></div>
+        <div class="ocard-name">Blanc Laiteux</div><div class="ocard-desc">Pur & sophistiqué</div>
+      </div>
+      <div class="ocard" onclick="sel(this,'style','Baby boomer dégradé nude')">
+        <div class="swatch" style="background:linear-gradient(180deg,#F8EEE5,#E8D5C0);"></div>
+        <div class="ocard-name">Baby Boomer</div><div class="ocard-desc">Dégradé naturel</div>
+      </div>
+      <div class="ocard" onclick="sel(this,'style','Nude rosé naturel')">
+        <div class="swatch" style="background:#D4A896;"></div>
+        <div class="ocard-name">Nude Rosé</div><div class="ocard-desc">Doux & naturel</div>
+      </div>
+      <div class="ocard" onclick="sel(this,'style','Nude taupe minimaliste')">
+        <div class="swatch" style="background:#C4A882;"></div>
+        <div class="ocard-name">Nude Taupe</div><div class="ocard-desc">Minimaliste & chic</div>
+      </div>
+      <div class="ocard" onclick="sel(this,'style','Glazed donut nacré irisé')">
+        <div class="swatch" style="background:linear-gradient(135deg,#FFF0F0,#FAE8E8);box-shadow:inset 0 0 10px rgba(255,180,180,.5),inset 0 -3px 6px rgba(255,255,255,.9);border:1.5px solid #f0e0e0;"></div>
+        <div class="ocard-name">Glazed Donut</div><div class="ocard-desc">Nacré & lumineux</div>
+      </div>
+      <div class="ocard" onclick="sel(this,'style','Aura nails nuages pastel')">
+        <div class="swatch" style="background:radial-gradient(ellipse at 30% 40%,rgba(200,150,255,.6),transparent 60%),radial-gradient(ellipse at 70% 60%,rgba(150,200,255,.6),transparent 60%),radial-gradient(ellipse at 50% 50%,rgba(255,180,200,.4),transparent 70%),#F5F0FF;"></div>
+        <div class="ocard-name">Aura Nails</div><div class="ocard-desc">Nuage & rêve</div>
+      </div>
+      <div class="ocard" onclick="sel(this,'style','Floral rose & feuilles d or')">
+        <div class="swatch" style="background:radial-gradient(circle at 35% 40%,#E8A0B0 8px,transparent 8px),radial-gradient(circle at 65% 60%,#E8A0B0 6px,transparent 6px),radial-gradient(circle at 55% 25%,#D4A020 5px,transparent 5px),#F5E8E0;"></div>
+        <div class="ocard-name">Floral & Or</div><div class="ocard-desc">Fleurs roses, paillettes or</div>
+      </div>
+      <div class="ocard" onclick="sel(this,'style','Nail art floral cerisier japonais')">
+        <div class="swatch" style="background:radial-gradient(circle at 30% 35%,#F0B8C8 7px,transparent 7px),radial-gradient(circle at 60% 55%,#F0B8C8 5px,transparent 5px),radial-gradient(circle at 75% 30%,#ECA0B5 6px,transparent 6px),#FDF0F5;"></div>
+        <div class="ocard-name">Floral Cerisier</div><div class="ocard-desc">Délicat & printanier</div>
+      </div>
+      <div class="ocard" onclick="sel(this,'style','Rouge passion profond')">
+        <div class="swatch" style="background:linear-gradient(135deg,#A01515,#7A0C0C);"></div>
+        <div class="ocard-name">Rouge Passion</div><div class="ocard-desc">Intense & glamour</div>
+      </div>
+      <div class="ocard" onclick="sel(this,'style','Bordeaux profond')">
+        <div class="swatch" style="background:linear-gradient(135deg,#6B1A2A,#4A0F1E);"></div>
+        <div class="ocard-name">Bordeaux</div><div class="ocard-desc">Chic & raffiné</div>
+      </div>
+      <div class="ocard" onclick="sel(this,'style','Rose poudré')">
+        <div class="swatch" style="background:linear-gradient(135deg,#ECC8C8,#D9A8A8);"></div>
+        <div class="ocard-name">Rose Poudré</div><div class="ocard-desc">Féminin & délicat</div>
+      </div>
+      <div class="ocard" onclick="sel(this,'style','Dégradé sunset rose orange')">
+        <div class="swatch" style="background:linear-gradient(180deg,#FF6B95,#FF9A6C,#FFD166);"></div>
+        <div class="ocard-name">Sunset Ombré</div><div class="ocard-desc">Coucher de soleil</div>
+      </div>
+      <div class="ocard" onclick="sel(this,'style','Corail pêche nacré')">
+        <div class="swatch" style="background:linear-gradient(135deg,#FF8C69,#FFA07A);"></div>
+        <div class="ocard-name">Corail Pêche</div><div class="ocard-desc">Estival & lumineux</div>
+      </div>
+      <div class="ocard" onclick="sel(this,'style','Terracotta terre cuite')">
+        <div class="swatch" style="background:linear-gradient(135deg,#C17754,#A35C3A);"></div>
+        <div class="ocard-name">Terracotta</div><div class="ocard-desc">Chaleur & naturel</div>
+      </div>
+      <div class="ocard" onclick="sel(this,'style','Lilas pastel doux')">
+        <div class="swatch" style="background:linear-gradient(135deg,#C8A8D8,#B090C8);"></div>
+        <div class="ocard-name">Lilas Pastel</div><div class="ocard-desc">Romantique & doux</div>
+      </div>
+      <div class="ocard" onclick="sel(this,'style','Bleu ciel pastel doux')">
+        <div class="swatch" style="background:linear-gradient(135deg,#AED9E0,#B8E0F7);"></div>
+        <div class="ocard-name">Bleu Ciel</div><div class="ocard-desc">Frais & lumineux</div>
+      </div>
+      <div class="ocard" onclick="sel(this,'style','Bleu nuit profond nacré')">
+        <div class="swatch" style="background:linear-gradient(135deg,#1A2A5E,#0D1A3E);box-shadow:inset 0 0 8px rgba(100,150,255,.3);"></div>
+        <div class="ocard-name">Bleu Nuit</div><div class="ocard-desc">Mystérieux & élégant</div>
+      </div>
+      <div class="ocard" onclick="sel(this,'style','Vert émeraude profond')">
+        <div class="swatch" style="background:linear-gradient(135deg,#1A6B45,#0D4A30);"></div>
+        <div class="ocard-name">Vert Émeraude</div><div class="ocard-desc">Intense & naturel</div>
+      </div>
+      <div class="ocard" onclick="sel(this,'style','Vert menthe fraîche')">
+        <div class="swatch" style="background:linear-gradient(135deg,#98D8C8,#7BC8B5);"></div>
+        <div class="ocard-name">Vert Menthe</div><div class="ocard-desc">Frais & moderne</div>
+      </div>
+      <div class="ocard" onclick="sel(this,'style','Violet chrome & noir mat')">
+        <div class="swatch" style="background:linear-gradient(135deg,#5B1A8A,#1A1A2E);box-shadow:inset 0 0 8px rgba(180,100,255,.4);"></div>
+        <div class="ocard-name">Violet Chrome</div><div class="ocard-desc">Audacieux & éclat</div>
+      </div>
+      <div class="ocard" onclick="sel(this,'style','Noir mat élégant')">
+        <div class="swatch" style="background:linear-gradient(135deg,#1A1A1A,#2D2D2D);"></div>
+        <div class="ocard-name">Noir Mat</div><div class="ocard-desc">Audacieux & moderne</div>
+      </div>
+      <div class="ocard" onclick="sel(this,'style','Or chrome doré métallique')">
+        <div class="swatch" style="background:linear-gradient(135deg,#D4AF37,#B8860B,#FFD700);"></div>
+        <div class="ocard-name">Or Chrome</div><div class="ocard-desc">Métallique & luxe</div>
+      </div>
+      <div class="ocard" onclick="sel(this,'style','Rose gold chrome métallique')">
+        <div class="swatch" style="background:linear-gradient(135deg,#E8A0A0,#D4788A,#C06080);"></div>
+        <div class="ocard-name">Rose Gold</div><div class="ocard-desc">Cuivré & précieux</div>
+      </div>
+      <div class="ocard" onclick="sel(this,'style','Chrome argenté miroir')">
+        <div class="swatch" style="background:linear-gradient(135deg,#B0B8C8,#D8DDE8,#9098A8);box-shadow:inset 0 0 8px rgba(255,255,255,.6);"></div>
+        <div class="ocard-name">Chrome Argent</div><div class="ocard-desc">Miroir métallique</div>
+      </div>
+      <div class="ocard" onclick="sel(this,'style','Chrome holographique irisé')">
+        <div class="swatch" style="background:linear-gradient(135deg,#FF6B6B,#FFD700,#4ECDC4,#A855F7);"></div>
+        <div class="ocard-name">Holo Chrome</div><div class="ocard-desc">Arc-en-ciel irisé</div>
+      </div>
+      <div class="ocard" onclick="sel(this,'style','Marbre blanc veines dorées')">
+        <div class="swatch" style="background:#F8F6F2;background-image:repeating-linear-gradient(25deg,transparent,transparent 10px,rgba(212,175,55,.25) 10px,rgba(212,175,55,.25) 11px),repeating-linear-gradient(80deg,transparent,transparent 7px,rgba(200,195,185,.2) 7px,rgba(200,195,185,.2) 8px);"></div>
+        <div class="ocard-name">Marbre & Or</div><div class="ocard-desc">Luxe intemporel</div>
+      </div>
+      <div class="ocard" onclick="sel(this,'style','Glitter argent pailleté')">
+        <div class="swatch" style="background:linear-gradient(135deg,#C8C8D0,#E0E0E8);background-image:radial-gradient(circle 1px at 20% 30%,rgba(255,255,255,.9) 100%,transparent 0),radial-gradient(circle 1px at 60% 70%,rgba(255,255,255,.9) 100%,transparent 0),radial-gradient(circle 1px at 80% 20%,rgba(255,255,255,.9) 100%,transparent 0);"></div>
+        <div class="ocard-name">Glitter Argent</div><div class="ocard-desc">Étincelant & festif</div>
+      </div>
+      <div class="ocard" onclick="sel(this,'style','Galaxie étoilée fond noir pailleté')">
+        <div class="swatch" style="background:linear-gradient(135deg,#1A1A2E,#16213E);background-image:radial-gradient(circle 1.5px at 25% 30%,#FFD700 100%,transparent 0),radial-gradient(circle 1px at 60% 20%,#FFD700 100%,transparent 0),radial-gradient(circle 1px at 75% 60%,#C0C0C0 100%,transparent 0),radial-gradient(circle 1.5px at 40% 75%,#FFD700 100%,transparent 0);"></div>
+        <div class="ocard-name">Galaxie Étoilée</div><div class="ocard-desc">Mystère & brillance</div>
+      </div>
+      <div class="ocard" onclick="sel(this,'style','Brown freestyle animal print')">
+        <div class="swatch" style="background:linear-gradient(135deg,#8B5E3C,#6B3A1F);background-image:radial-gradient(ellipse 6px 4px at 30% 40%,rgba(0,0,0,.3) 0%,transparent 100%),radial-gradient(ellipse 5px 3px at 65% 65%,rgba(0,0,0,.25) 0%,transparent 100%);"></div>
+        <div class="ocard-name">Animal Print</div><div class="ocard-desc">Léopard automne</div>
+      </div>
+      <div class="ocard" onclick="sel(this,'style','French tip colorée rose vif')">
+        <div class="swatch" style="background:linear-gradient(160deg,#FF6B95 45%,#F5E8E0 45%);border:1.5px solid #eee;"></div>
+        <div class="ocard-name">French Colorée</div><div class="ocard-desc">Tips rose vif</div>
+      </div>
+      <div class="ocard" onclick="sel(this,'style','French manucure inversée')">
+        <div class="swatch" style="background:linear-gradient(160deg,#F5E8E0 45%,#C8A0B8 45%);border:1.5px solid #eee;"></div>
+        <div class="ocard-name">French Inversée</div><div class="ocard-desc">Tendance & moderne</div>
+      </div>
+      <div class="ocard" onclick="sel(this,'style','Arabesques dorées sur nude')">
+        <div class="swatch" style="background:#E8D5C0;background-image:repeating-linear-gradient(45deg,transparent,transparent 4px,rgba(212,175,55,.4) 4px,rgba(212,175,55,.4) 5px);"></div>
+        <div class="ocard-name">Arabesques Or</div><div class="ocard-desc">Nail art précieux</div>
+      </div>
+      <div class="ocard" onclick="sel(this,'style','Nail art géométrique lignes dorées')">
+        <div class="swatch" style="background:#F5EEE6;background-image:linear-gradient(45deg,transparent 40%,rgba(212,175,55,.5) 40%,rgba(212,175,55,.5) 42%,transparent 42%),linear-gradient(-45deg,transparent 55%,rgba(212,175,55,.5) 55%,rgba(212,175,55,.5) 57%,transparent 57%);"></div>
+        <div class="ocard-name">Géométrique Or</div><div class="ocard-desc">Lignes fines & luxe</div>
+      </div>
     </div>
   </div>
   <div class="bot"><button class="btn-next" id="bn-sstyle" onclick="generate()">Générer mon rendu ✦</button></div>
@@ -355,7 +489,8 @@
     </div>
     <div class="r-msg">✨ Montrez ce rendu à <strong>Narjisse</strong> — elle réalisera exactement la pose de vos rêves !</div>
     <div class="r-acts">
-      <button class="btn-pr" onclick="openMail()">📧 Recevoir par email</button>
+      <button class="btn-pr" onclick="saveImage()">⬇ Enregistrer la photo</button>
+      <button class="btn-pr" onclick="openMail()" style="background:linear-gradient(135deg,var(--text-mid),var(--text-dark));">📧 Recevoir par email</button>
       <button class="btn-sec" onclick="resetApp()">Refaire une simulation</button>
     </div>
   </div>
@@ -379,6 +514,7 @@ const S = {photo:null,pose:null,longueur:null,forme:null,style:null};
 function go(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
+  if(id==='smask') initMask();
 }
 
 const BTN_MAP = {
@@ -401,15 +537,142 @@ function handlePhoto(e){
   const file=e.target.files[0]; if(!file) return;
   const r=new FileReader();
   r.onload=ev=>{
-    S.photo=ev.target.result;
-    const zone=document.getElementById('pzone');
-    document.getElementById('ph-ph').style.display='none';
-    let img=zone.querySelector('img.prev');
-    if(!img){img=document.createElement('img');img.className='prev';zone.appendChild(img);}
-    img.src=S.photo;
-    document.getElementById('bn-sp').classList.add('ok');
+    compressPhoto(ev.target.result).then(compressed=>{
+      S.photo=compressed;
+      const zone=document.getElementById('pzone');
+      document.getElementById('ph-ph').style.display='none';
+      let img=zone.querySelector('img.prev');
+      if(!img){img=document.createElement('img');img.className='prev';zone.appendChild(img);}
+      img.src=S.photo;
+      document.getElementById('bn-sp').classList.add('ok');
+    });
   };
   r.readAsDataURL(file);
+}
+
+// ── MediaPipe nail detection ───────────────────────────────
+let _handsModel=null, _mDrawing=false, _mLast=null;
+
+function loadHands(){
+  if(_handsModel) return Promise.resolve(_handsModel);
+  return new Promise((resolve,reject)=>{
+    const h=new Hands({locateFile:f=>`https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}`});
+    h.setOptions({maxNumHands:1,modelComplexity:1,minDetectionConfidence:0.5,minTrackingConfidence:0.5});
+    h.initialize().then(()=>{_handsModel=h;resolve(h);}).catch(reject);
+  });
+}
+
+async function detectNails(photoUrl){
+  const h=await loadHands();
+  const img=new Image(); img.src=photoUrl;
+  await new Promise(r=>{img.onload=r;});
+  return new Promise(resolve=>{
+    h.onResults(r=>{
+      resolve(r.multiHandLandmarks&&r.multiHandLandmarks.length?r.multiHandLandmarks[0]:null);
+    });
+    h.send({image:img});
+  });
+}
+
+function drawNailsFromLandmarks(ctx,lm,w,h){
+  // DIP→TIP pairs for each finger: thumb, index, middle, ring, pinky
+  [[3,4],[7,8],[11,12],[15,16],[19,20]].forEach(([d,t])=>{
+    const x1=lm[d].x*w, y1=lm[d].y*h, x2=lm[t].x*w, y2=lm[t].y*h;
+    const len=Math.sqrt((x2-x1)**2+(y2-y1)**2);
+    const angle=Math.atan2(y2-y1,x2-x1);
+    const nw=len*0.9, ext=len*0.45;
+    ctx.save();
+    ctx.translate((x1+x2)/2+Math.cos(angle)*ext/2,(y1+y2)/2+Math.sin(angle)*ext/2);
+    ctx.rotate(angle);
+    ctx.fillStyle='rgba(255,80,160,0.62)';
+    ctx.strokeStyle='rgba(255,80,160,0.62)';
+    ctx.lineJoin='round'; ctx.lineCap='round';
+    const hl=(len+ext)/2, hw=nw/2, r=hw*0.5;
+    ctx.beginPath();
+    ctx.moveTo(-hl+r,-hw); ctx.lineTo(hl-r,-hw);
+    ctx.arcTo(hl,-hw,hl,-hw+r,r); ctx.lineTo(hl,hw-r);
+    ctx.arcTo(hl,hw,hl-r,hw,r); ctx.lineTo(-hl+r,hw);
+    ctx.arcTo(-hl,hw,-hl,hw-r,r); ctx.lineTo(-hl,-hw+r);
+    ctx.arcTo(-hl,-hw,-hl+r,-hw,r); ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  });
+}
+
+function initMask(){
+  if(!S.photo) return;
+  const img=document.getElementById('mask-img');
+  const cvs=document.getElementById('mask-cvs');
+  const title=document.getElementById('mask-title');
+  const sub=document.getElementById('mask-sub');
+  title.textContent='Détection des ongles…';
+  sub.textContent='Analyse de votre photo en cours, veuillez patienter.';
+  img.src=S.photo;
+  img.onload=async()=>{
+    cvs.width=img.naturalWidth; cvs.height=img.naturalHeight;
+    const ctx=cvs.getContext('2d');
+    ctx.clearRect(0,0,cvs.width,cvs.height);
+    try{
+      const lm=await detectNails(S.photo);
+      if(lm){
+        drawNailsFromLandmarks(ctx,lm,cvs.width,cvs.height);
+        title.textContent='Ongles détectés ✓';
+        sub.textContent='Vérifiez la sélection. Vous pouvez peindre manuellement pour ajuster.';
+      } else {
+        title.textContent='Peignez vos ongles';
+        sub.textContent='Détection non disponible. Passez le doigt sur chaque ongle.';
+      }
+    }catch(e){
+      title.textContent='Peignez vos ongles';
+      sub.textContent='Passez le doigt sur chaque ongle. Pour longueur L/M, dépassez le bout.';
+    }
+    setupMaskEvents(cvs);
+  };
+}
+
+function setupMaskEvents(cvs){
+  function pos(e){
+    const rc=cvs.getBoundingClientRect();
+    const src=e.touches?e.touches[0]:e;
+    return{x:(src.clientX-rc.left)*(cvs.width/rc.width),y:(src.clientY-rc.top)*(cvs.height/rc.height)};
+  }
+  cvs.ontouchstart=e=>{e.preventDefault();_mDrawing=true;_mLast=null;_paint(pos(e),cvs);};
+  cvs.ontouchmove=e=>{e.preventDefault();if(_mDrawing)_paint(pos(e),cvs);};
+  cvs.ontouchend=()=>{_mDrawing=false;_mLast=null;};
+  cvs.onmousedown=e=>{_mDrawing=true;_mLast=null;_paint(pos(e),cvs);};
+  cvs.onmousemove=e=>{if(_mDrawing)_paint(pos(e),cvs);};
+  cvs.onmouseup=()=>{_mDrawing=false;_mLast=null;};
+}
+
+function _paint(p,cvs){
+  const ctx=cvs.getContext('2d');
+  const r=cvs.width*0.045;
+  ctx.fillStyle='rgba(255,80,160,0.55)';
+  ctx.strokeStyle='rgba(255,80,160,0.55)';
+  ctx.lineWidth=r*2; ctx.lineCap='round';
+  if(_mLast){ctx.beginPath();ctx.moveTo(_mLast.x,_mLast.y);ctx.lineTo(p.x,p.y);ctx.stroke();}
+  ctx.beginPath();ctx.arc(p.x,p.y,r,0,Math.PI*2);ctx.fill();
+  _mLast=p;
+}
+
+function clearMask(){
+  const cvs=document.getElementById('mask-cvs');
+  cvs.getContext('2d').clearRect(0,0,cvs.width,cvs.height);
+}
+
+function getMask(){
+  const cvs=document.getElementById('mask-cvs');
+  const src=cvs.getContext('2d').getImageData(0,0,cvs.width,cvs.height);
+  const mc=document.createElement('canvas');
+  mc.width=cvs.width; mc.height=cvs.height;
+  const mctx=mc.getContext('2d');
+  mctx.fillStyle='black'; mctx.fillRect(0,0,mc.width,mc.height);
+  const md=mctx.getImageData(0,0,mc.width,mc.height);
+  for(let i=0;i<src.data.length;i+=4){
+    if(src.data[i+3]>20){md.data[i]=md.data[i+1]=md.data[i+2]=255;md.data[i+3]=255;}
+  }
+  mctx.putImageData(md,0,0);
+  return mc.toDataURL('image/png');
 }
 
 async function generate(){
@@ -440,69 +703,86 @@ function compressPhoto(dataUrl,maxPx=768){
   });
 }
 
+const STYLE_PROMPTS = {
+  'French manucure classique': 'classic French manicure with crisp white tips and sheer natural pink base, glossy finish',
+  'Blanc laiteux nacré': 'milky white pearl nail polish, opaque creamy white with subtle shimmer, glossy finish',
+  'Baby boomer dégradé nude': 'baby boomer ombre nails, soft airbrushed gradient from white tip to nude blush pink base',
+  'Nude rosé naturel': 'nude rose pink nail polish, soft natural finish, healthy looking nails',
+  'Floral rose & feuilles d or': 'nude base nails with hand-painted delicate pink cherry blossom flowers and gold leaf flakes, gel finish',
+  'Rouge passion profond': 'deep rich red nail polish, highly glossy vibrant red, luxurious finish',
+  'Bordeaux profond': 'deep dark burgundy wine nail polish, rich glossy finish',
+  'Brown freestyle animal print': 'mix of brown burgundy nails with animal print pattern, some nails with nude base and brown cow print spots, gold accents',
+  'Violet chrome & noir mat': 'mix of deep purple chrome metallic nails and matte black nails, high-impact editorial style',
+  'Rose poudré': 'soft dusty powder pink nail polish, elegant feminine matte-satin finish',
+  'Noir mat élégant': 'matte black nail polish, velvety flat finish, editorial chic',
+  'Or chrome doré métallique': 'gold chrome metallic mirror nails, reflective gold foil finish, luxury',
+  'Corail pêche nacré': 'coral peach nail polish with pearl shimmer, warm vibrant summer finish',
+  'Lilas pastel doux': 'soft lilac pastel nail polish, delicate romantic purple-pink, glossy finish',
+  'Vert émeraude profond': 'deep emerald green nail polish, rich jewel tone, glossy luxurious finish',
+  'Arabesques dorées sur nude': 'nude beige base nails with hand-painted intricate gold arabesque designs and gold accents',
+  'Bleu nuit profond nacré': 'deep midnight navy blue nail polish with subtle pearl shimmer, sophisticated glossy finish',
+  'Nude taupe minimaliste': 'neutral taupe beige nail polish, minimalist clean finish, understated elegance',
+  'Glazed donut nacré irisé': 'glazed donut nails, sheer milky pearlescent glaze with iridescent shimmer, ultra-shiny glass-like finish',
+  'Aura nails nuages pastel': 'aura nails with dreamy blended pastel color clouds of lavender, pink and sky blue, ethereal soft finish',
+  'Marbre blanc veines dorées': 'white marble nails with delicate gold veins, luxury stone effect, high gloss finish',
+  'Chrome holographique irisé': 'holographic rainbow chrome nails, iridescent color-shifting surface, futuristic mirror finish',
+  'Rose gold chrome métallique': 'rose gold chrome metallic nails, warm pink-gold mirror finish, reflective and luxurious',
+  'Chrome argenté miroir': 'silver chrome mirror nails, highly reflective metallic silver, liquid mirror effect',
+  'Terracotta terre cuite': 'warm terracotta earth tone nail polish, muted burnt sienna clay color, satin finish',
+  'Bleu ciel pastel doux': 'soft baby blue pastel nail polish, airy sky blue, glossy delicate finish',
+  'Vert menthe fraîche': 'fresh mint green nail polish, soft cool green, clean modern glossy finish',
+  'Dégradé sunset rose orange': 'sunset ombre nails, airbrushed gradient from pink to orange to warm yellow, glowing finish',
+  'French tip colorée rose vif': 'modern French manicure with bold bright pink tips, sheer natural base, glossy finish',
+  'French manucure inversée': 'reverse French manicure with colorful interior half-moon and natural nude tips, modern trendy style',
+  'Nail art géométrique lignes dorées': 'geometric nail art with fine gold lines on nude base, minimalist luxury design, glossy finish',
+  'Nail art floral cerisier japonais': 'delicate cherry blossom nail art, soft pink flowers on sheer base, spring-inspired, glossy finish',
+  'Galaxie étoilée fond noir pailleté': 'dark navy black nails with hand-painted gold stars and silver sparkle constellations, celestial night sky',
+  'Glitter argent pailleté': 'full coverage silver glitter nails, densely packed fine silver glitter, festive sparkle finish'
+};
+const FORME_PROMPTS = {
+  'Carré': 'square nail shape with straight flat tip',
+  'Arrondi': 'rounded nail shape with soft curved tip',
+  'Amande': 'almond nail shape, elegant tapered oval',
+  'Stiletto': 'stiletto nail shape, sharp pointed tip',
+  'Coffin': 'coffin nail shape, flat tapered tip',
+  'Carré arrondi': 'squoval nail shape, square with soft rounded corners'
+};
+
 async function callReplicate(){
-  const prompt=`Beautiful professional manicure: ${S.style} nail color, ${S.forme} nail shape, ${S.longueur} length. Photorealistic, luxury nail salon quality, sharp focus on nails.`;
-  const image=await compressPhoto(S.photo);
+  const styleDesc = STYLE_PROMPTS[S.style] || S.style;
+  const formeDesc = FORME_PROMPTS[S.forme] || S.forme;
+  const lengthDesc = S.longueur==='Longue L' ? 'long extended nails, significantly longer than natural' : S.longueur==='Moyenne M' ? 'medium length nails, moderately extended' : 'short natural length nails';
+  const prompt=`All five fingernails perfectly done with ${styleDesc}. Nail shape: ${formeDesc}. Length: ${lengthDesc}. Professional gel nail extensions, all nails matching. Photorealistic, luxury nail salon, sharp focus, high detail.`;
+  const image=S.photo;
+  const mask=getMask();
   const stEl=document.getElementById('ld-st');
 
-  // Étape 1 : démarrer la segmentation SAM (détection des ongles)
-  stEl.textContent='Détection des ongles…';
+  stEl.textContent='Envoi de votre photo…';
   const startRes=await fetch('/api/start',{
     method:'POST',
     headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({image})
+    body:JSON.stringify({image,mask,prompt})
   });
   if(!startRes.ok){
     const err=await startRes.json().catch(()=>({}));
     throw new Error(err.error||'Start error '+startRes.status);
   }
-  const {id:samId}=await startRes.json();
+  const {id}=await startRes.json();
 
-  // Étape 2 : attendre le masque SAM via polling
-  stEl.textContent='Analyse du contour des ongles…';
-  const samDeadline=Date.now()+90000;
-  let mask=null;
-  while(!mask){
-    if(Date.now()>samDeadline) throw new Error('Timeout segmentation');
-    await new Promise(r=>setTimeout(r,2500));
-    const pollRes=await fetch(`/api/poll?id=${samId}`);
-    if(!pollRes.ok) throw new Error('Poll error '+pollRes.status);
-    const {status,output,error}=await pollRes.json();
-    if(status==='succeeded'){
-      if(!output) throw new Error('Pas de masque généré');
-      mask=Array.isArray(output)?output[0]:output;
-    } else if(status==='failed'){
-      throw new Error('Segmentation échouée: '+error);
-    }
-  }
-
-  // Étape 3 : démarrer l'inpainting avec le masque
-  stEl.textContent='Application du style sur vos ongles…';
-  const inpaintRes=await fetch('/api/inpaint',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({image,mask,prompt})
-  });
-  if(!inpaintRes.ok){
-    const err=await inpaintRes.json().catch(()=>({}));
-    throw new Error(err.error||'Inpaint error '+inpaintRes.status);
-  }
-  const {id:inpaintId}=await inpaintRes.json();
-
-  // Étape 4 : attendre le résultat de l'inpainting
-  stEl.textContent='Génération du rendu final…';
-  const inpaintDeadline=Date.now()+120000;
+  stEl.textContent='Génération IA en cours…';
+  const deadline=Date.now()+120000;
   while(true){
-    if(Date.now()>inpaintDeadline) throw new Error('Timeout inpainting');
-    await new Promise(r=>setTimeout(r,2500));
-    const pollRes=await fetch(`/api/poll?id=${inpaintId}`);
+    if(Date.now()>deadline) throw new Error('Timeout');
+    await new Promise(r=>setTimeout(r,3000));
+    const pollRes=await fetch(`/api/poll?id=${id}`);
     if(!pollRes.ok) throw new Error('Poll error '+pollRes.status);
     const {status,output,error}=await pollRes.json();
     if(status==='succeeded'){
       if(!output) throw new Error('No output');
+      stEl.textContent='Finalisation…';
       return Array.isArray(output)?output[0]:output;
     }
-    if(status==='failed') throw new Error('Inpainting échoué: '+error);
+    if(status==='failed') throw new Error(error||'Generation failed');
   }
 }
 
@@ -522,6 +802,12 @@ function showError(){
   document.querySelector('.r-msg').innerHTML=`⚠️ La génération IA n'a pas pu aboutir.<br><strong>Montrez vos choix à Narjisse</strong> — elle créera votre pose sur mesure !<br><small style="font-size:10px;color:#aaa;word-break:break-all;">${window._lastError||''}</small>`;
 }
 
+function saveImage(){
+  const img=document.getElementById('res-img');
+  const a=document.createElement('a');
+  a.href=img.src; a.download='simulation-ongles-nairam.jpg';
+  a.click();
+}
 function openMail(){document.getElementById('ovl').classList.add('on');}
 function closeMail(e){if(!e||e.target===document.getElementById('ovl')) document.getElementById('ovl').classList.remove('on');}
 
@@ -546,6 +832,7 @@ function resetApp(){
   ['bn-sp','bn-spose','bn-slong','bn-sforme','bn-sstyle'].forEach(id=>{
     const b=document.getElementById(id);if(b) b.classList.remove('ok');
   });
+  clearMask();
   go('sw');
 }
 </script>
