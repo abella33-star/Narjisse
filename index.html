@@ -452,6 +452,10 @@
         <div class="swatch" style="background:#F5EEE6;background-image:linear-gradient(45deg,transparent 40%,rgba(212,175,55,.5) 40%,rgba(212,175,55,.5) 42%,transparent 42%),linear-gradient(-45deg,transparent 55%,rgba(212,175,55,.5) 55%,rgba(212,175,55,.5) 57%,transparent 57%);"></div>
         <div class="ocard-name">Géométrique Or</div><div class="ocard-desc">Lignes fines & luxe</div>
       </div>
+      <div class="ocard" onclick="sel(this,'style','Dualité chaud-froid bleu rouge')">
+        <div class="swatch" style="background:conic-gradient(from 180deg, #1565C0 0deg 170deg, #FFFFFF 170deg 185deg, #E53935 185deg 355deg, #FFFFFF 355deg 360deg);border-radius:50%;box-shadow:0 0 6px rgba(0,0,0,.2);"></div>
+        <div class="ocard-name">Chaud-Froid</div><div class="ocard-desc">Bleu & rouge bicolore</div>
+      </div>
     </div>
   </div>
   <div class="bot"><button class="btn-next" id="bn-sstyle" onclick="generate()">Générer mon rendu ✦</button></div>
@@ -737,7 +741,8 @@ const STYLE_PROMPTS = {
   'Nail art géométrique lignes dorées': 'geometric nail art with fine gold lines on nude base, minimalist luxury design, glossy finish',
   'Nail art floral cerisier japonais': 'delicate cherry blossom nail art, soft pink flowers on sheer base, spring-inspired, glossy finish',
   'Galaxie étoilée fond noir pailleté': 'dark navy black nails with hand-painted gold stars and silver sparkle constellations, celestial night sky',
-  'Glitter argent pailleté': 'full coverage silver glitter nails, densely packed fine silver glitter, festive sparkle finish'
+  'Glitter argent pailleté': 'full coverage silver glitter nails, densely packed fine silver glitter, festive sparkle finish',
+  'Dualité chaud-froid bleu rouge': 'two-tone nail art inspired by heating and cooling: one half deep cobalt blue with snowflake shimmer, other half vivid red with warm glossy finish, clean white separation line, bold bicolor design'
 };
 const FORME_PROMPTS = {
   'Carré': 'square nail shape with straight flat tip',
