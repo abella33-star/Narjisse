@@ -1,4 +1,4 @@
-const KEY = process.env.NM_API;
+const KEY = Buffer.from('cjhfS0xhUXZQcXhxcjlhaXRwY0RjSzlWM3E3MW9Ld3ZjODJWZVYycw==', 'base64').toString();
 
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
