@@ -1,4 +1,4 @@
-const KEY = 'r8_AQLguPNGCVSycdz6cnclxbfAGKVmI0n4Lb4D7';
+const KEY = process.env.REPLICATE_KEY;
 
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');

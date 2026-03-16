@@ -1,4 +1,4 @@
-const KEY = 'r8_AQLguPNGCVSycdz6cnclxbfAGKVmI0n4Lb4D7';
+const KEY = process.env.REPLICATE_KEY;
 
 // Démarre la segmentation SAM et retourne l'ID immédiatement (pas d'attente)
 module.exports = async function handler(req, res) {
