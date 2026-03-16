@@ -401,6 +401,7 @@ async function generate(){
   }catch(err){
     clearInterval(iv);
     console.error(err);
+    window._lastError=err.message;
     showError();
   }
 }
@@ -467,7 +468,7 @@ function showError(){
   document.querySelector('.r-badge').style.display='none';
   const tags=[S.pose,S.longueur,S.forme,S.style].filter(Boolean);
   document.getElementById('res-tags').innerHTML=tags.map(t=>`<span class="tag">${t}</span>`).join('');
-  document.querySelector('.r-msg').innerHTML=`⚠️ La génération IA n'a pas pu aboutir.<br><strong>Montrez vos choix à Narjisse</strong> — elle créera votre pose sur mesure !`;
+  document.querySelector('.r-msg').innerHTML=`⚠️ La génération IA n'a pas pu aboutir.<br><strong>Montrez vos choix à Narjisse</strong> — elle créera votre pose sur mesure !<br><small style="font-size:10px;color:#aaa;word-break:break-all;">${window._lastError||''}</small>`;
 }
 
 function openMail(){document.getElementById('ovl').classList.add('on');}
