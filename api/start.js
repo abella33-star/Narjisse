@@ -12,7 +12,15 @@ module.exports = async function handler(req, res) {
   if (!image || !prompt) return res.status(400).json({ error: 'Missing required fields' });
 
   try {
-    const input = { image, prompt, num_outputs: 1, output_format: 'webp', output_quality: 90 };
+    const input = {
+      image,
+      prompt,
+      num_outputs: 1,
+      num_inference_steps: 50,
+      guidance: 30,
+      output_format: 'webp',
+      output_quality: 95
+    };
     if (mask) input.mask = mask;
 
     const r = await fetch('https://api.replicate.com/v1/models/black-forest-labs/flux-fill-dev/predictions', {
