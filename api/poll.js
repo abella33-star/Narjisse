@@ -1,4 +1,4 @@
-const KEY = process.env.REPLICATE_KEY;
+const KEY = process.env.NM_API;
 
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
