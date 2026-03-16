@@ -1,4 +1,4 @@
-const KEY = process.env.REPLICATE_KEY;
+const KEY = process.env.NM_API;
 
 // Démarre la segmentation SAM et retourne l'ID immédiatement (pas d'attente)
 module.exports = async function handler(req, res) {
