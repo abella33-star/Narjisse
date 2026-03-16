@@ -4,7 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
-<title>Narjisse Institut Naïram — Simulateur</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="NM Institut">
+<meta name="theme-color" content="#FAF5F0">
+<title>Institut Naïram — Simulateur Ongles</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
 <style>
@@ -13,9 +17,11 @@
     --cream:#FAF5F0; --nude:#F2EAE0; --nude-dark:#DDD0C0;
     --text-dark:#2C1F14; --text-mid:#6B4F3A; --text-light:#A07858; --white:#FFFFFF;
   }
-  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-  html,body{height:100%;height:100dvh;overflow:hidden;background:#FAF5F0;}
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased;}
+  html,body{height:100%;height:100dvh;overflow:hidden;background:#FAF5F0;overscroll-behavior:none;}
   body{font-family:'Jost',sans-serif;background:var(--cream);color:var(--text-dark);}
+  button{touch-action:manipulation;-webkit-touch-callout:none;}
+  a{-webkit-touch-callout:none;}
 
   .screen{display:none;height:100vh;height:100dvh;flex-direction:column;animation:fadeUp .5s ease;overflow:hidden;}
   .screen.active{display:flex;}
@@ -148,7 +154,7 @@
       <div class="wlc-step"><div class="step-ic">💅</div><div class="step-lbl">Rendu instantané</div></div>
     </div>
     <button class="btn-start" onclick="go('sp')">Commencer ✦</button>
-    <div class="wlc-addr">2 Chemin de Belle Étoile · 33370 Tresses<br>📅 Sur rendez-vous · @institutnairam_narjisse</div>
+    <div class="wlc-addr">2 Chemin de Belle Étoile · 33370 Tresses<br>📅 Sur rendez-vous · <strong>@institutnairam_narjisse</strong></div>
   </div>
 </div>
 
@@ -303,18 +309,51 @@
   <div class="prog"><div class="prog-bar"><div class="prog-fill" style="width:84%"></div></div><div class="prog-lbl">6 / 7</div></div>
   <div class="sb">
     <div class="qhdr">
-      <div class="q-eye">Étape 5 — Couleur & Style</div>
+      <div class="q-eye">Étape 6 — Couleur & Style</div>
       <div class="q-title">Quel style vous inspire ?</div>
+      <div class="q-sub">Les poses réalisées au salon.</div>
     </div>
     <div class="ogrid">
-      <div class="ocard" onclick="sel(this,'style','French manucure classique')"><div class="swatch" style="background:linear-gradient(135deg,#FFF8F4,#F2E4D4);"></div><div class="ocard-name">French</div><div class="ocard-desc">Intemporel</div></div>
-      <div class="ocard" onclick="sel(this,'style','Baby boomer dégradé nude')"><div class="swatch" style="background:linear-gradient(180deg,#F8EEE5,#E8D5C0);"></div><div class="ocard-name">Baby Boomer</div><div class="ocard-desc">Dégradé nude</div></div>
-      <div class="ocard" onclick="sel(this,'style','Nude rosé naturel')"><div class="swatch" style="background:#D4A896;"></div><div class="ocard-name">Nude Rosé</div><div class="ocard-desc">Doux & naturel</div></div>
-      <div class="ocard" onclick="sel(this,'style','Rouge passion profond')"><div class="swatch" style="background:#8B1A1A;"></div><div class="ocard-name">Rouge Passion</div><div class="ocard-desc">Intense</div></div>
-      <div class="ocard" onclick="sel(this,'style','Nail art floral délicat')"><div class="ocard-ic">🌸</div><div class="ocard-name">Nail Art Floral</div><div class="ocard-desc">Tendance</div></div>
-      <div class="ocard" onclick="sel(this,'style','Bordeaux profond')"><div class="swatch" style="background:#5C1A2E;"></div><div class="ocard-name">Bordeaux</div><div class="ocard-desc">Chic</div></div>
-      <div class="ocard" onclick="sel(this,'style','Rose poudré')"><div class="swatch" style="background:#E8BFBF;"></div><div class="ocard-name">Rose Poudré</div><div class="ocard-desc">Féminin</div></div>
-      <div class="ocard" onclick="sel(this,'style','Nude taupe minimaliste')"><div class="swatch" style="background:#C4A882;"></div><div class="ocard-name">Nude Taupe</div><div class="ocard-desc">Minimaliste</div></div>
+      <div class="ocard" onclick="sel(this,'style','French manucure classique')">
+        <div class="swatch" style="background:linear-gradient(160deg,#fff 45%,#F5DDD0 45%);border:1.5px solid #eee;"></div>
+        <div class="ocard-name">French Classique</div><div class="ocard-desc">Intemporel & élégant</div>
+      </div>
+      <div class="ocard" onclick="sel(this,'style','Blanc laiteux nacré')">
+        <div class="swatch" style="background:linear-gradient(135deg,#FAFAFA,#F0EDE8);border:1.5px solid #eee;"></div>
+        <div class="ocard-name">Blanc Laiteux</div><div class="ocard-desc">Pur & sophistiqué</div>
+      </div>
+      <div class="ocard" onclick="sel(this,'style','Baby boomer dégradé nude')">
+        <div class="swatch" style="background:linear-gradient(180deg,#F8EEE5,#E8D5C0);"></div>
+        <div class="ocard-name">Baby Boomer</div><div class="ocard-desc">Dégradé naturel</div>
+      </div>
+      <div class="ocard" onclick="sel(this,'style','Nude rosé naturel')">
+        <div class="swatch" style="background:#D4A896;"></div>
+        <div class="ocard-name">Nude Rosé</div><div class="ocard-desc">Doux & naturel</div>
+      </div>
+      <div class="ocard" onclick="sel(this,'style','Floral rose & feuilles d or')">
+        <div class="swatch" style="background:radial-gradient(circle at 35% 40%,#E8A0B0 8px,transparent 8px),radial-gradient(circle at 65% 60%,#E8A0B0 6px,transparent 6px),radial-gradient(circle at 55% 25%,#D4A020 5px,transparent 5px),#F5E8E0;"></div>
+        <div class="ocard-name">Floral & Or</div><div class="ocard-desc">Fleurs roses, paillettes or</div>
+      </div>
+      <div class="ocard" onclick="sel(this,'style','Rouge passion profond')">
+        <div class="swatch" style="background:linear-gradient(135deg,#A01515,#7A0C0C);"></div>
+        <div class="ocard-name">Rouge Passion</div><div class="ocard-desc">Intense & glamour</div>
+      </div>
+      <div class="ocard" onclick="sel(this,'style','Bordeaux profond')">
+        <div class="swatch" style="background:linear-gradient(135deg,#6B1A2A,#4A0F1E);"></div>
+        <div class="ocard-name">Bordeaux</div><div class="ocard-desc">Chic & raffiné</div>
+      </div>
+      <div class="ocard" onclick="sel(this,'style','Brown freestyle animal print')">
+        <div class="swatch" style="background:linear-gradient(135deg,#8B5E3C,#6B3A1F);background-image:radial-gradient(ellipse 6px 4px at 30% 40%,rgba(0,0,0,.3) 0%,transparent 100%),radial-gradient(ellipse 5px 3px at 65% 65%,rgba(0,0,0,.25) 0%,transparent 100%);"></div>
+        <div class="ocard-name">Brown Freestyle</div><div class="ocard-desc">Animal print automne</div>
+      </div>
+      <div class="ocard" onclick="sel(this,'style','Violet chrome & noir mat')">
+        <div class="swatch" style="background:linear-gradient(135deg,#5B1A8A,#1A1A2E);box-shadow:inset 0 0 8px rgba(180,100,255,.4);"></div>
+        <div class="ocard-name">Violet Chrome</div><div class="ocard-desc">Audacieux & éclat</div>
+      </div>
+      <div class="ocard" onclick="sel(this,'style','Rose poudré')">
+        <div class="swatch" style="background:linear-gradient(135deg,#ECC8C8,#D9A8A8);"></div>
+        <div class="ocard-name">Rose Poudré</div><div class="ocard-desc">Féminin & délicat</div>
+      </div>
     </div>
   </div>
   <div class="bot"><button class="btn-next" id="bn-sstyle" onclick="generate()">Générer mon rendu ✦</button></div>
@@ -352,7 +391,8 @@
     </div>
     <div class="r-msg">✨ Montrez ce rendu à <strong>Narjisse</strong> — elle réalisera exactement la pose de vos rêves !</div>
     <div class="r-acts">
-      <button class="btn-pr" onclick="openMail()">📧 Recevoir par email</button>
+      <button class="btn-pr" onclick="saveImage()">⬇ Enregistrer la photo</button>
+      <button class="btn-pr" onclick="openMail()" style="background:linear-gradient(135deg,var(--text-mid),var(--text-dark));">📧 Recevoir par email</button>
       <button class="btn-sec" onclick="resetApp()">Refaire une simulation</button>
     </div>
   </div>
@@ -566,14 +606,16 @@ function compressPhoto(dataUrl,maxPx=768){
 }
 
 const STYLE_PROMPTS = {
-  'French manucure classique': 'classic French manicure with white tips and natural pink base',
-  'Baby boomer dégradé nude': 'baby boomer ombre nails with soft gradient from white tip to nude pink base',
-  'Nude rosé naturel': 'nude rose pink nail polish, soft and natural finish',
-  'Rouge passion profond': 'deep passionate red nail polish, glossy and vibrant',
-  'Nail art floral délicat': 'delicate floral nail art with small painted flowers in soft pink, white and green on a nude base',
-  'Bordeaux profond': 'deep dark burgundy wine nail polish, glossy finish',
-  'Rose poudré': 'soft powder pink nail polish, elegant and feminine',
-  'Nude taupe minimaliste': 'minimalist nude taupe nail polish, matte elegant finish'
+  'French manucure classique': 'classic French manicure with crisp white tips and sheer natural pink base, glossy finish',
+  'Blanc laiteux nacré': 'milky white pearl nail polish, opaque creamy white with subtle shimmer, glossy finish',
+  'Baby boomer dégradé nude': 'baby boomer ombre nails, soft airbrushed gradient from white tip to nude blush pink base',
+  'Nude rosé naturel': 'nude rose pink nail polish, soft natural finish, healthy looking nails',
+  'Floral rose & feuilles d or': 'nude base nails with hand-painted delicate pink cherry blossom flowers and gold leaf flakes, gel finish',
+  'Rouge passion profond': 'deep rich red nail polish, highly glossy vibrant red, luxurious finish',
+  'Bordeaux profond': 'deep dark burgundy wine nail polish, rich glossy finish',
+  'Brown freestyle animal print': 'mix of brown burgundy nails with animal print pattern, some nails with nude base and brown cow print spots, gold accents',
+  'Violet chrome & noir mat': 'mix of deep purple chrome metallic nails and matte black nails, high-impact editorial style',
+  'Rose poudré': 'soft dusty powder pink nail polish, elegant feminine matte-satin finish'
 };
 const FORME_PROMPTS = {
   'Carré': 'square nail shape with straight flat tip',
@@ -638,6 +680,12 @@ function showError(){
   document.querySelector('.r-msg').innerHTML=`⚠️ La génération IA n'a pas pu aboutir.<br><strong>Montrez vos choix à Narjisse</strong> — elle créera votre pose sur mesure !<br><small style="font-size:10px;color:#aaa;word-break:break-all;">${window._lastError||''}</small>`;
 }
 
+function saveImage(){
+  const img=document.getElementById('res-img');
+  const a=document.createElement('a');
+  a.href=img.src; a.download='simulation-ongles-nairam.jpg';
+  a.click();
+}
 function openMail(){document.getElementById('ovl').classList.add('on');}
 function closeMail(e){if(!e||e.target===document.getElementById('ovl')) document.getElementById('ovl').classList.remove('on');}
 
