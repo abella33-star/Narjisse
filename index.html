@@ -421,7 +421,7 @@ function compressPhoto(dataUrl,maxPx=768){
 }
 
 async function callReplicate(){
-  const prompt=`Professional luxury nail salon photo, close-up of beautiful manicured woman's hands, ${S.style} nail color and design, ${S.forme} nail shape, ${S.longueur} nail length, ${S.pose} nail technique, photorealistic, high-end beauty photography, soft elegant studio lighting, sharp focus on nails, no text, no watermark`;
+  const prompt=`The same hand as in the photo but with a perfect professional manicure: ${S.style} nail color, ${S.forme} nail shape, ${S.longueur} length, ${S.pose} technique. Keep the exact same hand, skin, background and lighting. Only change the nails. Photorealistic, luxury nail salon quality, sharp focus on nails.`;
   const image=await compressPhoto(S.photo);
 
   // 1. Démarre la génération img2img avec la photo de la main
