@@ -17,10 +17,10 @@ module.exports = async function handler(req, res) {
       body: JSON.stringify({
         input: {
           prompt,
-          image,                  // photo de la main en base64
-          prompt_strength: 0.55,  // garde la main, modifie les ongles
-          num_inference_steps: 28,
-          guidance: 3.5,
+          image,
+          prompt_strength: 0.70,
+          num_inference_steps: 35,
+          guidance: 4.5,
           output_format: 'webp',
           output_quality: 90
         }
