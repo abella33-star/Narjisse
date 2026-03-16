@@ -497,8 +497,29 @@ function compressPhoto(dataUrl,maxPx=768){
   });
 }
 
+const STYLE_PROMPTS = {
+  'French manucure classique': 'classic French manicure with white tips and natural pink base',
+  'Baby boomer dégradé nude': 'baby boomer ombre nails with soft gradient from white tip to nude pink base',
+  'Nude rosé naturel': 'nude rose pink nail polish, soft and natural finish',
+  'Rouge passion profond': 'deep passionate red nail polish, glossy and vibrant',
+  'Nail art floral délicat': 'delicate floral nail art with small painted flowers in soft pink, white and green on a nude base',
+  'Bordeaux profond': 'deep dark burgundy wine nail polish, glossy finish',
+  'Rose poudré': 'soft powder pink nail polish, elegant and feminine',
+  'Nude taupe minimaliste': 'minimalist nude taupe nail polish, matte elegant finish'
+};
+const FORME_PROMPTS = {
+  'Carré': 'square nail shape with straight flat tip',
+  'Arrondi': 'rounded nail shape with soft curved tip',
+  'Amande': 'almond nail shape, elegant tapered oval',
+  'Stiletto': 'stiletto nail shape, sharp pointed tip',
+  'Coffin': 'coffin nail shape, flat tapered tip',
+  'Carré arrondi': 'squoval nail shape, square with soft rounded corners'
+};
+
 async function callReplicate(){
-  const prompt=`Professional manicure: ${S.style} nail color, ${S.forme} nail shape, ${S.longueur} length. Photorealistic, luxury nail salon quality, sharp focus on nails.`;
+  const styleDesc = STYLE_PROMPTS[S.style] || S.style;
+  const formeDesc = FORME_PROMPTS[S.forme] || S.forme;
+  const prompt=`Perfectly painted nails with ${styleDesc}, ${formeDesc}, ${S.longueur} length nails. All five nails fully painted. Photorealistic close-up, luxury nail salon quality, sharp focus, high detail.`;
   const image=S.photo;
   const mask=getMask();
   const stEl=document.getElementById('ld-st');
