@@ -405,14 +405,30 @@ async function generate(){
   }
 }
 
+function compressPhoto(dataUrl,maxPx=768){
+  return new Promise(resolve=>{
+    const img=new Image();
+    img.onload=()=>{
+      const scale=Math.min(1,maxPx/Math.max(img.width,img.height));
+      const c=document.createElement('canvas');
+      c.width=Math.round(img.width*scale);
+      c.height=Math.round(img.height*scale);
+      c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+      resolve(c.toDataURL('image/jpeg',0.82));
+    };
+    img.src=dataUrl;
+  });
+}
+
 async function callReplicate(){
   const prompt=`Professional luxury nail salon photo, close-up of beautiful manicured woman's hands, ${S.style} nail color and design, ${S.forme} nail shape, ${S.longueur} nail length, ${S.pose} nail technique, photorealistic, high-end beauty photography, soft elegant studio lighting, sharp focus on nails, no text, no watermark`;
+  const image=await compressPhoto(S.photo);
 
-  // 1. Démarre la génération
+  // 1. Démarre la génération img2img avec la photo de la main
   const startRes=await fetch('/api/start',{
     method:'POST',
     headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({prompt})
+    body:JSON.stringify({prompt, image})
   });
   if(!startRes.ok){
     const err=await startRes.json().catch(()=>({}));

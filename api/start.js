@@ -7,19 +7,27 @@ module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).end();
 
-  const { prompt } = req.body;
+  const { prompt, image } = req.body;
   if (!prompt) return res.status(400).json({ error: 'Missing prompt' });
 
   try {
-    const r = await fetch('https://api.replicate.com/v1/models/black-forest-labs/flux-schnell/predictions', {
+    const r = await fetch('https://api.replicate.com/v1/models/black-forest-labs/flux-dev/predictions', {
       method: 'POST',
       headers: { 'Authorization': `Token ${KEY}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        input: { prompt, num_outputs: 1, aspect_ratio: '1:1', output_format: 'webp', output_quality: 90 }
+        input: {
+          prompt,
+          image,                  // photo de la main en base64
+          prompt_strength: 0.80,  // modifie les ongles, garde la main
+          num_inference_steps: 28,
+          guidance: 3.5,
+          output_format: 'webp',
+          output_quality: 90
+        }
       })
     });
     const pred = await r.json();
-    if (!r.ok) return res.status(r.status).json({ error: pred.detail || 'Error' });
+    if (!r.ok) return res.status(r.status).json({ error: pred.detail || JSON.stringify(pred) });
     return res.json({ id: pred.id, status: pred.status, output: pred.output });
   } catch (e) {
     return res.status(500).json({ error: e.message });
