@@ -18,7 +18,7 @@ module.exports = async function handler(req, res) {
         input: {
           prompt,
           image,                  // photo de la main en base64
-          prompt_strength: 0.80,  // modifie les ongles, garde la main
+          prompt_strength: 0.55,  // garde la main, modifie les ongles
           num_inference_steps: 28,
           guidance: 3.5,
           output_format: 'webp',
