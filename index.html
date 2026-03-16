@@ -456,6 +456,46 @@
         <div class="swatch" style="background:conic-gradient(from 180deg, #1565C0 0deg 170deg, #FFFFFF 170deg 185deg, #E53935 185deg 355deg, #FFFFFF 355deg 360deg);border-radius:50%;box-shadow:0 0 6px rgba(0,0,0,.2);"></div>
         <div class="ocard-name">Chaud-Froid</div><div class="ocard-desc">Bleu & rouge bicolore</div>
       </div>
+      <div class="ocard" onclick="sel(this,'style','Élégance sombre noir mat et feuille or')">
+        <div class="swatch" style="background:linear-gradient(90deg,#0D0D0D 50%,#D4AF37 50%);box-shadow:inset 0 0 0 1px rgba(212,175,55,.3);"></div>
+        <div class="ocard-name">Noir & Or</div><div class="ocard-desc">Mat velouté & or craquelé</div>
+      </div>
+      <div class="ocard" onclick="sel(this,'style','Douceur printanière lilas et jaune pastel')">
+        <div class="swatch" style="background:linear-gradient(135deg,#C9B8E8 50%,#F9F0A0 50%);"></div>
+        <div class="ocard-name">Lilas & Citron</div><div class="ocard-desc">Diagonal pastel glossy</div>
+      </div>
+      <div class="ocard" onclick="sel(this,'style','Mystère magnétique vert cat-eye et chrome argent')">
+        <div class="swatch" style="background:linear-gradient(90deg,#1B6B3A 50%,#C0C8D0 50%);box-shadow:inset 2px 0 8px rgba(255,255,255,.3);"></div>
+        <div class="ocard-name">Cat-Eye & Chrome</div><div class="ocard-desc">Vert magnétique & miroir</div>
+      </div>
+      <div class="ocard" onclick="sel(this,'style','Gourmandise chic nude et chocolat vague')">
+        <div class="swatch" style="background:linear-gradient(to bottom right,#E8D5B8 0%,#E8D5B8 45%,#5C3317 55%,#5C3317 100%);"></div>
+        <div class="ocard-name">Nude & Chocolat</div><div class="ocard-desc">Vague fluide & brillant</div>
+      </div>
+      <div class="ocard" onclick="sel(this,'style','Rêve océanique bleu marine et paillettes holographiques')">
+        <div class="swatch" style="background:linear-gradient(90deg,#0D2B55 50%,#FFFFFF 50.5%,#7EC8E3 51%);background-image:linear-gradient(90deg,#0D2B55 50%,rgba(255,255,255,.8) 50.3%,#6BA3D6 50.6%,#A8D8F0 55%,#D4EDFF 60%,#C0D8F8 65%,#88C0E8 70%,#B0D0F0 75%,#7EC8E3 80%,#A0C8E8 85%,#D8ECFF 90%,#B8D8F0 100%);"></div>
+        <div class="ocard-name">Océan Holo</div><div class="ocard-desc">Bleu marine & paillettes</div>
+      </div>
+      <div class="ocard" onclick="sel(this,'style','Contraste électrique rose néon et noir jais')">
+        <div class="swatch" style="background:linear-gradient(90deg,#FF007F 50%,#0A0A0A 50%);box-shadow:0 0 8px rgba(255,0,127,.4);"></div>
+        <div class="ocard-name">Néon & Noir</div><div class="ocard-desc">Rose électrique & jais</div>
+      </div>
+      <div class="ocard" onclick="sel(this,'style','Glamour classique bordeaux uni et glitter rouge')">
+        <div class="swatch" style="background:linear-gradient(180deg,#6B1A2A 50%,#CC2200 50%);background-image:linear-gradient(180deg,#6B1A2A 50%,#CC2200 50%);"></div>
+        <div class="ocard-name">Bordeaux & Glitter</div><div class="ocard-desc">Rouge profond & pailleté</div>
+      </div>
+      <div class="ocard" onclick="sel(this,'style','Fraîcheur fruitée orange sanguine et crème mat')">
+        <div class="swatch" style="background:linear-gradient(90deg,#E8521A 50%,#FDF5EC 50%);"></div>
+        <div class="ocard-name">Orange & Crème</div><div class="ocard-desc">Estival mat & vif</div>
+      </div>
+      <div class="ocard" onclick="sel(this,'style','Minimalisme futuriste gris béton et acier brossé')">
+        <div class="swatch" style="background:linear-gradient(180deg,#7A7A7A 50%,#9EABB8 50%);"></div>
+        <div class="ocard-name">Béton & Acier</div><div class="ocard-desc">Gris mat & métal brossé</div>
+      </div>
+      <div class="ocard" onclick="sel(this,'style','Magie holo violet profond et poudre holographique')">
+        <div class="swatch" style="background:linear-gradient(135deg,#4B0082 50%,#FF6EC7 50%);background-image:linear-gradient(135deg,#4B0082 50%,#FF6EC7 50.3%,#FFD700 55%,#00FFFF 65%,#FF69B4 75%,#9B59B6 85%,#4B0082 100%);"></div>
+        <div class="ocard-name">Violet & Holo</div><div class="ocard-desc">Arc-en-ciel diagonal</div>
+      </div>
     </div>
   </div>
   <div class="bot"><button class="btn-next" id="bn-sstyle" onclick="generate()">Générer mon rendu ✦</button></div>
@@ -742,7 +782,17 @@ const STYLE_PROMPTS = {
   'Nail art floral cerisier japonais': 'delicate cherry blossom nail art, soft pink flowers on sheer base, spring-inspired, glossy finish',
   'Galaxie étoilée fond noir pailleté': 'dark navy black nails with hand-painted gold stars and silver sparkle constellations, celestial night sky',
   'Glitter argent pailleté': 'full coverage silver glitter nails, densely packed fine silver glitter, festive sparkle finish',
-  'Dualité chaud-froid bleu rouge': 'two-tone nail art inspired by heating and cooling: one half deep cobalt blue with snowflake shimmer, other half vivid red with warm glossy finish, clean white separation line, bold bicolor design'
+  'Dualité chaud-froid bleu rouge': 'two-tone nail art inspired by heating and cooling: one half deep cobalt blue with snowflake shimmer, other half vivid red with warm glossy finish, clean white separation line, bold bicolor design',
+  'Élégance sombre noir mat et feuille or': 'Photographie macro studio de haute qualité d\'un nail art deux tons sur des ongles en amande. La moitié est d\'un noir mat profond et velouté. L\'autre moitié est composée de feuille d\'or 24 carats craquelée et brillante. Une ligne fine et précise de gel doré en relief (3D) sépare les deux moitiés de manière nette. Éclairage cinématique, détails nets sur la texture.',
+  'Douceur printanière lilas et jaune pastel': 'Photo gros plan photoréaliste de ongles carrés courts avec un nail art deux tons. Une moitié est d\'un lilas poudré doux, l\'autre d\'un jaune citron pastel crémeux. La séparation est une ligne diagonale parfaitement nette traversant l\'ongle. Fini ultra-brillant glossy, lumière naturelle diffuse et douce.',
+  'Mystère magnétique vert cat-eye et chrome argent': 'Image 8k de nail art sur ongles stiletto longs. Design deux tons : la moitié gauche est un vert émeraude "œil de chat" magnétique (cat-eye effect) avec un reflet profond, la moitié droite est un argent chromé miroir lisse. Une séparation verticale nette les divise. Éclairage dramatique de studio faisant ressortir les reflets métalliques.',
+  'Gourmandise chic nude et chocolat vague': 'Photographie macro de ongles en forme de cercueil (coffin nails) au design deux tons. Une moitié est un beige crème nude sophistiqué, l\'autre est un marron chocolat riche et brillant. Les deux couleurs sont séparées par une ligne en forme de vague (swirl) parfaitement définie et fluide. Fini brillant, couleurs chaudes.',
+  'Rêve océanique bleu marine et paillettes holographiques': 'Gros plan de haute précision sur un nail art deux tons. La moitié de l\'ongle est un bleu marine profond mat. L\'autre moitié est couverte de paillettes holographiques bleues et argentées rappelant l\'océan. Une ligne blanche très nette sépare les deux zones. Éclairage focalisé pour scintillement des paillettes, ongles de longueur moyenne.',
+  'Contraste électrique rose néon et noir jais': 'Photo de nail art moderne et audacieux sur ongles carrés. Un design deux tons où la moitié est un rose néon vibrant et saturé, et l\'autre moitié est un noir de jais brillant. Une ligne de séparation verticale nette au centre. Éclairage UV léger pour faire ressortir le néon, style urbain et graphique.',
+  'Glamour classique bordeaux uni et glitter rouge': 'Photographie de luxe de ongles en amande courts. Un nail art deux tons sophistiqué : la moitié est un rouge bordeaux profond et uni, l\'autre moitié est couverte d\'un gel pailleté rouge vif scintillant (glitter). Séparation horizontale nette. Fini haute brillance, lumière douce et élégante.',
+  'Fraîcheur fruitée orange sanguine et crème mat': 'Image photoréaliste d\'ongles en forme d\'amande au fini mat. Design deux tons : la moitié est un orange sanguine vibrant, l\'autre moitié est un blanc crème doux. Séparation nette et verticale. Look estival, lumière du jour éclatante, texture mate granuleuse visible.',
+  'Minimalisme futuriste gris béton et acier brossé': 'Gros plan sur un nail art deux tons minimaliste sur ongles courts. Une moitié est un gris béton mat, l\'autre moitié est un acier inoxydable brossé métallique. Une ligne de séparation horizontale fine et nette les divise. Style industriel, éclairage froid et direct, détails précis sur les textures.',
+  'Magie holo violet profond et poudre holographique': 'Photographie macro éblouissante d\'ongles en forme de cercueil. Un design deux tons unique : la moitié est un violet profond uni, l\'autre moitié est couverte d\'une poudre holographique intense reflétant toutes les couleurs de l\'arc-en-ciel. Une séparation diagonale nette. Éclairage direct fort pour maximiser l\'effet holographique.'
 };
 const FORME_PROMPTS = {
   'Carré': 'square nail shape with straight flat tip',
