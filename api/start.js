@@ -17,7 +17,7 @@ module.exports = async function handler(req, res) {
       prompt,
       num_outputs: 1,
       num_inference_steps: 50,
-      guidance: 30,
+      guidance: 60,
       output_format: 'webp',
       output_quality: 95
     };
