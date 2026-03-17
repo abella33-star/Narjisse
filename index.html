@@ -153,7 +153,7 @@
   /* ─── RESULT ─── */
   #sres{background:linear-gradient(160deg,var(--cream),var(--parchment),var(--cream));}
   .r-img{margin:16px;border-radius:16px;overflow:hidden;box-shadow:0 8px 32px rgba(44,31,20,.15),0 0 0 1px rgba(201,168,76,.15);position:relative;}
-  .r-img img{width:100%;display:block;max-height:340px;object-fit:cover;}
+  .r-img img{width:100%;display:block;max-height:520px;object-fit:contain;}
   .r-badge{position:absolute;top:12px;right:12px;background:rgba(255,255,255,.95);border:1px solid rgba(201,168,76,.4);border-radius:30px;padding:5px 13px;font-size:8.5px;font-weight:300;letter-spacing:.18em;color:var(--gold-dark);text-transform:uppercase;backdrop-filter:blur(4px);}
   .r-sum{margin:0 16px 13px;background:var(--white);border-radius:14px;padding:15px 16px;border:1px solid rgba(201,168,76,.2);box-shadow:0 2px 10px rgba(44,31,20,.05);}
   .r-sum-t{font-family:'Cormorant Garamond',serif;font-size:15px;font-weight:500;color:var(--text-dark);margin-bottom:9px;letter-spacing:.04em;}
@@ -885,7 +885,7 @@ async function generate(){
   }
 }
 
-function compressPhoto(dataUrl,maxPx=768){
+function compressPhoto(dataUrl,maxPx=1280){
   return new Promise(resolve=>{
     const img=new Image();
     img.onload=()=>{
