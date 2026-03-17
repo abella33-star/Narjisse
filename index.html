@@ -972,7 +972,7 @@ async function callReplicate(){
    ──────────────────────────────────────── */
 
 const SALON = {
-  planityLink: 'https://www.planity.com/institut-nairam-33370-tresses',
+  planityLink: 'https://www.planity.com/institut-nairam-33370-tresses?utm_source=ig&utm_medium=social&utm_content=link_in_bio&fbclid=PAdGRleAQmloxleHRuA2FlbQIxMQBzcnRjBmFwcF9pZA8xMjQwMjQ1NzQyODc0MTQAAacgMMg8e2yMu8or6YnHL9AtDt3HXPFmqpJcQ5vl4SJuBxf6rzACFG-W9gAdjg_aem_LlwAKjzDrw-_oG56Pn8_RQ',
   nom: 'Institut Naïram — Narjisse',
 };
 
@@ -1111,7 +1111,7 @@ function saveImage(){
 function shareWhatsapp(){
   const url=S._resultUrl||document.getElementById('res-img').src;
   const style=S.style||'';
-  const text=`✨ Voici ma simulation d'ongles "${style}" créée avec le simulateur Naïram Institut !\n\n${url}\n\nPrendre RDV 👉 https://www.planity.com/institut-nairam-33370-tresses`;
+  const text=`✨ Voici ma simulation d'ongles "${style}" créée avec le simulateur Naïram Institut !\n\n${url}\n\nPrendre RDV 👉 ${SALON.planityLink}`;
   window.open('https://wa.me/?text='+encodeURIComponent(text),'_blank');
 }
 function openMail(){document.getElementById('ovl').classList.add('on');}
