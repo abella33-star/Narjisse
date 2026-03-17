@@ -22,12 +22,12 @@
     --text-dark:#2C1F14; --text-mid:#6B4F3A; --text-light:#A07858; --white:#FFFFFF;
   }
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased;}
-  html,body{height:100%;height:100dvh;overflow:hidden;overscroll-behavior:none;}
+  html,body{height:100%;height:100dvh;overflow:hidden;overflow-x:hidden;overscroll-behavior:none;overscroll-behavior-x:none;max-width:100vw;touch-action:pan-y;}
   body{font-family:'Jost',sans-serif;background:linear-gradient(160deg,#FAF5F0 0%,#F6EEE3 60%,#FAF5F0 100%);color:var(--text-dark);}
   button{touch-action:manipulation;-webkit-touch-callout:none;}
   a{-webkit-touch-callout:none;}
 
-  .screen{display:none;height:100vh;height:100dvh;flex-direction:column;animation:fadeUp .45s cubic-bezier(.22,.61,.36,1);overflow:hidden;}
+  .screen{display:none;height:100vh;height:100dvh;flex-direction:column;animation:fadeUp .45s cubic-bezier(.22,.61,.36,1);overflow:hidden;overflow-x:hidden;max-width:100vw;}
   .screen.active{display:flex;}
   @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 
@@ -47,7 +47,7 @@
   .prog-lbl{font-size:9.5px;font-weight:300;letter-spacing:.18em;color:var(--gold);text-transform:uppercase;white-space:nowrap;}
 
   /* ─── SCROLLABLE BODY / BOTTOM BAR ─── */
-  .sb{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+  .sb{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;touch-action:pan-y;}
   .bot{padding:13px 18px max(22px,env(safe-area-inset-bottom));background:var(--white);border-top:1px solid var(--nude);flex-shrink:0;}
 
   /* ─── BUTTONS ─── */
@@ -72,7 +72,7 @@
   #sw{background:var(--white);}
   .wlc{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:center;padding:0 0 28px;text-align:center;}
 
-  .hero-slider{width:100%;height:68vw;max-height:340px;min-height:240px;position:relative;overflow:hidden;flex-shrink:0;}
+  .hero-slider{width:100%;height:68vw;max-height:340px;min-height:240px;position:relative;overflow:hidden;flex-shrink:0;touch-action:pan-y;}
   .hero-slides{display:flex;width:400%;height:100%;transition:transform .55s cubic-bezier(.4,0,.2,1);}
   .hero-slide{width:25%;height:100%;position:relative;overflow:hidden;}
   .hero-slide img{width:100%;height:100%;object-fit:cover;object-position:center 30%;}
@@ -198,9 +198,9 @@
   .as-price-amount{font-family:'Cormorant Garamond',serif;font-size:38px;font-weight:600;color:var(--terra);line-height:1;}
   .as-price-unit{font-size:10px;font-weight:300;color:var(--text-mid);margin-top:2px;text-align:right;}
 
-  .as-urgency{margin:0 16px 14px;display:flex;justify-content:center;animation:asIn .5s .2s both;}
+  .as-urgency{margin:0 16px 14px;display:flex;justify-content:center;overflow:hidden;animation:asIn .5s .2s both;}
   @keyframes asUrgPulse{0%,100%{transform:scale(1);box-shadow:0 3px 12px rgba(232,69,69,.3)}50%{transform:scale(1.025);box-shadow:0 5px 18px rgba(232,69,69,.45)}}
-  .as-urgency-badge{background:linear-gradient(135deg,#FF6B35,#E84545);color:white;border-radius:30px;padding:8px 22px;font-size:10.5px;font-weight:400;letter-spacing:.16em;text-transform:uppercase;animation:asUrgPulse 2.8s ease-in-out infinite;}
+  .as-urgency-badge{background:linear-gradient(135deg,#FF6B35,#E84545);color:white;border-radius:30px;padding:8px 16px;font-size:10px;font-weight:400;letter-spacing:.1em;text-transform:uppercase;animation:asUrgPulse 2.8s ease-in-out infinite;max-width:100%;text-align:center;}
 
   .as-acts{padding:0 16px 24px;display:flex;flex-direction:column;gap:10px;animation:asIn .5s .25s both;}
 
@@ -1089,8 +1089,7 @@ function showAutoSell(resultUrl, choices, salon){
         <div class="as-price-unit">prix estimé</div>
       </div>
     </div>
-    <div style="text-align:center;font-size:11px;color:var(--text-mid);margin:-4px 16px 12px;">✨ Ce style est parfaitement adapté à vos mains</div>
-    <a href="${salon.planityLink}" target="_blank" class="as-book-btn" style="margin:0 16px 14px;display:block;" onclick="if(navigator.vibrate)navigator.vibrate([50,30,50]);">💅 Je veux cette pose (${prix}€)</a>
+    <div style="text-align:center;font-size:11px;color:var(--text-mid);margin:-4px 16px 16px;">✨ Ce style est parfaitement adapté à vos mains</div>
 
     <div class="as-urgency">
       <div class="as-urgency-badge">🔥 Plus que ${slots} créneaux disponibles cette semaine</div>
@@ -1267,7 +1266,7 @@ function heroStopAuto() {
     el.addEventListener('touchstart', e => { sx = e.touches[0].clientX; heroStopAuto(); }, {passive:true});
     el.addEventListener('touchend', e => {
       const dx = e.changedTouches[0].clientX - sx;
-      if (Math.abs(dx) > 40) heroGo(((_heroIdx + (dx < 0 ? 1 : -1)) + 3) % 3);
+      if (Math.abs(dx) > 40) heroGo(((_heroIdx + (dx < 0 ? 1 : -1)) + 4) % 4);
       heroStartAuto();
     }, {passive:true});
     heroStartAuto();
