@@ -941,15 +941,18 @@ async function generate(){
     return card;
   });
 
-  // Lancer 3 appels en parallèle
+  // Lancer les appels avec un délai échelonné pour éviter le rate-limit
   seeds.forEach((seed,i)=>{
-    callReplicate(seed).then(url=>{
-      const card=cards[i];
-      card.innerHTML=`<div class="var-card-num">Variante ${i+1}</div><img src="${url}" alt="Variante ${i+1}"><div class="var-card-lbl">Variante ${i+1}</div>`;
-      card.onclick=()=>selectVariant(url,cards);
-    }).catch(()=>{
-      cards[i].innerHTML=`<div class="var-card-num">Variante ${i+1}</div><div class="var-card-err">Génération échouée</div>`;
-    });
+    const delay=i*4000;
+    setTimeout(()=>{
+      callReplicate(seed).then(url=>{
+        const card=cards[i];
+        card.innerHTML=`<div class="var-card-num">Variante ${i+1}</div><img src="${url}" alt="Variante ${i+1}"><div class="var-card-lbl">Variante ${i+1}</div>`;
+        card.onclick=()=>selectVariant(url,cards);
+      }).catch(()=>{
+        cards[i].innerHTML=`<div class="var-card-num">Variante ${i+1}</div><div class="var-card-err">Génération échouée — réessayez</div>`;
+      });
+    }, delay);
   });
 }
 
