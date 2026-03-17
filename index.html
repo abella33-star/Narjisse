@@ -137,6 +137,22 @@
   .tag{background:var(--nude);border:1px solid var(--nude-dark);border-radius:20px;padding:4px 11px;font-size:11px;font-weight:400;color:var(--text-mid);}
   .r-msg{background:linear-gradient(135deg,rgba(194,123,74,.08),rgba(194,123,74,.02));border:1px solid rgba(194,123,74,.2);border-radius:8px;padding:13px;font-size:12px;font-weight:300;color:var(--text-mid);line-height:1.7;text-align:center;margin:0 14px 10px;}
   .r-msg strong{color:var(--terra);font-weight:500;}
+  /* Variantes */
+  .var-hdr{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:400;color:var(--text-dark);text-align:center;padding:18px 14px 6px;}
+  .var-sub{font-size:11px;font-weight:300;color:var(--text-light);text-align:center;letter-spacing:.05em;margin-bottom:14px;}
+  .var-grid{display:flex;flex-direction:column;gap:14px;padding:0 14px 24px;}
+  .var-card{border-radius:12px;overflow:hidden;box-shadow:0 4px 18px rgba(44,31,20,.12);position:relative;cursor:pointer;border:2.5px solid transparent;transition:border-color .25s;}
+  .var-card.selected{border-color:var(--terra);}
+  .var-card img{width:100%;display:block;max-height:260px;object-fit:cover;}
+  .var-card-lbl{position:absolute;bottom:0;left:0;right:0;padding:22px 14px 10px;background:linear-gradient(to top,rgba(44,31,20,.6),transparent);font-family:'Jost',sans-serif;font-size:10px;font-weight:300;letter-spacing:.2em;text-transform:uppercase;color:#fff;}
+  .var-card-num{position:absolute;top:10px;left:10px;background:rgba(255,255,255,.92);border:1px solid var(--nude-dark);border-radius:20px;padding:4px 10px;font-size:9px;letter-spacing:.1em;color:var(--terra);text-transform:uppercase;}
+  .var-card-loading{width:100%;height:220px;background:linear-gradient(135deg,var(--nude),var(--nude-dark));display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;}
+  .var-spinner{width:28px;height:28px;border:2.5px solid rgba(194,123,74,.3);border-top-color:var(--terra);border-radius:50%;animation:spin .8s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .var-card-err{width:100%;height:160px;background:var(--nude);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text-light);}
+  .btn-choose{display:block;margin:0 14px 10px;padding:16px;background:linear-gradient(135deg,var(--terra),var(--terra-dark));color:white;font-family:'Jost',sans-serif;font-size:11px;font-weight:400;letter-spacing:.25em;text-transform:uppercase;text-align:center;border:none;border-radius:2px;box-shadow:0 4px 16px rgba(194,123,74,.3);cursor:pointer;width:calc(100% - 28px);transition:all .3s;opacity:.4;pointer-events:none;}
+  .btn-choose.active{opacity:1;pointer-events:auto;}
+
   .btn-planity{display:block;margin:0 14px 12px;padding:17px;background:linear-gradient(135deg,#2c6e49,#1e4d34);color:white;font-family:'Jost',sans-serif;font-size:11px;font-weight:400;letter-spacing:.25em;text-transform:uppercase;text-align:center;text-decoration:none;border-radius:2px;box-shadow:0 4px 16px rgba(44,110,73,.3);transition:all .3s;}
   .btn-planity:active{transform:scale(.98);}
   .r-acts{padding:0 14px 28px;display:flex;flex-direction:column;gap:9px;}
@@ -561,6 +577,23 @@
   <div id="ld-st">Analyse de votre photo…</div>
 </div>
 
+<!-- VARIANTES -->
+<div id="svariants" class="screen">
+  <div class="hdr">
+    <button class="hdr-back" onclick="resetApp()">✕ Recommencer</button>
+    <div><div class="hdr-nm">NM</div><div class="hdr-sub">Institut</div></div>
+  </div>
+  <div style="flex:1;overflow-y:auto;">
+    <div class="var-hdr">Choisissez votre variante</div>
+    <div class="var-sub">3 rendus générés — sélectionnez votre préféré</div>
+    <div class="var-grid" id="varGrid"></div>
+    <button class="btn-choose" id="btnChoose" onclick="confirmVariant()">Choisir ce rendu ✦</button>
+    <div style="padding:0 14px 28px;">
+      <button class="btn-sec" onclick="resetApp()">Recommencer</button>
+    </div>
+  </div>
+</div>
+
 <!-- RESULT -->
 <div id="sres" class="screen">
   <div class="hdr">
@@ -580,6 +613,7 @@
     <a href="https://www.planity.com/institut-nairam-33370-tresses" target="_blank" class="btn-planity">Prendre rendez-vous ✦</a>
     <div class="r-acts">
       <button class="btn-pr" onclick="saveImage()">⬇ Enregistrer la photo</button>
+      <button class="btn-pr" onclick="shareWhatsapp()" style="background:linear-gradient(135deg,#25d366,#128c3e);">Partager sur WhatsApp</button>
       <button class="btn-pr" onclick="openMail()" style="background:linear-gradient(135deg,var(--text-mid),var(--text-dark));">📧 Recevoir par email</button>
       <button class="btn-sec" onclick="resetApp()">Refaire une simulation</button>
     </div>
@@ -849,20 +883,20 @@ const FORME_PROMPTS = {
   'Carré arrondi': 'squoval nail shape, square with soft rounded corners'
 };
 
-async function callReplicate(){
+async function callReplicate(seed){
   const styleDesc = STYLE_PROMPTS[S.style] || S.style;
   const formeDesc = FORME_PROMPTS[S.forme] || S.forme;
   const lengthDesc = S.longueur==='Longue L' ? 'long extended nails, significantly longer than natural' : S.longueur==='Moyenne M' ? 'medium length nails, moderately extended' : 'short natural length nails';
   const prompt=`All five fingernails perfectly done with ${styleDesc}. Nail shape: ${formeDesc}. Length: ${lengthDesc}. Professional gel nail extensions, all nails matching. Photorealistic, luxury nail salon, sharp focus, high detail.`;
   const image=S.photo;
   const mask=getMask();
-  const stEl=document.getElementById('ld-st');
 
-  stEl.textContent='Envoi de votre photo…';
+  const body={image,mask,prompt};
+  if(seed!==undefined) body.seed=seed;
   const startRes=await fetch('/api/start',{
     method:'POST',
     headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({image,mask,prompt})
+    body:JSON.stringify(body)
   });
   if(!startRes.ok){
     const err=await startRes.json().catch(()=>({}));
@@ -870,7 +904,6 @@ async function callReplicate(){
   }
   const {id}=await startRes.json();
 
-  stEl.textContent='Génération IA en cours…';
   const deadline=Date.now()+120000;
   while(true){
     if(Date.now()>deadline) throw new Error('Timeout');
@@ -880,15 +913,62 @@ async function callReplicate(){
     const {status,output,error}=await pollRes.json();
     if(status==='succeeded'){
       if(!output) throw new Error('No output');
-      stEl.textContent='Finalisation…';
       return Array.isArray(output)?output[0]:output;
     }
     if(status==='failed') throw new Error(error||'Generation failed');
   }
 }
 
+let _selectedVariantUrl = null;
+
+async function generate(){
+  go('sl');
+  document.getElementById('ld-st').textContent='Génération de vos 3 variantes…';
+  const seeds=[42,1337,9999];
+  go('svariants');
+  const grid=document.getElementById('varGrid');
+  grid.innerHTML='';
+  _selectedVariantUrl=null;
+  document.getElementById('btnChoose').classList.remove('active');
+
+  // Créer 3 cartes de chargement
+  const cards=seeds.map((_,i)=>{
+    const card=document.createElement('div');
+    card.className='var-card';
+    card.id=`vcard-${i}`;
+    card.innerHTML=`<div class="var-card-num">Variante ${i+1}</div><div class="var-card-loading"><div class="var-spinner"></div><div style="font-size:10px;font-weight:300;color:var(--text-light);letter-spacing:.1em;">Génération…</div></div>`;
+    grid.appendChild(card);
+    return card;
+  });
+
+  // Lancer 3 appels en parallèle
+  seeds.forEach((seed,i)=>{
+    callReplicate(seed).then(url=>{
+      const card=cards[i];
+      card.innerHTML=`<div class="var-card-num">Variante ${i+1}</div><img src="${url}" alt="Variante ${i+1}"><div class="var-card-lbl">Variante ${i+1}</div>`;
+      card.onclick=()=>selectVariant(url,cards);
+    }).catch(()=>{
+      cards[i].innerHTML=`<div class="var-card-num">Variante ${i+1}</div><div class="var-card-err">Génération échouée</div>`;
+    });
+  });
+}
+
+function selectVariant(url, cards){
+  _selectedVariantUrl=url;
+  cards.forEach(c=>c.classList.remove('selected'));
+  const chosen=cards.find(c=>c.querySelector(`img[src="${url}"]`));
+  if(chosen) chosen.classList.add('selected');
+  document.getElementById('btnChoose').classList.add('active');
+}
+
+function confirmVariant(){
+  if(!_selectedVariantUrl) return;
+  showResult(_selectedVariantUrl);
+}
+
 function showResult(url){
   document.getElementById('res-img').src=url;
+  S._resultUrl=url;
   const tags=[S.pose,S.longueur,S.forme,S.style].filter(Boolean);
   document.getElementById('res-tags').innerHTML=tags.map(t=>`<span class="tag">${t}</span>`).join('');
   go('sres');
@@ -908,6 +988,12 @@ function saveImage(){
   const a=document.createElement('a');
   a.href=img.src; a.download='simulation-ongles-nairam.jpg';
   a.click();
+}
+function shareWhatsapp(){
+  const url=S._resultUrl||document.getElementById('res-img').src;
+  const style=S.style||'';
+  const text=`✨ Voici ma simulation d'ongles "${style}" créée avec le simulateur Naïram Institut !\n\n${url}\n\nPrendre RDV 👉 https://www.planity.com/institut-nairam-33370-tresses`;
+  window.open('https://wa.me/?text='+encodeURIComponent(text),'_blank');
 }
 function openMail(){document.getElementById('ovl').classList.add('on');}
 function closeMail(e){if(!e||e.target===document.getElementById('ovl')) document.getElementById('ovl').classList.remove('on');}
