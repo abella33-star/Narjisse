@@ -209,7 +209,7 @@
     background:linear-gradient(90deg,var(--terra-dark) 0%,var(--terra) 30%,var(--gold) 55%,var(--terra) 75%,var(--terra-dark) 100%);background-size:200% auto;animation:goldShimmer 3.5s linear infinite;
     box-shadow:0 6px 26px rgba(194,123,74,.45),0 1px 0 rgba(255,255,255,.15) inset;}
   .as-book-btn:active{transform:scale(.98);}
-  .as-wa-btn{display:block;width:100%;margin-top:9px;padding:13px;text-align:center;color:#1a7a47;font-family:'Jost',sans-serif;font-size:10.5px;font-weight:300;letter-spacing:.18em;text-transform:uppercase;border:1px solid rgba(37,211,102,.35);border-radius:30px;cursor:pointer;text-decoration:none;background:rgba(37,211,102,.06);transition:all .3s;}
+  .as-wa-btn{display:block;width:100%;margin-top:9px;padding:13px;text-align:center;color:#1a7a47;font-family:'Jost',sans-serif;font-size:9px;font-weight:300;letter-spacing:.18em;text-transform:uppercase;border:1px solid rgba(37,211,102,.35);border-radius:30px;cursor:pointer;text-decoration:none;background:rgba(37,211,102,.06);transition:all .3s;opacity:0.7;}
   .as-wa-btn:active{transform:scale(.98);}
 
   /* ─── AUTO-SELL ÉLITE extras ─── */
@@ -687,7 +687,7 @@
   <div class="as-sticky" id="as-sticky" style="display:none;">
     <a id="as-book-btn" href="#" target="_blank" class="as-book-btn">💅 Je veux cette pose (<span id="as-cta-price">?</span>€)</a>
     <div class="as-fomo-bar">
-      <span class="as-fomo-timer-text">⏳ Ce rendu expire dans <span id="as-countdown">10:00</span></span>
+      <span class="as-fomo-timer-text">⏳ Ce rendu disparaît dans <span id="as-countdown">8:00</span></span>
       <span class="as-bonus-pill">🎁 -10% maintenant</span>
     </div>
   </div>
@@ -1061,6 +1061,9 @@ function showAutoSell(resultUrl, choices, salon){
   if(ctaPrice) ctaPrice.textContent = prix;
   document.getElementById('as-book-btn').href = salon.planityLink;
   document.getElementById('as-sticky').style.display = '';
+  document.getElementById('as-book-btn').addEventListener('click', () => {
+    if(navigator.vibrate) navigator.vibrate([50, 30, 50]);
+  });
 
   // Vibration d'arrivée
   if(navigator.vibrate) navigator.vibrate([40, 60, 40]);
@@ -1083,9 +1086,11 @@ function showAutoSell(resultUrl, choices, salon){
       </div>
       <div style="text-align:right;">
         <div class="as-price-amount">${prix}€</div>
-        <div class="as-price-unit">à partir de</div>
+        <div class="as-price-unit">prix estimé</div>
       </div>
     </div>
+    <div style="text-align:center;font-size:11px;color:var(--text-mid);margin:-4px 16px 12px;">✨ Ce style est parfaitement adapté à vos mains</div>
+    <a href="${salon.planityLink}" target="_blank" class="as-book-btn" style="margin:0 16px 14px;display:block;" onclick="if(navigator.vibrate)navigator.vibrate([50,30,50]);">💅 Je veux cette pose (${prix}€)</a>
 
     <div class="as-urgency">
       <div class="as-urgency-badge">🔥 Plus que ${slots} créneaux disponibles cette semaine</div>
@@ -1123,7 +1128,7 @@ function showAutoSell(resultUrl, choices, salon){
     </div>
   `;
 
-  startCountdown(600); // 10 minutes
+  startCountdown(480); // 8 minutes
 }
 
 function autoSellWhatsapp(){
