@@ -47,20 +47,33 @@
 
   /* WELCOME */
   #sw{background:var(--white);}
-  .wlc{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:36px 28px 28px;text-align:center;}
-  .wlc-orn{width:50px;height:1px;background:linear-gradient(90deg,transparent,var(--terra),transparent);margin-bottom:28px;}
-  .wlc-logo{font-family:'Cormorant Garamond',serif;font-size:56px;font-weight:300;color:var(--terra);letter-spacing:.08em;line-height:.9;}
+  .wlc{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:center;padding:0 0 24px;text-align:center;}
+
+  /* Hero slider */
+  .hero-slider{width:100%;height:52vw;max-height:260px;min-height:180px;position:relative;overflow:hidden;flex-shrink:0;}
+  .hero-slides{display:flex;width:300%;height:100%;transition:transform .5s cubic-bezier(.4,0,.2,1);}
+  .hero-slide{width:33.333%;height:100%;position:relative;overflow:hidden;}
+  .hero-slide img{width:100%;height:100%;object-fit:cover;object-position:center top;}
+  .hero-slide-label{position:absolute;bottom:0;left:0;right:0;padding:28px 16px 12px;background:linear-gradient(to top,rgba(44,31,20,.55) 0%,transparent 100%);font-family:'Jost',sans-serif;font-size:11px;font-weight:300;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.9);}
+  .hero-dots{display:flex;gap:7px;justify-content:center;padding:12px 0 4px;}
+  .hero-dot{width:20px;height:2px;background:var(--nude-dark);border-radius:2px;cursor:pointer;transition:all .3s;}
+  .hero-dot.on{background:var(--terra);width:32px;}
+
+  /* Welcome content below slider */
+  .wlc-inner{display:flex;flex-direction:column;align-items:center;padding:14px 28px 0;width:100%;}
+  .wlc-orn{width:50px;height:1px;background:linear-gradient(90deg,transparent,var(--terra),transparent);margin-bottom:18px;}
+  .wlc-logo{font-family:'Cormorant Garamond',serif;font-size:48px;font-weight:300;color:var(--terra);letter-spacing:.08em;line-height:.9;}
   .wlc-logo span{display:block;font-size:9px;font-family:'Jost',sans-serif;font-weight:300;letter-spacing:.5em;color:var(--text-mid);margin-top:10px;text-transform:uppercase;}
-  .wlc-div{width:36px;height:1px;background:var(--nude-dark);margin:22px 0;}
-  .wlc-title{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:400;color:var(--text-dark);line-height:1.3;margin-bottom:10px;}
+  .wlc-div{width:36px;height:1px;background:var(--nude-dark);margin:16px 0;}
+  .wlc-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:400;color:var(--text-dark);line-height:1.3;margin-bottom:8px;}
   .wlc-sub{font-size:13px;font-weight:300;color:var(--text-mid);line-height:1.7;max-width:280px;}
-  .wlc-steps{display:flex;gap:16px;margin:22px 0;width:100%;}
+  .wlc-steps{display:flex;gap:16px;margin:16px 0;width:100%;}
   .wlc-step{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;}
   .step-ic{width:44px;height:44px;border-radius:50%;background:var(--nude);border:1px solid var(--nude-dark);display:flex;align-items:center;justify-content:center;font-size:18px;}
   .step-lbl{font-size:10px;font-weight:300;color:var(--text-mid);text-align:center;line-height:1.4;}
   .btn-start{background:linear-gradient(135deg,var(--terra),var(--terra-dark));color:white;border:none;padding:17px 44px;font-family:'Jost',sans-serif;font-size:11px;font-weight:400;letter-spacing:.28em;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:all .3s;box-shadow:0 4px 20px rgba(194,123,74,.3);}
   .btn-start:active{transform:scale(.98);}
-  .wlc-addr{margin-top:22px;font-size:11px;font-weight:300;color:var(--text-light);letter-spacing:.04em;line-height:1.9;}
+  .wlc-addr{margin-top:18px;font-size:11px;font-weight:300;color:var(--text-light);letter-spacing:.04em;line-height:1.9;}
 
   /* Q header */
   .qhdr{padding:20px 20px 14px;flex-shrink:0;}
@@ -145,18 +158,43 @@
 <!-- WELCOME -->
 <div id="sw" class="screen active">
   <div class="wlc">
-    <div class="wlc-orn"></div>
-    <div class="wlc-logo">NM<span>Narjisse · Naïram · Institut</span></div>
-    <div class="wlc-div"></div>
-    <h1 class="wlc-title">Visualisez vos ongles<br><em>avant votre pose</em></h1>
-    <p class="wlc-sub">En quelques secondes, découvrez le rendu de votre future manucure grâce à notre simulateur IA.</p>
-    <div class="wlc-steps">
-      <div class="wlc-step"><div class="step-ic">📸</div><div class="step-lbl">Photo de vos mains</div></div>
-      <div class="wlc-step"><div class="step-ic">✨</div><div class="step-lbl">Choisissez votre style</div></div>
-      <div class="wlc-step"><div class="step-ic">💅</div><div class="step-lbl">Rendu instantané</div></div>
+    <!-- Hero slider réalisations salon -->
+    <div class="hero-slider" id="heroSlider">
+      <div class="hero-slides" id="heroSlides">
+        <div class="hero-slide">
+          <img src="salon1.jpg" alt="French manucure & rose shimmer — Naïram">
+          <div class="hero-slide-label">French & Rose Shimmer</div>
+        </div>
+        <div class="hero-slide">
+          <img src="salon2.jpg" alt="Rose shimmer amande — Naïram">
+          <div class="hero-slide-label">Rose Shimmer Amande</div>
+        </div>
+        <div class="hero-slide">
+          <img src="salon3.jpg" alt="Rose perle nacré — Naïram">
+          <div class="hero-slide-label">Rose Perle Nacré</div>
+        </div>
+      </div>
     </div>
-    <button class="btn-start" onclick="go('sp')">Commencer ✦</button>
-    <div class="wlc-addr">2 Chemin de Belle Étoile · 33370 Tresses<br>📅 Sur rendez-vous · <strong>@institutnairam_narjisse</strong></div>
+    <div class="hero-dots">
+      <div class="hero-dot on" onclick="heroGo(0)"></div>
+      <div class="hero-dot" onclick="heroGo(1)"></div>
+      <div class="hero-dot" onclick="heroGo(2)"></div>
+    </div>
+    <!-- Contenu -->
+    <div class="wlc-inner">
+      <div class="wlc-orn"></div>
+      <div class="wlc-logo">NM<span>Narjisse · Naïram · Institut</span></div>
+      <div class="wlc-div"></div>
+      <h1 class="wlc-title">Visualisez vos ongles<br><em>avant votre pose</em></h1>
+      <p class="wlc-sub">En quelques secondes, découvrez le rendu de votre future manucure grâce à notre simulateur IA.</p>
+      <div class="wlc-steps">
+        <div class="wlc-step"><div class="step-ic">📸</div><div class="step-lbl">Photo de vos mains</div></div>
+        <div class="wlc-step"><div class="step-ic">✨</div><div class="step-lbl">Choisissez votre style</div></div>
+        <div class="wlc-step"><div class="step-ic">💅</div><div class="step-lbl">Rendu instantané</div></div>
+      </div>
+      <button class="btn-start" onclick="go('sp')">Commencer ✦</button>
+      <div class="wlc-addr">2 Chemin de Belle Étoile · 33370 Tresses<br>📅 Sur rendez-vous · <strong>@institutnairam_narjisse</strong></div>
+    </div>
   </div>
 </div>
 
@@ -890,6 +928,37 @@ function resetApp(){
   clearMask();
   go('sw');
 }
+
+/* ── Hero slider ── */
+let _heroIdx = 0, _heroTimer = null;
+function heroGo(i) {
+  _heroIdx = i;
+  const slides = document.getElementById('heroSlides');
+  if (slides) slides.style.transform = `translateX(-${i * 33.333}%)`;
+  document.querySelectorAll('.hero-dot').forEach((d, j) => d.classList.toggle('on', j === i));
+}
+function heroNext() { heroGo((_heroIdx + 1) % 3); }
+function heroStartAuto() {
+  _heroTimer = setInterval(heroNext, 3200);
+}
+function heroStopAuto() {
+  if (_heroTimer) { clearInterval(_heroTimer); _heroTimer = null; }
+}
+/* touch swipe support */
+(function() {
+  let sx = 0;
+  document.addEventListener('DOMContentLoaded', () => {
+    const el = document.getElementById('heroSlider');
+    if (!el) return;
+    el.addEventListener('touchstart', e => { sx = e.touches[0].clientX; heroStopAuto(); }, {passive:true});
+    el.addEventListener('touchend', e => {
+      const dx = e.changedTouches[0].clientX - sx;
+      if (Math.abs(dx) > 40) heroGo(((_heroIdx + (dx < 0 ? 1 : -1)) + 3) % 3);
+      heroStartAuto();
+    }, {passive:true});
+    heroStartAuto();
+  });
+})();
 </script>
 </body>
 </html>
