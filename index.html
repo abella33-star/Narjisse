@@ -875,12 +875,12 @@ const STYLE_PROMPTS = {
   'Magie holo violet profond et poudre holographique': 'Photographie macro éblouissante d\'ongles en forme de cercueil. Un design deux tons unique : la moitié est un violet profond uni, l\'autre moitié est couverte d\'une poudre holographique intense reflétant toutes les couleurs de l\'arc-en-ciel. Une séparation diagonale nette. Éclairage direct fort pour maximiser l\'effet holographique.'
 };
 const FORME_PROMPTS = {
-  'Carré': 'square nail shape with straight flat tip',
-  'Arrondi': 'rounded nail shape with soft curved tip',
-  'Amande': 'almond nail shape, elegant tapered oval',
-  'Stiletto': 'stiletto nail shape, sharp pointed tip',
-  'Coffin': 'coffin nail shape, flat tapered tip',
-  'Carré arrondi': 'squoval nail shape, square with soft rounded corners'
+  'Carré': 'perfectly square nail shape, completely flat straight tip, 90-degree corners, NOT rounded',
+  'Arrondi': 'rounded oval nail shape, smooth curved tip, no sharp corners, NOT square',
+  'Amande': 'almond nail shape, narrow tapered oval tip, pointed like an almond seed, sides taper inward toward tip, absolutely NOT square, NOT flat tip',
+  'Stiletto': 'stiletto nail shape, very sharp pointed tip, extreme taper, like a spike, NOT square',
+  'Coffin': 'coffin nail shape (ballerina), flat tapered tip, sides taper inward but tip is flat, NOT fully square',
+  'Carré arrondi': 'squoval nail shape, mostly square with very slightly rounded corners, NOT sharply pointed'
 };
 
 function buildPrompt(){
@@ -891,10 +891,10 @@ function buildPrompt(){
     : S.longueur==='Moyenne M'
     ? 'medium length nail extensions, moderately longer than natural nail'
     : 'short natural nail length, no extension, nail does not go past fingertip';
-  return `Professional nail salon photo. MANDATORY nail shape: ${formeDesc} — absolutely not square unless selected. MANDATORY nail length: ${lengthDesc}. Nail design and color: ${styleDesc}. All five nails identical shape and length. Photorealistic, sharp focus, high detail.`;
+  return `Professional nail salon photo. Nail shape is strictly: ${formeDesc}. Nail length: ${lengthDesc}. Nail design: ${styleDesc}. All five nails have identical shape and length. Photorealistic, sharp focus, high detail.`;
 }
 
-async function callReplicate(numOutputs){
+async function callReplicate(){
   const prompt=buildPrompt();
   const image=S.photo;
   const mask=getMask();
@@ -902,7 +902,7 @@ async function callReplicate(numOutputs){
   const startRes=await fetch('/api/start',{
     method:'POST',
     headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({image,mask,prompt,num_outputs:numOutputs||1})
+    body:JSON.stringify({image,mask,prompt,num_outputs:1})
   });
   if(!startRes.ok){
     const err=await startRes.json().catch(()=>({}));
@@ -919,60 +919,10 @@ async function callReplicate(numOutputs){
     const {status,output,error}=await pollRes.json();
     if(status==='succeeded'){
       if(!output) throw new Error('No output');
-      return Array.isArray(output)?output:[ output];
+      return Array.isArray(output)?output[0]:output;
     }
     if(status==='failed') throw new Error(error||'Generation failed');
   }
-}
-
-let _selectedVariantUrl = null;
-
-async function generate(){
-  go('sl');
-  document.getElementById('ld-st').textContent='Génération de vos 3 variantes…';
-
-  // Créer les 3 cartes de chargement immédiatement
-  go('svariants');
-  const grid=document.getElementById('varGrid');
-  grid.innerHTML='';
-  _selectedVariantUrl=null;
-  document.getElementById('btnChoose').classList.remove('active');
-
-  const cards=[0,1,2].map(i=>{
-    const card=document.createElement('div');
-    card.className='var-card';
-    card.innerHTML=`<div class="var-card-num">Variante ${i+1}</div><div class="var-card-loading"><div class="var-spinner"></div><div style="font-size:10px;font-weight:300;color:var(--text-light);letter-spacing:.1em;">Génération…</div></div>`;
-    grid.appendChild(card);
-    return card;
-  });
-
-  // 1 seul appel API avec num_outputs:3
-  callReplicate(3).then(urls=>{
-    urls.forEach((url,i)=>{
-      if(!cards[i]) return;
-      cards[i].innerHTML=`<div class="var-card-num">Variante ${i+1}</div><img src="${url}" alt="Variante ${i+1}"><div class="var-card-lbl">Variante ${i+1}</div>`;
-      cards[i].onclick=()=>selectVariant(url,cards);
-    });
-  }).catch(()=>{
-    cards.forEach((card,i)=>{
-      if(card.querySelector('.var-card-loading')){
-        card.innerHTML=`<div class="var-card-num">Variante ${i+1}</div><div class="var-card-err">Génération échouée — réessayez</div>`;
-      }
-    });
-  });
-}
-
-function selectVariant(url, cards){
-  _selectedVariantUrl=url;
-  cards.forEach(c=>c.classList.remove('selected'));
-  const chosen=cards.find(c=>c.querySelector(`img[src="${url}"]`));
-  if(chosen) chosen.classList.add('selected');
-  document.getElementById('btnChoose').classList.add('active');
-}
-
-function confirmVariant(){
-  if(!_selectedVariantUrl) return;
-  showResult(_selectedVariantUrl);
 }
 
 function showResult(url){
