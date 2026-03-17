@@ -886,8 +886,12 @@ const FORME_PROMPTS = {
 async function callReplicate(seed){
   const styleDesc = STYLE_PROMPTS[S.style] || S.style;
   const formeDesc = FORME_PROMPTS[S.forme] || S.forme;
-  const lengthDesc = S.longueur==='Longue L' ? 'long extended nails, significantly longer than natural' : S.longueur==='Moyenne M' ? 'medium length nails, moderately extended' : 'short natural length nails';
-  const prompt=`All five fingernails perfectly done with ${styleDesc}. Nail shape: ${formeDesc}. Length: ${lengthDesc}. Professional gel nail extensions, all nails matching. Photorealistic, luxury nail salon, sharp focus, high detail.`;
+  const lengthDesc = S.longueur==='Longue L'
+    ? 'very long extended gel nails, dramatically longer than natural nail, long nail extensions clearly visible'
+    : S.longueur==='Moyenne M'
+    ? 'medium length nail extensions, moderately longer than natural nail'
+    : 'short natural nail length, no extension, nail does not go past fingertip';
+  const prompt=`Professional nail salon photo. MANDATORY nail shape: ${formeDesc} — absolutely not square unless selected. MANDATORY nail length: ${lengthDesc}. Nail design and color: ${styleDesc}. All five nails identical shape and length. Photorealistic, sharp focus, high detail.`;
   const image=S.photo;
   const mask=getMask();
 
