@@ -964,7 +964,7 @@ function buildPrompt(){
     : S.longueur==='Moyenne M'
     ? 'medium length nail extensions, moderately longer than natural nail'
     : 'short natural nail length, no extension, nail does not go past fingertip';
-  return `Professional nail salon photo. Nail shape is strictly: ${formeDesc}. Nail length: ${lengthDesc}. Nail design: ${styleDesc}. All five nails have identical shape and length. Photorealistic, sharp focus, high detail.`;
+  return `Professional nail salon close-up photo. Only the nails are modified, the hand skin, fingers, background and lighting remain exactly as in the original photo. Nail shape is strictly: ${formeDesc}. Nail length: ${lengthDesc}. Nail design: ${styleDesc}. All five nails have identical shape, length and design. Seamless integration with surrounding skin. Photorealistic, sharp focus, high detail, no artifacts.`;
 }
 
 async function callReplicate(){
