@@ -8,21 +8,20 @@ module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).end();
 
-  const { image, mask, prompt, seed } = req.body;
+  const { image, mask, prompt, num_outputs } = req.body;
   if (!image || !prompt) return res.status(400).json({ error: 'Missing required fields' });
 
   try {
     const input = {
       image,
       prompt,
-      num_outputs: 1,
+      num_outputs: num_outputs || 1,
       num_inference_steps: 50,
       guidance: 60,
       output_format: 'webp',
       output_quality: 95
     };
     if (mask) input.mask = mask;
-    if (seed !== undefined) input.seed = seed;
 
     const r = await fetch('https://api.replicate.com/v1/models/black-forest-labs/flux-fill-dev/predictions', {
       method: 'POST',

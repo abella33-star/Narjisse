@@ -883,7 +883,7 @@ const FORME_PROMPTS = {
   'Carré arrondi': 'squoval nail shape, square with soft rounded corners'
 };
 
-async function callReplicate(seed){
+function buildPrompt(){
   const styleDesc = STYLE_PROMPTS[S.style] || S.style;
   const formeDesc = FORME_PROMPTS[S.forme] || S.forme;
   const lengthDesc = S.longueur==='Longue L'
@@ -891,16 +891,18 @@ async function callReplicate(seed){
     : S.longueur==='Moyenne M'
     ? 'medium length nail extensions, moderately longer than natural nail'
     : 'short natural nail length, no extension, nail does not go past fingertip';
-  const prompt=`Professional nail salon photo. MANDATORY nail shape: ${formeDesc} — absolutely not square unless selected. MANDATORY nail length: ${lengthDesc}. Nail design and color: ${styleDesc}. All five nails identical shape and length. Photorealistic, sharp focus, high detail.`;
+  return `Professional nail salon photo. MANDATORY nail shape: ${formeDesc} — absolutely not square unless selected. MANDATORY nail length: ${lengthDesc}. Nail design and color: ${styleDesc}. All five nails identical shape and length. Photorealistic, sharp focus, high detail.`;
+}
+
+async function callReplicate(numOutputs){
+  const prompt=buildPrompt();
   const image=S.photo;
   const mask=getMask();
 
-  const body={image,mask,prompt};
-  if(seed!==undefined) body.seed=seed;
   const startRes=await fetch('/api/start',{
     method:'POST',
     headers:{'Content-Type':'application/json'},
-    body:JSON.stringify(body)
+    body:JSON.stringify({image,mask,prompt,num_outputs:numOutputs||1})
   });
   if(!startRes.ok){
     const err=await startRes.json().catch(()=>({}));
@@ -908,7 +910,7 @@ async function callReplicate(seed){
   }
   const {id}=await startRes.json();
 
-  const deadline=Date.now()+120000;
+  const deadline=Date.now()+180000;
   while(true){
     if(Date.now()>deadline) throw new Error('Timeout');
     await new Promise(r=>setTimeout(r,3000));
@@ -917,7 +919,7 @@ async function callReplicate(seed){
     const {status,output,error}=await pollRes.json();
     if(status==='succeeded'){
       if(!output) throw new Error('No output');
-      return Array.isArray(output)?output[0]:output;
+      return Array.isArray(output)?output:[ output];
     }
     if(status==='failed') throw new Error(error||'Generation failed');
   }
@@ -928,35 +930,35 @@ let _selectedVariantUrl = null;
 async function generate(){
   go('sl');
   document.getElementById('ld-st').textContent='Génération de vos 3 variantes…';
-  const seeds=[42,1337,9999];
+
+  // Créer les 3 cartes de chargement immédiatement
   go('svariants');
   const grid=document.getElementById('varGrid');
   grid.innerHTML='';
   _selectedVariantUrl=null;
   document.getElementById('btnChoose').classList.remove('active');
 
-  // Créer 3 cartes de chargement
-  const cards=seeds.map((_,i)=>{
+  const cards=[0,1,2].map(i=>{
     const card=document.createElement('div');
     card.className='var-card';
-    card.id=`vcard-${i}`;
     card.innerHTML=`<div class="var-card-num">Variante ${i+1}</div><div class="var-card-loading"><div class="var-spinner"></div><div style="font-size:10px;font-weight:300;color:var(--text-light);letter-spacing:.1em;">Génération…</div></div>`;
     grid.appendChild(card);
     return card;
   });
 
-  // Lancer les appels avec un délai échelonné pour éviter le rate-limit
-  seeds.forEach((seed,i)=>{
-    const delay=i*4000;
-    setTimeout(()=>{
-      callReplicate(seed).then(url=>{
-        const card=cards[i];
-        card.innerHTML=`<div class="var-card-num">Variante ${i+1}</div><img src="${url}" alt="Variante ${i+1}"><div class="var-card-lbl">Variante ${i+1}</div>`;
-        card.onclick=()=>selectVariant(url,cards);
-      }).catch(()=>{
-        cards[i].innerHTML=`<div class="var-card-num">Variante ${i+1}</div><div class="var-card-err">Génération échouée — réessayez</div>`;
-      });
-    }, delay);
+  // 1 seul appel API avec num_outputs:3
+  callReplicate(3).then(urls=>{
+    urls.forEach((url,i)=>{
+      if(!cards[i]) return;
+      cards[i].innerHTML=`<div class="var-card-num">Variante ${i+1}</div><img src="${url}" alt="Variante ${i+1}"><div class="var-card-lbl">Variante ${i+1}</div>`;
+      cards[i].onclick=()=>selectVariant(url,cards);
+    });
+  }).catch(()=>{
+    cards.forEach((card,i)=>{
+      if(card.querySelector('.var-card-loading')){
+        card.innerHTML=`<div class="var-card-num">Variante ${i+1}</div><div class="var-card-err">Génération échouée — réessayez</div>`;
+      }
+    });
   });
 }
 
