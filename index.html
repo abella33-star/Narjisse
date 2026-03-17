@@ -51,8 +51,8 @@
 
   /* Hero slider */
   .hero-slider{width:100%;height:68vw;max-height:340px;min-height:240px;position:relative;overflow:hidden;flex-shrink:0;}
-  .hero-slides{display:flex;width:300%;height:100%;transition:transform .5s cubic-bezier(.4,0,.2,1);}
-  .hero-slide{width:33.333%;height:100%;position:relative;overflow:hidden;}
+  .hero-slides{display:flex;width:400%;height:100%;transition:transform .5s cubic-bezier(.4,0,.2,1);}
+  .hero-slide{width:25%;height:100%;position:relative;overflow:hidden;}
   .hero-slide img{width:100%;height:100%;object-fit:cover;object-position:center 30%;}
   .hero-slide-label{position:absolute;bottom:0;left:0;right:0;padding:28px 16px 12px;background:linear-gradient(to top,rgba(44,31,20,.55) 0%,transparent 100%);font-family:'Jost',sans-serif;font-size:11px;font-weight:300;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.9);}
   .hero-dots{display:flex;gap:7px;justify-content:center;padding:12px 0 4px;}
@@ -162,6 +162,10 @@
     <div class="hero-slider" id="heroSlider">
       <div class="hero-slides" id="heroSlides">
         <div class="hero-slide">
+          <img src="IMG_1745.png" alt="Mauve lilas amande — Naïram" style="object-position:center 55%;">
+          <div class="hero-slide-label">Mauve Lilas</div>
+        </div>
+        <div class="hero-slide">
           <img src="IMG_1732.png" alt="French manucure & rose shimmer — Naïram" style="object-position:center 52%;">
           <div class="hero-slide-label">French & Rose Shimmer</div>
         </div>
@@ -179,6 +183,7 @@
       <div class="hero-dot on" onclick="heroGo(0)"></div>
       <div class="hero-dot" onclick="heroGo(1)"></div>
       <div class="hero-dot" onclick="heroGo(2)"></div>
+      <div class="hero-dot" onclick="heroGo(3)"></div>
     </div>
     <!-- Contenu -->
     <div class="wlc-inner">
@@ -934,10 +939,10 @@ let _heroIdx = 0, _heroTimer = null;
 function heroGo(i) {
   _heroIdx = i;
   const slides = document.getElementById('heroSlides');
-  if (slides) slides.style.transform = `translateX(-${i * 33.333}%)`;
+  if (slides) slides.style.transform = `translateX(-${i * 25}%)`;
   document.querySelectorAll('.hero-dot').forEach((d, j) => d.classList.toggle('on', j === i));
 }
-function heroNext() { heroGo((_heroIdx + 1) % 3); }
+function heroNext() { heroGo((_heroIdx + 1) % 4); }
 function heroStartAuto() {
   _heroTimer = setInterval(heroNext, 3200);
 }
