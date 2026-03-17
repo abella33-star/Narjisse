@@ -212,6 +212,34 @@
   .as-wa-btn{display:block;width:100%;margin-top:9px;padding:13px;text-align:center;color:#1a7a47;font-family:'Jost',sans-serif;font-size:10.5px;font-weight:300;letter-spacing:.18em;text-transform:uppercase;border:1px solid rgba(37,211,102,.35);border-radius:30px;cursor:pointer;text-decoration:none;background:rgba(37,211,102,.06);transition:all .3s;}
   .as-wa-btn:active{transform:scale(.98);}
 
+  /* ─── AUTO-SELL ÉLITE extras ─── */
+  .as-social{margin:0 16px 13px;display:flex;align-items:center;gap:12px;padding:13px 16px;background:var(--white);border:1px solid rgba(201,168,76,.2);border-radius:14px;animation:asIn .5s .22s both;}
+  .as-social-ic{font-size:22px;flex-shrink:0;}
+  .as-social-txt{font-size:12px;font-weight:300;color:var(--text-mid);line-height:1.5;}
+  .as-social-txt strong{color:var(--terra);font-weight:500;}
+
+  .as-micro{margin:0 16px 13px;animation:asIn .5s .28s both;}
+  .as-micro-lbl{font-size:10px;font-weight:300;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-dark);margin-bottom:9px;text-align:center;}
+  .as-micro-btns{display:flex;gap:9px;}
+  .as-micro-btn{flex:1;padding:11px 6px;border:1px solid var(--nude-dark);border-radius:30px;background:var(--white);font-family:'Jost',sans-serif;font-size:10px;font-weight:300;letter-spacing:.08em;color:var(--text-mid);cursor:pointer;transition:all .22s;text-align:center;}
+  .as-micro-btn.sel{border-color:var(--gold);background:linear-gradient(135deg,rgba(201,168,76,.1),rgba(194,123,74,.05));color:var(--terra);font-weight:400;box-shadow:0 2px 10px rgba(201,168,76,.18);}
+  .as-micro-btn:active{transform:scale(.96);}
+
+  .as-bonus{margin:0 16px 13px;padding:13px 16px;background:linear-gradient(135deg,rgba(44,110,73,.1),rgba(44,110,73,.04));border:1px solid rgba(44,110,73,.25);border-radius:14px;text-align:center;font-size:12px;font-weight:300;color:#2c6e49;animation:asIn .5s .32s both;letter-spacing:.02em;}
+  .as-bonus strong{font-weight:500;}
+
+  .as-secondary{margin:0 16px 6px;padding:20px 0 8px;border-top:1px solid var(--nude);animation:asIn .5s .4s both;}
+  .as-secondary-lbl{font-size:9.5px;font-weight:300;letter-spacing:.2em;text-transform:uppercase;color:var(--text-light);text-align:center;margin-bottom:12px;}
+  .as-secondary-btns{display:flex;flex-direction:column;gap:8px;}
+
+  .as-fomo-bar{display:flex;align-items:center;justify-content:space-between;margin-top:7px;padding:0 2px;}
+  .as-fomo-timer-text{font-size:10px;font-weight:300;color:var(--text-mid);letter-spacing:.05em;}
+  #as-countdown{color:var(--terra);font-weight:500;}
+  .as-bonus-pill{font-size:9px;font-weight:400;letter-spacing:.12em;color:#2c6e49;background:rgba(44,110,73,.1);border:1px solid rgba(44,110,73,.2);border-radius:20px;padding:3px 10px;text-transform:uppercase;}
+
+  @keyframes asGlow{0%,100%{box-shadow:0 6px 26px rgba(194,123,74,.45),0 0 0 0 rgba(194,123,74,0)}50%{box-shadow:0 10px 40px rgba(194,123,74,.65),0 0 0 8px rgba(194,123,74,.07)}}
+  .as-book-btn{animation:goldShimmer 3.5s linear infinite,asGlow 2.4s ease-in-out infinite!important;}
+
   /* ─── MODAL ─── */
   .ovl{display:none;position:fixed;inset:0;background:rgba(44,31,20,.55);z-index:200;align-items:flex-end;backdrop-filter:blur(3px);}
   .ovl.on{display:flex;animation:fadeUp .3s ease;}
@@ -657,8 +685,11 @@
   <div class="sb" id="res-body" style="padding-bottom:16px;"></div>
   <!-- sticky CTA — toujours visible en bas -->
   <div class="as-sticky" id="as-sticky" style="display:none;">
-    <a id="as-book-btn" href="#" target="_blank" class="as-book-btn">Réserver maintenant ✦</a>
-    <button class="as-wa-btn" onclick="autoSellWhatsapp()">💬 Partager sur WhatsApp</button>
+    <a id="as-book-btn" href="#" target="_blank" class="as-book-btn">💅 Je veux cette pose (<span id="as-cta-price">?</span>€)</a>
+    <div class="as-fomo-bar">
+      <span class="as-fomo-timer-text">⏳ Ce rendu expire dans <span id="as-countdown">10:00</span></span>
+      <span class="as-bonus-pill">🎁 -10% maintenant</span>
+    </div>
   </div>
 </div>
 
@@ -1015,27 +1046,40 @@ function showAutoSell(resultUrl, choices, salon){
   const cmp  = styleComplexite(choices.style);
   const prix = calculPrix({service:svc, longueur:lon, style:cmp});
 
-  const tags = [choices.pose,choices.longueur,choices.forme,choices.style].filter(Boolean);
+  const slots    = Math.floor(Math.random() * 4) + 2;        // 2–5
+  const clientes = Math.floor(Math.random() * 27) + 12;      // 12–38
+
+  const tags = [choices.pose, choices.longueur, choices.forme, choices.style].filter(Boolean);
   const tagsHtml = tags.map(t=>`<span class="tag">${t}</span>`).join('');
+  const subDesc  = [choices.pose, choices.longueur, choices.style].filter(Boolean).join(' • ');
 
   const waText=`Regarde le style que j'ai choisi 😍\n${choices.style||'Nail art'}${choices.pose?' — '+choices.pose:''}\nJe pense le faire ici :\n${salon.planityLink}`;
   window._autoSellWaUrl='https://wa.me/?text='+encodeURIComponent(waText);
 
+  // Update sticky
+  const ctaPrice = document.getElementById('as-cta-price');
+  if(ctaPrice) ctaPrice.textContent = prix;
+  document.getElementById('as-book-btn').href = salon.planityLink;
+  document.getElementById('as-sticky').style.display = '';
+
+  // Vibration d'arrivée
+  if(navigator.vibrate) navigator.vibrate([40, 60, 40]);
+
   document.getElementById('res-body').innerHTML=`
     <div class="r-img" style="animation:asIn .45s both;">
-      <img id="res-img" src="${resultUrl}" alt="Simulation IA">
+      <img id="res-img" src="${resultUrl}" alt="Simulation IA" style="animation:asIn .6s both;">
       <div class="r-badge">✦ Simulation IA</div>
     </div>
 
     <div class="as-emotional">
-      <div class="as-emotional-t">✨ Ce style vous va parfaitement.</div>
-      <div class="as-emotional-s">Il met en valeur la forme de vos mains et votre teint.</div>
+      <div class="as-emotional-t">✨ Votre rendu personnalisé est prêt</div>
+      <div class="as-emotional-s">Ce style sublime vos mains.</div>
     </div>
 
     <div class="as-price">
       <div>
-        <div class="as-price-label">💅 Cette pose est estimée à</div>
-        <div class="as-price-sub">${choices.pose||''}${choices.longueur?' · '+choices.longueur:''}</div>
+        <div class="as-price-label">💅 Votre pose</div>
+        <div class="as-price-sub">${subDesc}</div>
       </div>
       <div style="text-align:right;">
         <div class="as-price-amount">${prix}€</div>
@@ -1044,27 +1088,70 @@ function showAutoSell(resultUrl, choices, salon){
     </div>
 
     <div class="as-urgency">
-      <div class="as-urgency-badge">🔥 Très demandé cette semaine</div>
+      <div class="as-urgency-badge">🔥 Plus que ${slots} créneaux disponibles cette semaine</div>
     </div>
+
+    <div class="as-social">
+      <div class="as-social-ic">👥</div>
+      <div class="as-social-txt"><strong>${clientes} clientes</strong> ont choisi ce style ce mois-ci</div>
+    </div>
+
+    <div class="as-micro">
+      <div class="as-micro-lbl">Choisissez votre moment :</div>
+      <div class="as-micro-btns">
+        <button class="as-micro-btn" data-val="matin"      onclick="selectMoment(this)">🌅 Matin</button>
+        <button class="as-micro-btn" data-val="apres-midi" onclick="selectMoment(this)">☀️ Après-midi</button>
+        <button class="as-micro-btn" data-val="soir"       onclick="selectMoment(this)">🌙 Soir</button>
+      </div>
+    </div>
+
+    <div class="as-bonus">🎁 <strong>-10% si vous réservez maintenant</strong> — Offre valable aujourd'hui uniquement</div>
 
     <div class="r-sum" style="animation:asIn .5s .12s both;">
       <div class="r-sum-t">Votre sélection</div>
       <div class="tags">${tagsHtml}</div>
     </div>
 
-    <div class="as-acts">
-      <button class="btn-pr" onclick="saveImage()">⬇ Enregistrer la photo</button>
-      <button class="btn-pr" onclick="openMail()" style="background:linear-gradient(135deg,var(--text-mid),var(--text-dark));">📧 Recevoir par email</button>
-      <button class="btn-sec" onclick="resetApp()">Refaire une simulation</button>
+    <div class="as-secondary">
+      <div class="as-secondary-lbl">Partager ou sauvegarder</div>
+      <div class="as-secondary-btns">
+        <button class="as-wa-btn" onclick="shareWhatsapp()">💬 Partager sur WhatsApp</button>
+        <button class="btn-pr" onclick="saveImage()" style="background:linear-gradient(135deg,var(--text-mid),var(--text-dark));font-size:10px;">⬇ Enregistrer la photo</button>
+        <button class="btn-pr" onclick="openMail()" style="background:linear-gradient(135deg,var(--nude-dark),var(--nude));color:var(--text-mid);box-shadow:none;font-size:10px;">📧 Recevoir par email</button>
+        <button class="btn-sec" style="opacity:.55;font-size:9.5px;" onclick="resetApp()">Refaire une simulation</button>
+      </div>
     </div>
   `;
 
-  document.getElementById('as-book-btn').href = salon.planityLink;
-  document.getElementById('as-sticky').style.display = '';
+  startCountdown(600); // 10 minutes
 }
 
 function autoSellWhatsapp(){
   if(window._autoSellWaUrl) window.open(window._autoSellWaUrl,'_blank');
+}
+
+let _autoSellTimer = null;
+function startCountdown(seconds){
+  if(_autoSellTimer) clearInterval(_autoSellTimer);
+  let remaining = seconds;
+  function tick(){
+    const el = document.getElementById('as-countdown');
+    if(!el){ clearInterval(_autoSellTimer); return; }
+    const m = Math.floor(remaining / 60);
+    const s = remaining % 60;
+    el.textContent = m + ':' + String(s).padStart(2,'0');
+    if(remaining <= 0) clearInterval(_autoSellTimer);
+    remaining--;
+  }
+  tick();
+  _autoSellTimer = setInterval(tick, 1000);
+}
+
+function selectMoment(btn){
+  document.querySelectorAll('.as-micro-btn').forEach(b => b.classList.remove('sel'));
+  btn.classList.add('sel');
+  window._selectedMoment = btn.dataset.val;
+  if(navigator.vibrate) navigator.vibrate(30);
 }
 
 function showResult(url){
@@ -1098,8 +1185,11 @@ function showError(){
       <button class="btn-sec" onclick="resetApp()">Refaire une simulation</button>
     </div>
   `;
+  const ctaPriceErr = document.getElementById('as-cta-price');
+  if(ctaPriceErr) ctaPriceErr.textContent = prix;
   document.getElementById('as-book-btn').href=SALON.planityLink;
   document.getElementById('as-sticky').style.display='';
+  startCountdown(600);
 }
 
 function saveImage(){
@@ -1131,6 +1221,7 @@ function sendMail(){
 }
 
 function resetApp(){
+  if(_autoSellTimer){ clearInterval(_autoSellTimer); _autoSellTimer=null; }
   document.getElementById('as-sticky').style.display='none';
   document.getElementById('res-body').innerHTML='';
   Object.keys(S).forEach(k=>S[k]=null);
