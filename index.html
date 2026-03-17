@@ -137,6 +137,8 @@
   .tag{background:var(--nude);border:1px solid var(--nude-dark);border-radius:20px;padding:4px 11px;font-size:11px;font-weight:400;color:var(--text-mid);}
   .r-msg{background:linear-gradient(135deg,rgba(194,123,74,.08),rgba(194,123,74,.02));border:1px solid rgba(194,123,74,.2);border-radius:8px;padding:13px;font-size:12px;font-weight:300;color:var(--text-mid);line-height:1.7;text-align:center;margin:0 14px 10px;}
   .r-msg strong{color:var(--terra);font-weight:500;}
+  .btn-planity{display:block;margin:0 14px 12px;padding:17px;background:linear-gradient(135deg,#2c6e49,#1e4d34);color:white;font-family:'Jost',sans-serif;font-size:11px;font-weight:400;letter-spacing:.25em;text-transform:uppercase;text-align:center;text-decoration:none;border-radius:2px;box-shadow:0 4px 16px rgba(44,110,73,.3);transition:all .3s;}
+  .btn-planity:active{transform:scale(.98);}
   .r-acts{padding:0 14px 28px;display:flex;flex-direction:column;gap:9px;}
   .btn-pr{background:linear-gradient(135deg,var(--terra),var(--terra-dark));color:white;border:none;padding:16px;font-family:'Jost',sans-serif;font-size:11px;font-weight:400;letter-spacing:.25em;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:all .3s;width:100%;box-shadow:0 4px 16px rgba(194,123,74,.3);}
   .btn-pr:active{transform:scale(.98);}
@@ -223,7 +225,7 @@
         <div class="ph-sub">ou sélectionner dans la galerie<br>Lumière naturelle recommandée</div>
       </div>
     </div>
-    <input type="file" id="fi" accept="image/*" capture="environment" onchange="handlePhoto(event)">
+    <input type="file" id="fi" accept="image/*" onchange="handlePhoto(event)">
     <button class="btn-sec" onclick="document.getElementById('fi').click()">📷 Prendre / Choisir une photo</button>
   </div>
   <div class="bot"><button class="btn-next" id="bn-sp" onclick="go('smask')">Continuer →</button></div>
@@ -575,6 +577,7 @@
       <div class="tags" id="res-tags"></div>
     </div>
     <div class="r-msg">✨ Montrez ce rendu à <strong>Narjisse</strong> — elle réalisera exactement la pose de vos rêves !</div>
+    <a href="https://www.planity.com/institut-nairam-33370-tresses" target="_blank" class="btn-planity">Prendre rendez-vous ✦</a>
     <div class="r-acts">
       <button class="btn-pr" onclick="saveImage()">⬇ Enregistrer la photo</button>
       <button class="btn-pr" onclick="openMail()" style="background:linear-gradient(135deg,var(--text-mid),var(--text-dark));">📧 Recevoir par email</button>
