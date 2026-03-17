@@ -185,6 +185,33 @@
   .btn-pr{background:linear-gradient(90deg,var(--terra-dark),var(--terra),var(--gold-dark),var(--terra));background-size:200% auto;animation:goldShimmer 5s linear infinite;color:white;border:none;padding:16px;font-family:'Jost',sans-serif;font-size:10.5px;font-weight:400;letter-spacing:.25em;text-transform:uppercase;cursor:pointer;border-radius:30px;transition:all .3s;width:100%;box-shadow:0 4px 16px rgba(194,123,74,.28);}
   .btn-pr:active{transform:scale(.98);}
 
+  /* ─── AUTO-SELL ─── */
+  @keyframes asIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+  .as-emotional{margin:0 16px 14px;padding:20px 18px;background:linear-gradient(135deg,rgba(201,168,76,.1),rgba(194,123,74,.06));border:1px solid rgba(201,168,76,.3);border-radius:16px;text-align:center;animation:asIn .5s .1s both;}
+  .as-emotional-t{font-family:'Cormorant Garamond',serif;font-size:19px;font-style:italic;font-weight:400;color:var(--text-dark);line-height:1.45;margin-bottom:5px;}
+  .as-emotional-s{font-size:12px;font-weight:300;color:var(--text-mid);letter-spacing:.03em;}
+
+  .as-price{margin:0 16px 13px;background:var(--white);border-radius:16px;padding:18px 20px;border:1px solid rgba(201,168,76,.25);box-shadow:0 3px 16px rgba(44,31,20,.07);display:flex;align-items:center;justify-content:space-between;animation:asIn .5s .15s both;}
+  .as-price-label{font-size:10px;font-weight:300;color:var(--text-light);letter-spacing:.12em;text-transform:uppercase;margin-bottom:4px;}
+  .as-price-sub{font-size:10px;font-weight:300;color:var(--text-light);margin-top:3px;}
+  .as-price-amount{font-family:'Cormorant Garamond',serif;font-size:38px;font-weight:600;color:var(--terra);line-height:1;}
+  .as-price-unit{font-size:10px;font-weight:300;color:var(--text-mid);margin-top:2px;text-align:right;}
+
+  .as-urgency{margin:0 16px 14px;display:flex;justify-content:center;animation:asIn .5s .2s both;}
+  @keyframes asUrgPulse{0%,100%{transform:scale(1);box-shadow:0 3px 12px rgba(232,69,69,.3)}50%{transform:scale(1.025);box-shadow:0 5px 18px rgba(232,69,69,.45)}}
+  .as-urgency-badge{background:linear-gradient(135deg,#FF6B35,#E84545);color:white;border-radius:30px;padding:8px 22px;font-size:10.5px;font-weight:400;letter-spacing:.16em;text-transform:uppercase;animation:asUrgPulse 2.8s ease-in-out infinite;}
+
+  .as-acts{padding:0 16px 24px;display:flex;flex-direction:column;gap:10px;animation:asIn .5s .25s both;}
+
+  .as-sticky{padding:12px 16px max(20px,env(safe-area-inset-bottom));background:rgba(250,245,240,.96);border-top:1px solid rgba(201,168,76,.2);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);flex-shrink:0;}
+  .as-book-btn{display:block;width:100%;padding:18px;text-align:center;color:white;font-family:'Jost',sans-serif;font-size:10.5px;font-weight:400;letter-spacing:.28em;text-transform:uppercase;border:none;border-radius:30px;cursor:pointer;text-decoration:none;
+    background:linear-gradient(90deg,var(--terra-dark) 0%,var(--terra) 30%,var(--gold) 55%,var(--terra) 75%,var(--terra-dark) 100%);background-size:200% auto;animation:goldShimmer 3.5s linear infinite;
+    box-shadow:0 6px 26px rgba(194,123,74,.45),0 1px 0 rgba(255,255,255,.15) inset;}
+  .as-book-btn:active{transform:scale(.98);}
+  .as-wa-btn{display:block;width:100%;margin-top:9px;padding:13px;text-align:center;color:#1a7a47;font-family:'Jost',sans-serif;font-size:10.5px;font-weight:300;letter-spacing:.18em;text-transform:uppercase;border:1px solid rgba(37,211,102,.35);border-radius:30px;cursor:pointer;text-decoration:none;background:rgba(37,211,102,.06);transition:all .3s;}
+  .as-wa-btn:active{transform:scale(.98);}
+
   /* ─── MODAL ─── */
   .ovl{display:none;position:fixed;inset:0;background:rgba(44,31,20,.55);z-index:200;align-items:flex-end;backdrop-filter:blur(3px);}
   .ovl.on{display:flex;animation:fadeUp .3s ease;}
@@ -626,23 +653,12 @@
     <button class="hdr-back" onclick="resetApp()">✕ Recommencer</button>
     <div><div class="hdr-nm">NM</div><div class="hdr-sub">Institut</div></div>
   </div>
-  <div class="sb" style="padding-bottom:20px;">
-    <div class="r-img">
-      <img id="res-img" src="" alt="Simulation">
-      <div class="r-badge">✦ Simulation IA</div>
-    </div>
-    <div class="r-sum">
-      <div class="r-sum-t">Votre sélection</div>
-      <div class="tags" id="res-tags"></div>
-    </div>
-    <div class="r-msg">✨ Montrez ce rendu à <strong>Narjisse</strong> — elle réalisera exactement la pose de vos rêves !</div>
-    <a href="https://www.planity.com/institut-nairam-33370-tresses" target="_blank" class="btn-planity">Prendre rendez-vous ✦</a>
-    <div class="r-acts">
-      <button class="btn-pr" onclick="saveImage()">⬇ Enregistrer la photo</button>
-      <button class="btn-pr" onclick="shareWhatsapp()" style="background:linear-gradient(135deg,#25d366,#128c3e);">Partager sur WhatsApp</button>
-      <button class="btn-pr" onclick="openMail()" style="background:linear-gradient(135deg,var(--text-mid),var(--text-dark));">📧 Recevoir par email</button>
-      <button class="btn-sec" onclick="resetApp()">Refaire une simulation</button>
-    </div>
+  <!-- contenu injecté dynamiquement par showAutoSell() -->
+  <div class="sb" id="res-body" style="padding-bottom:16px;"></div>
+  <!-- sticky CTA — toujours visible en bas -->
+  <div class="as-sticky" id="as-sticky" style="display:none;">
+    <a id="as-book-btn" href="#" target="_blank" class="as-book-btn">Réserver maintenant ✦</a>
+    <button class="as-wa-btn" onclick="autoSellWhatsapp()">💬 Partager sur WhatsApp</button>
   </div>
 </div>
 
@@ -951,21 +967,139 @@ async function callReplicate(){
   }
 }
 
+/* ────────────────────────────────────────
+   AUTO-SELL — machine à conversion
+   ──────────────────────────────────────── */
+
+const SALON = {
+  planityLink: 'https://www.planity.com/institut-nairam-33370-tresses?utm_source=ig&utm_medium=social&utm_content=link_in_bio&fbclid=PAdGRleAQmloxleHRuA2FlbQIxMQBzcnRjBmFwcF9pZA8xMjQwMjQ1NzQyODc0MTQAAacgMMg8e2yMu8or6YnHL9AtDt3HXPFmqpJcQ5vl4SJuBxf6rzACFG-W9gAdjg_aem_LlwAKjzDrw-_oG56Pn8_RQ',
+  nom: 'Institut Naïram — Narjisse',
+};
+
+function serviceToCode(pose){
+  if(!pose) return 'gel';
+  const p=pose.toLowerCase();
+  if(p.includes('semi')) return 'semi';
+  if(p.includes('résine')||p.includes('resine')) return 'resine';
+  return 'gel';
+}
+
+const _STYLE_COMPLEXITE={
+  'French manucure classique':'medium','Nude rosé naturel':'simple','Nude taupe minimaliste':'simple',
+  'Glazed donut nacré irisé':'simple','Aura nails nuages pastel':'medium',
+  'Pétales de fleurs 3D':'complexe','Chrome argenté miroir':'medium','Chrome holographique irisé':'medium',
+  'Marbre blanc veines dorées':'complexe','Glitter argent pailleté':'medium','Glitter night sky':'medium',
+  'Animal print léopard':'complexe','French tip colorée rose vif':'medium',
+  'Violet chrome':'medium','Or chrome':'medium','Rose chrome':'medium','Ombré sunset':'medium',
+};
+function styleComplexite(s){ return _STYLE_COMPLEXITE[s]||'medium'; }
+
+function calculPrix(data){
+  const BASE={semi:35,gel:50,resine:60};
+  const LON={courte:0,moyenne:5,longue:10};
+  const STY={simple:5,medium:10,complexe:20};
+  return (BASE[data.service]||50)+(LON[data.longueur]||0)+(STY[data.style]||10);
+}
+
+function longueurCode(l){
+  if(!l) return 'courte';
+  const v=l.toLowerCase();
+  if(v.includes('long')) return 'longue';
+  if(v.includes('moyen')||v.includes('medium')) return 'moyenne';
+  return 'courte';
+}
+
+function showAutoSell(resultUrl, choices, salon){
+  const svc  = serviceToCode(choices.pose);
+  const lon  = longueurCode(choices.longueur);
+  const cmp  = styleComplexite(choices.style);
+  const prix = calculPrix({service:svc, longueur:lon, style:cmp});
+
+  const tags = [choices.pose,choices.longueur,choices.forme,choices.style].filter(Boolean);
+  const tagsHtml = tags.map(t=>`<span class="tag">${t}</span>`).join('');
+
+  const waText=`Regarde le style que j'ai choisi 😍\n${choices.style||'Nail art'}${choices.pose?' — '+choices.pose:''}\nJe pense le faire ici :\n${salon.planityLink}`;
+  window._autoSellWaUrl='https://wa.me/?text='+encodeURIComponent(waText);
+
+  document.getElementById('res-body').innerHTML=`
+    <div class="r-img" style="animation:asIn .45s both;">
+      <img id="res-img" src="${resultUrl}" alt="Simulation IA">
+      <div class="r-badge">✦ Simulation IA</div>
+    </div>
+
+    <div class="as-emotional">
+      <div class="as-emotional-t">✨ Ce style vous va parfaitement.</div>
+      <div class="as-emotional-s">Il met en valeur la forme de vos mains et votre teint.</div>
+    </div>
+
+    <div class="as-price">
+      <div>
+        <div class="as-price-label">💅 Cette pose est estimée à</div>
+        <div class="as-price-sub">${choices.pose||''}${choices.longueur?' · '+choices.longueur:''}</div>
+      </div>
+      <div style="text-align:right;">
+        <div class="as-price-amount">${prix}€</div>
+        <div class="as-price-unit">à partir de</div>
+      </div>
+    </div>
+
+    <div class="as-urgency">
+      <div class="as-urgency-badge">🔥 Très demandé cette semaine</div>
+    </div>
+
+    <div class="r-sum" style="animation:asIn .5s .12s both;">
+      <div class="r-sum-t">Votre sélection</div>
+      <div class="tags">${tagsHtml}</div>
+    </div>
+
+    <div class="as-acts">
+      <button class="btn-pr" onclick="saveImage()">⬇ Enregistrer la photo</button>
+      <button class="btn-pr" onclick="openMail()" style="background:linear-gradient(135deg,var(--text-mid),var(--text-dark));">📧 Recevoir par email</button>
+      <button class="btn-sec" onclick="resetApp()">Refaire une simulation</button>
+    </div>
+  `;
+
+  document.getElementById('as-book-btn').href = salon.planityLink;
+  document.getElementById('as-sticky').style.display = '';
+}
+
+function autoSellWhatsapp(){
+  if(window._autoSellWaUrl) window.open(window._autoSellWaUrl,'_blank');
+}
+
 function showResult(url){
-  document.getElementById('res-img').src=url;
   S._resultUrl=url;
-  const tags=[S.pose,S.longueur,S.forme,S.style].filter(Boolean);
-  document.getElementById('res-tags').innerHTML=tags.map(t=>`<span class="tag">${t}</span>`).join('');
   go('sres');
+  showAutoSell(url, S, SALON);
 }
 
 function showError(){
   go('sres');
-  document.getElementById('res-img').style.display='none';
-  document.querySelector('.r-badge').style.display='none';
   const tags=[S.pose,S.longueur,S.forme,S.style].filter(Boolean);
-  document.getElementById('res-tags').innerHTML=tags.map(t=>`<span class="tag">${t}</span>`).join('');
-  document.querySelector('.r-msg').innerHTML=`⚠️ La génération IA n'a pas pu aboutir.<br><strong>Montrez vos choix à Narjisse</strong> — elle créera votre pose sur mesure !<br><small style="font-size:10px;color:#aaa;word-break:break-all;">${window._lastError||''}</small>`;
+  const tagsHtml=tags.map(t=>`<span class="tag">${t}</span>`).join('');
+  const prix=calculPrix({service:serviceToCode(S.pose),longueur:longueurCode(S.longueur),style:styleComplexite(S.style)});
+  document.getElementById('res-body').innerHTML=`
+    <div class="as-emotional" style="margin-top:20px;">
+      <div class="as-emotional-t">⚠️ Rendu IA indisponible</div>
+      <div class="as-emotional-s">Montrez vos choix à <strong style="color:var(--terra)">Narjisse</strong> — elle créera votre pose sur mesure !</div>
+    </div>
+    <div class="as-price">
+      <div>
+        <div class="as-price-label">💅 Cette pose est estimée à</div>
+        <div class="as-price-sub">${S.pose||''}${S.longueur?' · '+S.longueur:''}</div>
+      </div>
+      <div style="text-align:right;">
+        <div class="as-price-amount">${prix}€</div>
+        <div class="as-price-unit">à partir de</div>
+      </div>
+    </div>
+    <div class="r-sum"><div class="r-sum-t">Votre sélection</div><div class="tags">${tagsHtml}</div></div>
+    <div class="as-acts">
+      <button class="btn-sec" onclick="resetApp()">Refaire une simulation</button>
+    </div>
+  `;
+  document.getElementById('as-book-btn').href=SALON.planityLink;
+  document.getElementById('as-sticky').style.display='';
 }
 
 function saveImage(){
@@ -977,7 +1111,7 @@ function saveImage(){
 function shareWhatsapp(){
   const url=S._resultUrl||document.getElementById('res-img').src;
   const style=S.style||'';
-  const text=`✨ Voici ma simulation d'ongles "${style}" créée avec le simulateur Naïram Institut !\n\n${url}\n\nPrendre RDV 👉 https://www.planity.com/institut-nairam-33370-tresses`;
+  const text=`✨ Voici ma simulation d'ongles "${style}" créée avec le simulateur Naïram Institut !\n\n${url}\n\nPrendre RDV 👉 ${SALON.planityLink}`;
   window.open('https://wa.me/?text='+encodeURIComponent(text),'_blank');
 }
 function openMail(){document.getElementById('ovl').classList.add('on');}
@@ -987,13 +1121,18 @@ function sendMail(){
   const email=document.getElementById('mi').value;
   if(!email.includes('@')){alert('Adresse email invalide.');return;}
   closeMail();
-  const msg=document.querySelector('.r-msg');
-  msg.innerHTML=`✅ Simulation envoyée à <strong>${email}</strong> — À tout à l'heure chez Narjisse ! 🌸`;
-  msg.style.background='linear-gradient(135deg,rgba(90,138,90,.08),rgba(90,138,90,.02))';
-  msg.style.borderColor='rgba(90,138,90,.25)';
+  // inject confirmation banner au top du res-body
+  const banner=document.createElement('div');
+  banner.className='r-msg';
+  banner.style.cssText='margin:14px 16px 0;animation:asIn .4s both;background:linear-gradient(135deg,rgba(90,138,90,.1),rgba(90,138,90,.04));border-color:rgba(90,138,90,.3);';
+  banner.innerHTML=`✅ Simulation envoyée à <strong>${email}</strong> — À tout à l'heure chez Narjisse ! 🌸`;
+  const body=document.getElementById('res-body');
+  body.insertBefore(banner,body.firstChild);
 }
 
 function resetApp(){
+  document.getElementById('as-sticky').style.display='none';
+  document.getElementById('res-body').innerHTML='';
   Object.keys(S).forEach(k=>S[k]=null);
   const zone=document.getElementById('pzone');
   const prev=zone.querySelector('img.prev');
