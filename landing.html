@@ -3,404 +3,448 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NM Institut — Visualise tes ongles avant la pose</title>
+<title>NM Institut IA — Visualise tes ongles avant la pose</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --dark: #1C1410;
-    --dark-mid: #2A1F18;
-    --dark-light: #3D2E24;
-    --gold: #C9956A;
-    --gold-light: #E8B68A;
-    --cream: #FAF7F4;
-    --muted: rgba(250,247,244,0.55);
+    --cream: #FAF7F2;
+    --cream2: #F2EDE6;
+    --terra: #C4654A;
+    --terra-light: #D4856A;
+    --ink: #1A1612;
+    --ink-mid: #4A4540;
+    --muted: #9A9088;
+    --border: rgba(180,160,140,0.2);
   }
 
   html { scroll-behavior: smooth; }
 
   body {
     font-family: 'DM Sans', sans-serif;
-    background: var(--dark);
-    color: var(--cream);
-    min-height: 100vh;
+    background: var(--cream);
+    color: var(--ink);
     overflow-x: hidden;
   }
 
   /* NAV */
   nav {
-    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-    padding: 20px 32px;
+    position: sticky; top: 0; z-index: 100;
+    padding: 18px 24px;
+    background: rgba(250,247,242,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
     display: flex; align-items: center; justify-content: space-between;
-    background: rgba(28,20,16,0.8);
-    backdrop-filter: blur(16px);
-    border-bottom: 1px solid rgba(201,149,106,0.15);
   }
 
   .nav-logo {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 20px; font-weight: 400;
-    letter-spacing: 0.12em;
-    color: var(--cream);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 18px; font-weight: 500;
+    letter-spacing: 0.01em;
+    color: var(--ink);
   }
 
-  .nav-logo span { color: var(--gold); }
-
-  .nav-badge {
-    display: flex; align-items: center; gap: 8px;
-    padding: 6px 14px;
-    background: rgba(201,149,106,0.12);
-    border: 1px solid rgba(201,149,106,0.3);
-    border-radius: 100px;
-    font-size: 10px; font-weight: 500;
-    letter-spacing: 0.1em; text-transform: uppercase;
-    color: var(--gold-light);
-  }
-
-  .badge-dot {
-    width: 6px; height: 6px; border-radius: 50%;
-    background: var(--gold);
-    box-shadow: 0 0 8px var(--gold);
-    animation: pulse 2s infinite;
-  }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.4; }
-  }
+  .nav-logo .accent { color: var(--terra); font-weight: 400; }
 
   /* HERO */
   .hero {
-    min-height: 100vh;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    padding: 120px 32px 80px;
-    text-align: center;
-    position: relative;
+    padding: 56px 28px 64px;
+    background: linear-gradient(180deg, var(--cream) 0%, var(--cream2) 100%);
   }
 
-  .hero::before {
-    content: '';
-    position: absolute; inset: 0;
-    background: radial-gradient(ellipse 80% 60% at 50% 40%, rgba(201,149,106,0.08) 0%, transparent 70%);
-    pointer-events: none;
-  }
-
-  .hero-tag {
+  .hero-badge {
     display: inline-flex; align-items: center; gap: 8px;
     padding: 8px 18px;
-    background: rgba(201,149,106,0.1);
-    border: 1px solid rgba(201,149,106,0.25);
+    background: #fff;
+    border: 1px solid var(--border);
     border-radius: 100px;
-    font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase;
-    color: var(--gold-light);
-    margin-bottom: 40px;
+    font-size: 11px; font-weight: 500;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--ink-mid);
+    margin-bottom: 36px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.05);
   }
 
-  .hero-tag-dot {
-    width: 6px; height: 6px; border-radius: 50%;
-    background: #ff6b6b;
-    box-shadow: 0 0 8px #ff6b6b;
-    animation: pulse 2s infinite;
+  .badge-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: #E03C2B;
+    flex-shrink: 0;
   }
 
   .hero-title {
     font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(52px, 12vw, 80px);
+    font-size: clamp(48px, 13vw, 72px);
     font-weight: 300;
     line-height: 1.05;
     letter-spacing: -0.01em;
-    color: var(--cream);
-    margin-bottom: 8px;
+    color: var(--ink);
+    margin-bottom: 24px;
   }
 
   .hero-title em {
     font-style: italic;
-    color: var(--gold);
+    color: var(--terra);
+    display: block;
   }
 
   .hero-subtitle {
-    font-size: 16px; font-weight: 300;
-    color: var(--muted);
-    line-height: 1.7;
+    font-size: 15px; font-weight: 300;
+    color: var(--ink-mid);
+    line-height: 1.65;
+    margin-bottom: 40px;
     max-width: 320px;
-    margin: 24px auto 48px;
   }
 
   .hero-cta {
-    display: inline-flex; align-items: center; gap: 12px;
-    padding: 18px 40px;
-    background: var(--gold);
-    color: var(--dark);
-    font-family: 'DM Sans', sans-serif;
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 17px 32px;
+    background: var(--ink);
+    color: #fff;
     font-size: 14px; font-weight: 500;
-    letter-spacing: 0.08em; text-transform: uppercase;
+    letter-spacing: 0.02em;
     text-decoration: none;
     border-radius: 100px;
-    transition: all 0.3s ease;
-    box-shadow: 0 0 40px rgba(201,149,106,0.25);
+    transition: all 0.25s;
+    margin-bottom: 18px;
   }
 
-  .hero-cta:hover {
-    background: var(--gold-light);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 40px rgba(201,149,106,0.4);
-  }
+  .hero-cta:active { transform: scale(0.97); }
 
-  .hero-cta-note {
-    margin-top: 16px;
-    font-size: 12px;
+  .hero-link {
+    display: block;
+    font-size: 14px; font-weight: 300;
     color: var(--muted);
-    letter-spacing: 0.05em;
+    text-decoration: none;
+    margin-bottom: 64px;
+    transition: color 0.2s;
   }
+
+  .hero-link:hover { color: var(--ink); }
 
   /* STATS */
   .stats {
-    display: flex;
-    justify-content: center;
+    border-top: 1px solid var(--border);
+    padding-top: 40px;
+    display: grid; grid-template-columns: repeat(3, 1fr);
     gap: 0;
-    margin-top: 72px;
-    border-top: 1px solid rgba(201,149,106,0.15);
-    padding-top: 48px;
-    width: 100%;
-    max-width: 400px;
   }
 
   .stat {
-    flex: 1;
-    text-align: center;
-    padding: 0 16px;
-    border-right: 1px solid rgba(201,149,106,0.15);
+    padding: 0 8px;
+    border-right: 1px solid var(--border);
+    text-align: left;
   }
 
   .stat:last-child { border-right: none; }
 
   .stat-value {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 36px; font-weight: 300;
-    color: var(--cream);
+    font-size: 38px; font-weight: 300;
+    color: var(--ink);
+    line-height: 1;
     display: block;
+    margin-bottom: 6px;
   }
 
   .stat-label {
     font-size: 9px; font-weight: 500;
     letter-spacing: 0.12em; text-transform: uppercase;
     color: var(--muted);
-    margin-top: 4px;
+    line-height: 1.4;
     display: block;
   }
 
-  /* HOW IT WORKS */
-  .section {
-    padding: 80px 32px;
-    max-width: 440px;
-    margin: 0 auto;
+  /* DEMO SECTION */
+  .demo {
+    padding: 80px 28px 72px;
+    background: #fff;
+    text-align: center;
   }
 
   .section-label {
     font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
-    color: var(--gold);
-    margin-bottom: 24px;
-    text-align: center;
+    color: var(--terra);
+    margin-bottom: 20px;
   }
 
   .section-title {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 36px; font-weight: 300;
-    text-align: center;
-    color: var(--cream);
+    font-size: clamp(34px, 9vw, 50px);
+    font-weight: 300;
+    line-height: 1.1;
+    color: var(--ink);
     margin-bottom: 48px;
-    line-height: 1.2;
   }
 
+  .section-title em {
+    font-style: italic;
+    color: var(--terra);
+    display: block;
+  }
+
+  /* MOCKUPS */
+  .mockups {
+    display: flex; gap: 16px; align-items: center;
+    margin-bottom: 40px;
+  }
+
+  .mockup {
+    flex: 1;
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+    position: relative;
+  }
+
+  .mockup-header {
+    padding: 10px 14px 8px;
+    background: var(--cream);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+
+  .mockup-nav-text {
+    font-size: 8px; letter-spacing: 0.05em; color: var(--muted);
+  }
+
+  .mockup-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 13px; font-weight: 400; letter-spacing: 0.12em;
+    color: var(--ink);
+    text-align: center;
+  }
+
+  .mockup-logo span { display: block; font-size: 7px; letter-spacing: 0.2em; color: var(--muted); }
+
+  .mockup-img {
+    width: 100%; aspect-ratio: 3/4;
+    background: #D4C8BC;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+  }
+
+  .mockup-img img { width: 100%; height: 100%; object-fit: cover; }
+
+  /* hand placeholder if no image */
+  .hand-placeholder {
+    width: 100%; height: 100%;
+    background: linear-gradient(135deg, #C8B8A8 0%, #B8A898 100%);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 40px;
+  }
+
+  .mockup-pill {
+    position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
+    padding: 6px 16px;
+    border-radius: 100px;
+    font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .pill-avant {
+    background: rgba(255,255,255,0.9);
+    color: var(--ink);
+    border: 1px solid var(--border);
+  }
+
+  .pill-apres {
+    background: var(--terra);
+    color: #fff;
+  }
+
+  .arrow-circle {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: #fff;
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    font-size: 14px; color: var(--ink);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  }
+
+  .demo-cta {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 17px 32px;
+    background: var(--ink);
+    color: #fff;
+    font-size: 14px; font-weight: 500;
+    text-decoration: none;
+    border-radius: 100px;
+    transition: all 0.25s;
+  }
+
+  .demo-cta:active { transform: scale(0.97); }
+
+  /* STEPS */
+  .steps-section {
+    padding: 72px 28px;
+    background: var(--cream2);
+  }
+
+  .steps-section .section-label { text-align: center; }
+  .steps-section .section-title { text-align: center; font-size: clamp(30px, 8vw, 44px); }
+
   .steps {
-    display: flex; flex-direction: column; gap: 24px;
+    display: flex; flex-direction: column; gap: 16px;
+    margin-top: 0;
   }
 
   .step {
-    display: flex; align-items: flex-start; gap: 20px;
-    padding: 24px;
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(201,149,106,0.12);
-    border-radius: 20px;
+    display: flex; gap: 18px; align-items: flex-start;
+    padding: 20px;
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: 18px;
   }
 
   .step-num {
-    width: 40px; height: 40px; border-radius: 50%;
-    background: rgba(201,149,106,0.12);
-    border: 1px solid rgba(201,149,106,0.25);
+    width: 36px; height: 36px; border-radius: 50%;
+    border: 1px solid rgba(196,101,74,0.3);
     display: flex; align-items: center; justify-content: center;
     font-family: 'Cormorant Garamond', serif;
-    font-size: 18px; color: var(--gold);
+    font-size: 16px; color: var(--terra);
     flex-shrink: 0;
   }
 
-  .step-text strong {
-    display: block;
-    font-size: 15px; font-weight: 500;
-    color: var(--cream);
-    margin-bottom: 4px;
+  .step-title {
+    font-size: 14px; font-weight: 500; color: var(--ink);
+    margin-bottom: 3px;
   }
 
-  .step-text span {
-    font-size: 13px; font-weight: 300;
-    color: var(--muted);
+  .step-desc {
+    font-size: 12px; font-weight: 300; color: var(--muted);
     line-height: 1.5;
   }
 
   /* PRICING */
   .pricing {
-    padding: 80px 32px;
-    max-width: 440px;
-    margin: 0 auto;
+    padding: 72px 28px;
+    background: #fff;
   }
 
+  .pricing .section-label { text-align: center; }
+  .pricing .section-title { text-align: center; font-size: clamp(30px, 8vw, 44px); margin-bottom: 36px; }
+
+  .price-cards { display: flex; flex-direction: column; gap: 16px; }
+
   .price-card {
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(201,149,106,0.2);
-    border-radius: 28px;
-    padding: 40px 32px;
-    text-align: center;
-    margin-bottom: 20px;
+    padding: 32px 28px;
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    background: var(--cream);
   }
 
   .price-card.featured {
-    background: rgba(201,149,106,0.08);
-    border-color: rgba(201,149,106,0.4);
+    background: var(--ink);
+    border-color: var(--ink);
+    color: #fff;
   }
 
-  .price-tag {
-    display: inline-block;
-    padding: 4px 12px;
-    background: var(--gold);
-    color: var(--dark);
-    border-radius: 100px;
-    font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
-    margin-bottom: 20px;
+  .price-card .plan-name {
+    font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 12px;
   }
+
+  .price-card.featured .plan-name { color: rgba(255,255,255,0.5); }
 
   .price-amount {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 56px; font-weight: 300;
-    color: var(--cream);
-    line-height: 1;
+    font-size: 52px; font-weight: 300;
+    color: var(--ink); line-height: 1;
+    margin-bottom: 4px;
   }
 
-  .price-amount sup { font-size: 24px; vertical-align: top; margin-top: 10px; }
-  .price-period { font-size: 13px; color: var(--muted); margin-top: 4px; }
+  .price-card.featured .price-amount { color: #fff; }
+
+  .price-period {
+    font-size: 12px; color: var(--muted);
+    margin-bottom: 24px;
+  }
+
+  .price-card.featured .price-period { color: rgba(255,255,255,0.5); }
 
   .price-features {
-    list-style: none;
-    margin: 24px 0 32px;
-    display: flex; flex-direction: column; gap: 12px;
+    list-style: none; display: flex; flex-direction: column; gap: 10px;
+    margin-bottom: 28px;
   }
 
   .price-features li {
     font-size: 13px; font-weight: 300;
-    color: rgba(250,247,244,0.75);
+    color: var(--ink-mid);
     display: flex; align-items: center; gap: 10px;
   }
 
+  .price-card.featured .price-features li { color: rgba(255,255,255,0.75); }
+
   .price-features li::before {
-    content: '✦';
-    color: var(--gold);
-    font-size: 8px;
-    flex-shrink: 0;
+    content: '✦'; font-size: 7px; color: var(--terra); flex-shrink: 0;
   }
 
-  .btn-outline {
-    display: block; width: 100%;
-    padding: 16px;
+  .price-card.featured .price-features li::before { color: var(--terra-light); }
+
+  .btn-price {
+    display: block; width: 100%; padding: 15px;
+    border-radius: 100px;
+    font-size: 13px; font-weight: 500; letter-spacing: 0.06em;
+    text-decoration: none; text-align: center;
+    transition: all 0.25s; cursor: pointer; border: none;
+  }
+
+  .btn-price-outline {
     background: transparent;
-    border: 1px solid rgba(201,149,106,0.4);
-    border-radius: 100px;
-    color: var(--gold-light);
-    font-size: 13px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
-    text-decoration: none;
-    text-align: center;
-    transition: all 0.3s;
-    cursor: pointer;
+    border: 1px solid rgba(180,160,140,0.4);
+    color: var(--ink);
   }
 
-  .btn-outline:hover {
-    background: rgba(201,149,106,0.1);
-    border-color: var(--gold);
+  .btn-price-fill {
+    background: var(--terra);
+    color: #fff;
   }
-
-  .btn-solid {
-    display: block; width: 100%;
-    padding: 16px;
-    background: var(--gold);
-    border: none;
-    border-radius: 100px;
-    color: var(--dark);
-    font-size: 13px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
-    text-decoration: none;
-    text-align: center;
-    transition: all 0.3s;
-    cursor: pointer;
-  }
-
-  .btn-solid:hover { background: var(--gold-light); }
 
   /* FOOTER */
   footer {
-    padding: 48px 32px;
-    border-top: 1px solid rgba(201,149,106,0.12);
+    padding: 48px 28px 36px;
+    border-top: 1px solid var(--border);
     text-align: center;
+    background: var(--cream);
   }
 
   .footer-logo {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 28px; font-weight: 300; letter-spacing: 0.15em;
-    color: var(--cream);
-    margin-bottom: 8px;
+    font-size: 26px; font-weight: 300;
+    letter-spacing: 0.15em; color: var(--ink);
+    margin-bottom: 4px;
   }
 
-  .footer-logo span { color: var(--gold); }
+  .footer-logo span { color: var(--terra); }
 
-  .footer-name {
-    font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 24px;
+  .footer-inst {
+    font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 24px;
   }
 
   .footer-info {
-    font-size: 12px; font-weight: 300;
-    color: var(--muted);
-    line-height: 2;
+    font-size: 12px; font-weight: 300; color: var(--muted); line-height: 2;
   }
 
-  .footer-info a {
-    color: var(--gold-light);
-    text-decoration: none;
-  }
-
-  /* Divider */
-  .divider {
-    width: 40px; height: 1px;
-    background: rgba(201,149,106,0.3);
-    margin: 0 auto 60px;
-  }
+  .footer-info a { color: var(--terra); text-decoration: none; }
 </style>
 </head>
 <body>
 
 <!-- NAV -->
 <nav>
-  <div class="nav-logo"><span>N</span>M INSTITUT</div>
-  <div class="nav-badge">
-    <span class="badge-dot"></span>
-    Simulateur IA — Gratuit pour commencer
-  </div>
+  <div class="nav-logo">NM <span class="accent">Institut</span> IA</div>
 </nav>
 
 <!-- HERO -->
 <section class="hero">
-  <div class="hero-tag">
-    <span class="hero-tag-dot"></span>
-    Simulateur IA exclusif
+  <div class="hero-badge">
+    <span class="badge-dot"></span>
+    NM Institut · Simulateur IA exclusif
   </div>
 
   <h1 class="hero-title">
@@ -409,20 +453,18 @@
   </h1>
 
   <p class="hero-subtitle">
-    Prends une photo de ta main, choisis un design,<br>
-    vois le rendu en temps réel grâce à l'IA.<br>
-    Réservé aux clientes de l'institut.
+    Prends une photo de ta main, choisis un design,
+    et découvre le rendu en temps réel grâce à l'IA.
+    Finis les surprises chez ta prothésiste.
   </p>
 
-  <a href="/app" class="hero-cta">
-    💅 Essayer gratuitement
-  </a>
-  <p class="hero-cta-note">3 essais gratuits · Sans inscription</p>
+  <a href="/app" class="hero-cta">💅 Essayer gratuitement</a>
+  <a href="#demo" class="hero-link">Voir comment ça marche &nbsp;→</a>
 
   <div class="stats">
     <div class="stat">
-      <span class="stat-value">3</span>
-      <span class="stat-label">Essais<br>gratuits</span>
+      <span class="stat-value">100%</span>
+      <span class="stat-label">Personnalisé</span>
     </div>
     <div class="stat">
       <span class="stat-value">30s</span>
@@ -435,72 +477,114 @@
   </div>
 </section>
 
-<!-- HOW IT WORKS -->
-<section class="section">
+<!-- DEMO -->
+<section class="demo" id="demo">
+  <p class="section-label">La magie en action</p>
+  <h2 class="section-title">
+    Avant la simulation,<br>
+    <em>après la simulation</em>
+  </h2>
+
+  <div class="mockups">
+    <!-- AVANT -->
+    <div class="mockup">
+      <div class="mockup-header">
+        <span class="mockup-nav-text">← RETOUR</span>
+        <div class="mockup-logo">NM<span>INSTITUT</span></div>
+        <span class="mockup-nav-text"></span>
+      </div>
+      <div class="mockup-img">
+        <div class="hand-placeholder">🤚</div>
+      </div>
+      <div class="mockup-pill pill-avant">AVANT</div>
+    </div>
+
+    <div class="arrow-circle">→</div>
+
+    <!-- APRÈS -->
+    <div class="mockup">
+      <div class="mockup-header">
+        <span class="mockup-nav-text">✕ RECOMMENCER</span>
+        <div class="mockup-logo">NM<span>INSTITUT</span></div>
+        <span class="mockup-nav-text"></span>
+      </div>
+      <div class="mockup-img" style="background: linear-gradient(135deg, #8B6050 0%, #6B4035 100%);">
+        <div class="hand-placeholder" style="background: linear-gradient(135deg, #8B6050 0%, #6B4035 100%); font-size:36px;">💅</div>
+      </div>
+      <div class="mockup-pill pill-apres">✨ Rendu IA</div>
+    </div>
+  </div>
+
+  <a href="/app" class="demo-cta">💅 Essayer sur ma propre main</a>
+</section>
+
+<!-- STEPS -->
+<section class="steps-section">
   <p class="section-label">Comment ça marche</p>
-  <h2 class="section-title">3 étapes, 30 secondes</h2>
+  <h2 class="section-title" style="margin-bottom: 36px;">3 étapes,<br>30 secondes</h2>
   <div class="steps">
     <div class="step">
       <div class="step-num">1</div>
-      <div class="step-text">
-        <strong>Photographie tes mains</strong>
-        <span>Pose tes mains à plat, paume vers le bas, en bonne lumière naturelle.</span>
+      <div>
+        <div class="step-title">Photographie tes mains</div>
+        <div class="step-desc">Pose tes mains à plat, paume vers le bas, en bonne lumière naturelle.</div>
       </div>
     </div>
     <div class="step">
       <div class="step-num">2</div>
-      <div class="step-text">
-        <strong>Choisis ton design</strong>
-        <span>French, nude, nail art, couleur… sélectionne parmi nos styles signature.</span>
+      <div>
+        <div class="step-title">Choisis ton design</div>
+        <div class="step-desc">French, nude, nail art, couleur… sélectionne parmi nos styles signature.</div>
       </div>
     </div>
     <div class="step">
       <div class="step-num">3</div>
-      <div class="step-text">
-        <strong>Vois le rendu IA</strong>
-        <span>Notre IA applique le design sur tes vraies mains en quelques secondes.</span>
+      <div>
+        <div class="step-title">Vois le rendu IA</div>
+        <div class="step-desc">Notre IA applique le design sur tes vraies mains en quelques secondes.</div>
       </div>
     </div>
   </div>
 </section>
 
-<div class="divider"></div>
-
 <!-- PRICING -->
 <section class="pricing">
-  <p class="section-label" style="text-align:center;">Tarifs</p>
+  <p class="section-label">Tarifs</p>
   <h2 class="section-title">Commence gratuitement</h2>
+  <div class="price-cards">
 
-  <div class="price-card">
-    <p class="price-period" style="margin-bottom:12px; color: var(--gold-light); font-size:14px; font-weight:400;">Gratuit</p>
-    <div class="price-amount">3<sup style="font-size:24px; margin-left:4px;">essais</sup></div>
-    <p class="price-period">pour découvrir</p>
-    <ul class="price-features">
-      <li>3 simulations IA complètes</li>
-      <li>Tous les styles disponibles</li>
-      <li>Sans inscription requise</li>
-    </ul>
-    <a href="/app" class="btn-outline">Commencer maintenant</a>
-  </div>
+    <div class="price-card">
+      <div class="plan-name">Découverte</div>
+      <div class="price-amount">Gratuit</div>
+      <div class="price-period">3 simulations pour commencer</div>
+      <ul class="price-features">
+        <li>3 simulations IA complètes</li>
+        <li>Tous les styles disponibles</li>
+        <li>Sans inscription requise</li>
+      </ul>
+      <a href="/app" class="btn-price btn-price-outline">Commencer maintenant</a>
+    </div>
 
-  <div class="price-card featured">
-    <span class="price-tag">Accès illimité</span>
-    <div class="price-amount"><sup>€</sup>4<sup style="font-size:24px;">,99</sup></div>
-    <p class="price-period">paiement unique · à vie</p>
-    <ul class="price-features">
-      <li>Simulations illimitées</li>
-      <li>Tous les styles présents et futurs</li>
-      <li>Priorité de traitement</li>
-      <li>Accès à vie</li>
-    </ul>
-    <a href="/app" class="btn-solid">Obtenir l'accès illimité</a>
+    <div class="price-card featured">
+      <div class="plan-name">Accès illimité</div>
+      <div class="price-amount">€4<sup style="font-size:22px;">,99</sup></div>
+      <div class="price-period">paiement unique · à vie</div>
+      <ul class="price-features">
+        <li>Simulations illimitées</li>
+        <li>Tous les styles présents et futurs</li>
+        <li>Priorité de traitement</li>
+        <li>Accès à vie</li>
+      </ul>
+      <a href="/app" class="btn-price btn-price-fill">Obtenir l'accès illimité</a>
+    </div>
+
   </div>
 </section>
 
 <!-- FOOTER -->
 <footer>
   <div class="footer-logo"><span>N</span>M</div>
-  <div class="footer-name">Narjisse · Nairam · Institut</div>
+  <div class="footer-inst">Narjisse · Nairam · Institut</div>
   <div class="footer-info">
     2 Chemin de Belle Étoile · 33370 Tresses<br>
     Sur rendez-vous · <a href="https://instagram.com/institutnairam_narjisse" target="_blank">@institutnairam_narjisse</a>
