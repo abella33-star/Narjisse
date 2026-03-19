@@ -297,6 +297,7 @@
         <div class="wlc-step"><div class="step-ic">💅</div><div class="step-lbl">Rendu IA<br>instantané</div></div>
       </div>
       <button class="btn-start" onclick="go('sp')">Commencer ✦</button>
+      <p id="usage-info" style="font-size:11px;font-weight:300;color:var(--text-light);letter-spacing:.08em;margin-top:8px;margin-bottom:0;"></p>
       <div class="wlc-addr">2 Chemin de Belle Étoile · 33370 Tresses<br>Sur rendez-vous · <strong style="color:var(--terra)">@institutnairam_narjisse</strong></div>
     </div>
   </div>
@@ -693,6 +694,19 @@
   </div>
 </div>
 
+<!-- PAYWALL MODAL -->
+<div class="ovl" id="paywall-ovl">
+  <div class="sheet" style="text-align:center;">
+    <div class="sh-h"></div>
+    <div style="font-size:36px;margin-bottom:4px">💅</div>
+    <div class="sh-t">Vos 3 essais gratuits sont utilisés</div>
+    <p style="font-size:12px;font-weight:300;color:var(--text-mid);line-height:1.7;margin:8px 0 20px;">Débloquez un accès illimité pour visualiser tous vos styles sans limite.</p>
+    <a href="https://buy.stripe.com/7sY5kF5Craggb6b4Kd9oc00" class="btn-pr" style="display:block;text-decoration:none;text-align:center;margin-bottom:10px;">✦ Je m'abonne — 9,99€/mois</a>
+    <a href="https://buy.stripe.com/9B6aEZ3ujbkk1vB7Wp9oc01" style="display:block;font-size:11px;letter-spacing:.1em;color:var(--text-mid);text-decoration:none;padding:8px 0;text-transform:uppercase;">Je suis prothésiste →</a>
+    <button onclick="document.getElementById('paywall-ovl').style.display='none'" style="background:none;border:none;color:var(--text-light);font-family:'Jost',sans-serif;font-size:11px;letter-spacing:.12em;cursor:pointer;text-transform:uppercase;padding:6px;margin-top:4px;">Pas maintenant</button>
+  </div>
+</div>
+
 <!-- EMAIL MODAL -->
 <div class="ovl" id="ovl" onclick="closeMail(event)">
   <div class="sheet">
@@ -876,8 +890,11 @@ async function generate(){
   go('sl');
   try{
     const url=await callReplicate();
-    if(url) showResult(url);
-    else showError();
+    if(url){
+      _incUsage();
+      _updateUsageInfo();
+      showResult(url);
+    } else showError();
   }catch(err){
     console.error(err);
     window._lastError=err.message;
@@ -967,7 +984,49 @@ function buildPrompt(){
   return `Professional nail salon close-up photo. Only the nails are modified, the hand skin, fingers, background and lighting remain exactly as in the original photo. Nail shape is strictly: ${formeDesc}. Nail length: ${lengthDesc}. Nail design: ${styleDesc}. All five nails have identical shape, length and design. Seamless integration with surrounding skin. Photorealistic, sharp focus, high detail, no artifacts.`;
 }
 
+/* ────────────────────────────────────────
+   FREEMIUM — 3 essais gratuits
+   ──────────────────────────────────────── */
+const _USAGE_KEY = 'nm_usage_count';
+const _UNLOCK_KEY = 'nm_unlocked';
+const _FREE_LIMIT = 3;
+
+function _getUsage(){ return parseInt(localStorage.getItem(_USAGE_KEY)||'0'); }
+function _incUsage(){ localStorage.setItem(_USAGE_KEY, _getUsage()+1); }
+function _isUnlocked(){ return localStorage.getItem(_UNLOCK_KEY)==='true'; }
+
+function _updateUsageInfo(){
+  const el=document.getElementById('usage-info');
+  if(!el) return;
+  if(_isUnlocked()){ el.textContent='✦ Accès illimité actif'; return; }
+  const rem=Math.max(0,_FREE_LIMIT-_getUsage());
+  el.textContent= rem===0 ? '0 essai gratuit restant — abonnez-vous pour continuer'
+                : rem===1 ? '1 essai gratuit restant'
+                : rem+' essais gratuits restants';
+}
+
+function showPaywall(){
+  document.getElementById('paywall-ovl').style.display='flex';
+}
+
+/* Vérifier le code unlock dans l'URL (retour Stripe) */
+(function(){
+  const p=new URLSearchParams(window.location.search);
+  if(p.get('unlocked')==='ok2026'){
+    localStorage.setItem(_UNLOCK_KEY,'true');
+    history.replaceState({},'','/app');
+  }
+  document.addEventListener('DOMContentLoaded', _updateUsageInfo);
+})();
+
 async function callReplicate(){
+  /* Vérification freemium */
+  if(!_isUnlocked() && _getUsage()>=_FREE_LIMIT){
+    go('sstyle');
+    showPaywall();
+    return;
+  }
+
   const prompt=buildPrompt();
   const image=S.photo;
   const mask=getMask();
