@@ -278,15 +278,21 @@ function processData(history, bankroll, initialDeposit, profit) {
     );
   }
 
-  // ── 5b. Early anomaly: N≥3 + Z>2.5 → force PLAY (répétition dès 3 tirages)
+  // ── 5b. Early anomaly: Z>1.2 → force PLAY (secteur chauffe)
   let status;
   if (confidence >= 90) status = 'KILLER';
   else if (confidence >= 70) status = 'PLAY';
   else status = 'WAIT';
 
-  if (win.length >= 3 && best.Z > 2.5 && status === 'WAIT') {
+  if (best.Z > 1.2 && status === 'WAIT') {
     status = 'PLAY';
-    confidence = Math.max(confidence, 35);
+    confidence = Math.max(confidence, 30);
+  }
+
+  // Force PLAY after 5 spins — never leave Smart Splits empty
+  if (win.length >= 5 && status === 'WAIT') {
+    status = 'PLAY';
+    confidence = Math.max(confidence, 25);
   }
 
   if (status === 'WAIT') {

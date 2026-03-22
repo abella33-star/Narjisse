@@ -238,10 +238,16 @@ export function processData(
     status = 'WAIT'
   }
 
-  // Early anomaly override: N≥3 + Z>2.5 → force PLAY (répétition visible dès 3 tirages)
-  if (win.length >= 3 && best.Z > 2.5 && status === 'WAIT') {
+  // Early anomaly override: Z>1.2 → force PLAY (secteur chauffe)
+  if (best.Z > 1.2 && status === 'WAIT') {
     status = 'PLAY'
-    confidence = Math.max(confidence, 35)
+    confidence = Math.max(confidence, 30)
+  }
+
+  // Force PLAY after 5 spins — never leave Smart Splits empty
+  if (win.length >= 5 && status === 'WAIT') {
+    status = 'PLAY'
+    confidence = Math.max(confidence, 25)
   }
 
   if (status === 'WAIT') {
