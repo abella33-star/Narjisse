@@ -8,7 +8,6 @@ import BetCard        from '@/components/BetCard'
 import NumberPad      from '@/components/NumberPad'
 import ControlBar     from '@/components/ControlBar'
 
-// Heatmap is client-only (SVG, no SSR needed)
 const SectorHeatmap = dynamic(() => import('@/components/SectorHeatmap'), { ssr: false })
 
 // ── Settings Modal ────────────────────────────────────────────
@@ -16,14 +15,14 @@ function SettingsModal({
   current, onApply, onClose
 }: { current: number; onApply: (v: number) => void; onClose: () => void }) {
   const [val, setVal] = useState(current.toString())
-  const PRESETS = [200, 500, 1000, 2000, 5000]
+  const PRESETS = [50, 100, 200, 500, 1000]
 
   return (
     <div className="fixed inset-0 z-50 flex items-end" style={{ paddingBottom: 'var(--sab)' }}>
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative w-full bg-surface rounded-t-3xl p-6 border-t border-border animate-slide-up">
+      <div className="relative w-full bg-surface rounded-t-3xl p-6 border-t border-border">
         <div className="flex items-center justify-between mb-4">
-          <span className="text-sm font-black tracking-widest">💰 BANKROLL</span>
+          <span className="text-sm font-black tracking-widest">BANKROLL</span>
           <button onClick={onClose} className="text-muted text-xl">✕</button>
         </div>
         <input
@@ -76,9 +75,7 @@ function VictoryOverlay({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90">
       <div className="flex flex-col items-center gap-4 p-8 text-center max-w-sm">
-        <div className="text-6xl glow-gold" style={{ animation: 'glowGold 0.7s ease-in-out infinite' }}>
-          💰
-        </div>
+        <div className="text-6xl glow-gold">💰</div>
         <h1 className="text-4xl font-black tracking-[6px] text-gold">VICTOIRE</h1>
         <div className="text-gold font-black tracking-[3px]">ENCAISSE ET SORS</div>
         <div className="bg-card border border-gold/30 rounded-2xl p-4 w-full text-sm space-y-1.5">
@@ -95,18 +92,14 @@ function VictoryOverlay({
             <span className="font-black text-neon">+{fmt(bankroll - initialDeposit)}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-muted">Multiplicateur</span>
+            <span className="text-muted">×</span>
             <span className="font-black text-gold">×{mult}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-muted">Ratio V/D</span>
+            <span className="text-muted">V/D</span>
             <span className="font-black">{losses > 0 ? (wins/losses).toFixed(2) : '∞'}</span>
           </div>
         </div>
-        <p className="text-muted text-sm leading-relaxed">
-          Le moteur a détecté l'objectif optimal.<br />
-          <em>Un joueur discipliné sait quand s'arrêter.</em>
-        </p>
         <button
           onClick={onAcknowledge}
           className="btn-giant w-full bg-gold/10 text-gold border border-gold/40 rounded-2xl text-base"
@@ -142,7 +135,6 @@ export default function Home() {
 
   return (
     <>
-      {/* ── Victory overlay ── */}
       {showVictory && (
         <VictoryOverlay
           bankroll={state.bankroll}
@@ -152,8 +144,6 @@ export default function Home() {
           onAcknowledge={() => setShowVictory(false)}
         />
       )}
-
-      {/* ── Settings modal ── */}
       {showSettings && (
         <SettingsModal
           current={state.bankroll}
@@ -162,9 +152,8 @@ export default function Home() {
         />
       )}
 
-      {/* ── Main layout ── */}
       <main
-        className="h-screen flex flex-col bg-black"
+        className="h-screen flex flex-col bg-black overflow-hidden"
         style={{
           paddingTop:    'var(--sat)',
           paddingBottom: 'var(--sab)',
@@ -172,10 +161,19 @@ export default function Home() {
           paddingRight:  'var(--sar)',
         }}
       >
-        {/* ── Top 70%: analysis zone ── */}
-        <div className="flex flex-col flex-1 min-h-0 px-3 pt-2 gap-2 overflow-y-auto scroll-zone">
+        {/* ── TOP: Radar heatmap full-width ── */}
+        <div className="flex-shrink-0 flex justify-center px-2 pt-1" style={{ height: '38vh' }}>
+          <div className="h-full aspect-square">
+            <SectorHeatmap
+              heat={heat}
+              engineResult={result}
+              lastNumber={state.spins[state.spins.length - 1]?.number ?? null}
+            />
+          </div>
+        </div>
 
-          {/* Header */}
+        {/* ── MIDDLE: Bankroll + Signal compact ── */}
+        <div className="flex-shrink-0 px-3 py-1 flex flex-col gap-1.5">
           <BankrollHeader
             bankroll={state.bankroll}
             initialDeposit={state.initialDeposit}
@@ -183,32 +181,13 @@ export default function Home() {
             losses={state.losses}
             onOpenSettings={() => setShowSettings(true)}
           />
-
-          {/* Heatmap + Signal side by side on wide screens, stacked on iPhone */}
-          <div className="flex gap-2 items-start">
-            {/* Heatmap */}
-            <div className="w-[200px] flex-shrink-0 aspect-square">
-              <SectorHeatmap
-                heat={heat}
-                engineResult={result}
-                lastNumber={state.spins[state.spins.length - 1]?.number ?? null}
-              />
-            </div>
-
-            {/* Signal card */}
-            <div className="flex-1 min-w-0">
-              <SignalCard result={result} bufferSize={bufferSize} />
-            </div>
-          </div>
-
-          {/* Bet card */}
+          <SignalCard result={result} bufferSize={bufferSize} />
           <BetCard result={result} bankroll={state.bankroll} profit={profit} />
         </div>
 
-        {/* ── Bottom 30%: number pad + controls (thumb zone) ── */}
+        {/* ── BOTTOM: Number pad thumb zone ── */}
         <div
-          className="flex-shrink-0 px-3 pb-2 pt-2 border-t border-border flex flex-col gap-2"
-          style={{ minHeight: '30vh' }}
+          className="flex-1 min-h-0 px-3 pb-1 pt-1 border-t border-border flex flex-col gap-1.5"
         >
           <NumberPad
             onSpin={addSpin}
