@@ -110,6 +110,10 @@
   .ogrid.c1{grid-template-columns:1fr;}
 
   .ocard{background:var(--white);border:1px solid var(--nude-dark);border-radius:14px;padding:15px 12px;cursor:pointer;transition:all .22s;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;position:relative;box-shadow:0 2px 10px rgba(44,31,20,.05);}
+  .ocard.locked{opacity:.55;filter:saturate(.4);cursor:pointer;}
+  .ocard.locked::after{content:'🔒';position:absolute;top:7px;right:9px;font-size:11px;z-index:2;background:rgba(255,255,255,.85);border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;line-height:1;}
+  .lock-banner{display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,rgba(201,168,76,.08),rgba(194,123,74,.04));border:1px solid rgba(201,168,76,.25);border-radius:12px;padding:11px 14px;margin:4px 14px 10px;font-size:11.5px;font-weight:300;color:var(--text-mid);cursor:pointer;}
+  .lock-banner strong{color:var(--terra);font-weight:500;}
   .ocard:active{transform:scale(.97);}
   .ocard.sel{border-color:var(--gold);background:linear-gradient(135deg,rgba(201,168,76,.08),rgba(194,123,74,.04));
     box-shadow:0 3px 16px rgba(201,168,76,.2),0 0 0 1px rgba(201,168,76,.25);}
@@ -433,13 +437,14 @@
       <div class="q-eye">Étape 4 — Forme</div>
       <div class="q-title">Quelle forme souhaitez-vous ?</div>
     </div>
+    <div class="lock-banner" onclick="showFeaturePaywall()">🔒 <span><strong>Forme Premium</strong> — Carré, Arrondi, Stiletto, Coffin disponibles avec l'abonnement</span></div>
     <div class="ogrid">
-      <div class="ocard" onclick="sel(this,'forme','Carré')"><div class="ocard-ic">▭</div><div class="ocard-name">Carré</div><div class="ocard-desc">Classique & tendance</div></div>
-      <div class="ocard" onclick="sel(this,'forme','Arrondi')"><div class="ocard-ic">⬭</div><div class="ocard-name">Arrondi</div><div class="ocard-desc">Doux & naturel</div></div>
-      <div class="ocard" onclick="sel(this,'forme','Amande')"><div class="ocard-ic">🌰</div><div class="ocard-name">Amande</div><div class="ocard-desc">Élégant & féminin</div></div>
-      <div class="ocard" onclick="sel(this,'forme','Stiletto')"><div class="ocard-ic">🔺</div><div class="ocard-name">Stiletto</div><div class="ocard-desc">Audacieux & glamour</div></div>
-      <div class="ocard" onclick="sel(this,'forme','Coffin')"><div class="ocard-ic">🪦</div><div class="ocard-name">Coffin</div><div class="ocard-desc">Moderne & statement</div></div>
-      <div class="ocard" onclick="sel(this,'forme','Carré arrondi')"><div class="ocard-ic">◻️</div><div class="ocard-name">Carré arrondi</div><div class="ocard-desc">L'équilibre parfait</div></div>
+      <div class="ocard" onclick="sel(this,'forme','Amande')"><div class="ocard-ic">🌰</div><div class="ocard-name">Amande</div><div class="ocard-desc">Élégant & féminin ✦ Gratuit</div></div>
+      <div class="ocard locked" onclick="showFeaturePaywall()"><div class="ocard-ic">▭</div><div class="ocard-name">Carré</div><div class="ocard-desc">Classique & tendance</div></div>
+      <div class="ocard locked" onclick="showFeaturePaywall()"><div class="ocard-ic">⬭</div><div class="ocard-name">Arrondi</div><div class="ocard-desc">Doux & naturel</div></div>
+      <div class="ocard locked" onclick="showFeaturePaywall()"><div class="ocard-ic">🔺</div><div class="ocard-name">Stiletto</div><div class="ocard-desc">Audacieux & glamour</div></div>
+      <div class="ocard locked" onclick="showFeaturePaywall()"><div class="ocard-ic">🪦</div><div class="ocard-name">Coffin</div><div class="ocard-desc">Moderne & statement</div></div>
+      <div class="ocard locked" onclick="showFeaturePaywall()"><div class="ocard-ic">◻️</div><div class="ocard-name">Carré arrondi</div><div class="ocard-desc">L'équilibre parfait</div></div>
     </div>
   </div>
   <div class="bot"><button class="btn-next" id="bn-sforme" onclick="go('sstyle')">Continuer →</button></div>
@@ -458,6 +463,7 @@
       <div class="q-title">Quel style vous inspire ?</div>
       <div class="q-sub">Les poses réalisées au salon.</div>
     </div>
+    <div class="lock-banner" onclick="showFeaturePaywall()">🔒 <span><strong>+35 styles Premium</strong> — Glazed Donut, Rouge, Aura, Chrome, Nail Art… débloqués avec l'abonnement</span></div>
     <div class="ogrid">
       <div class="ocard" onclick="sel(this,'style','French manucure classique')">
         <div class="swatch" style="background:linear-gradient(160deg,#fff 45%,#F5DDD0 45%);border:1.5px solid #eee;"></div>
@@ -479,163 +485,163 @@
         <div class="swatch" style="background:#C4A882;"></div>
         <div class="ocard-name">Nude Taupe</div><div class="ocard-desc">Minimaliste & chic</div>
       </div>
-      <div class="ocard" onclick="sel(this,'style','Glazed donut nacré irisé')">
+      <div class="ocard locked" onclick="showFeaturePaywall()">
         <div class="swatch" style="background:linear-gradient(135deg,#FFF0F0,#FAE8E8);box-shadow:inset 0 0 10px rgba(255,180,180,.5),inset 0 -3px 6px rgba(255,255,255,.9);border:1.5px solid #f0e0e0;"></div>
         <div class="ocard-name">Glazed Donut</div><div class="ocard-desc">Nacré & lumineux</div>
       </div>
-      <div class="ocard" onclick="sel(this,'style','Aura nails nuages pastel')">
+      <div class="ocard locked" onclick="showFeaturePaywall()">
         <div class="swatch" style="background:radial-gradient(ellipse at 30% 40%,rgba(200,150,255,.6),transparent 60%),radial-gradient(ellipse at 70% 60%,rgba(150,200,255,.6),transparent 60%),radial-gradient(ellipse at 50% 50%,rgba(255,180,200,.4),transparent 70%),#F5F0FF;"></div>
         <div class="ocard-name">Aura Nails</div><div class="ocard-desc">Nuage & rêve</div>
       </div>
-      <div class="ocard" onclick="sel(this,'style','Floral rose & feuilles d or')">
+      <div class="ocard locked" onclick="showFeaturePaywall()">
         <div class="swatch" style="background:radial-gradient(circle at 35% 40%,#E8A0B0 8px,transparent 8px),radial-gradient(circle at 65% 60%,#E8A0B0 6px,transparent 6px),radial-gradient(circle at 55% 25%,#D4A020 5px,transparent 5px),#F5E8E0;"></div>
         <div class="ocard-name">Floral & Or</div><div class="ocard-desc">Fleurs roses, paillettes or</div>
       </div>
-      <div class="ocard" onclick="sel(this,'style','Nail art floral cerisier japonais')">
+      <div class="ocard locked" onclick="showFeaturePaywall()">
         <div class="swatch" style="background:radial-gradient(circle at 30% 35%,#F0B8C8 7px,transparent 7px),radial-gradient(circle at 60% 55%,#F0B8C8 5px,transparent 5px),radial-gradient(circle at 75% 30%,#ECA0B5 6px,transparent 6px),#FDF0F5;"></div>
         <div class="ocard-name">Floral Cerisier</div><div class="ocard-desc">Délicat & printanier</div>
       </div>
-      <div class="ocard" onclick="sel(this,'style','Rouge passion profond')">
+      <div class="ocard locked" onclick="showFeaturePaywall()">
         <div class="swatch" style="background:linear-gradient(135deg,#A01515,#7A0C0C);"></div>
         <div class="ocard-name">Rouge Passion</div><div class="ocard-desc">Intense & glamour</div>
       </div>
-      <div class="ocard" onclick="sel(this,'style','Bordeaux profond')">
+      <div class="ocard locked" onclick="showFeaturePaywall()">
         <div class="swatch" style="background:linear-gradient(135deg,#6B1A2A,#4A0F1E);"></div>
         <div class="ocard-name">Bordeaux</div><div class="ocard-desc">Chic & raffiné</div>
       </div>
-      <div class="ocard" onclick="sel(this,'style','Rose poudré')">
+      <div class="ocard locked" onclick="showFeaturePaywall()">
         <div class="swatch" style="background:linear-gradient(135deg,#ECC8C8,#D9A8A8);"></div>
         <div class="ocard-name">Rose Poudré</div><div class="ocard-desc">Féminin & délicat</div>
       </div>
-      <div class="ocard" onclick="sel(this,'style','Dégradé sunset rose orange')">
+      <div class="ocard locked" onclick="showFeaturePaywall()">
         <div class="swatch" style="background:linear-gradient(180deg,#FF6B95,#FF9A6C,#FFD166);"></div>
         <div class="ocard-name">Sunset Ombré</div><div class="ocard-desc">Coucher de soleil</div>
       </div>
-      <div class="ocard" onclick="sel(this,'style','Corail pêche nacré')">
+      <div class="ocard locked" onclick="showFeaturePaywall()">
         <div class="swatch" style="background:linear-gradient(135deg,#FF8C69,#FFA07A);"></div>
         <div class="ocard-name">Corail Pêche</div><div class="ocard-desc">Estival & lumineux</div>
       </div>
-      <div class="ocard" onclick="sel(this,'style','Terracotta terre cuite')">
+      <div class="ocard locked" onclick="showFeaturePaywall()">
         <div class="swatch" style="background:linear-gradient(135deg,#C17754,#A35C3A);"></div>
         <div class="ocard-name">Terracotta</div><div class="ocard-desc">Chaleur & naturel</div>
       </div>
-      <div class="ocard" onclick="sel(this,'style','Lilas pastel doux')">
+      <div class="ocard locked" onclick="showFeaturePaywall()">
         <div class="swatch" style="background:linear-gradient(135deg,#C8A8D8,#B090C8);"></div>
         <div class="ocard-name">Lilas Pastel</div><div class="ocard-desc">Romantique & doux</div>
       </div>
-      <div class="ocard" onclick="sel(this,'style','Bleu ciel pastel doux')">
+      <div class="ocard locked" onclick="showFeaturePaywall()">
         <div class="swatch" style="background:linear-gradient(135deg,#AED9E0,#B8E0F7);"></div>
         <div class="ocard-name">Bleu Ciel</div><div class="ocard-desc">Frais & lumineux</div>
       </div>
-      <div class="ocard" onclick="sel(this,'style','Bleu nuit profond nacré')">
+      <div class="ocard locked" onclick="showFeaturePaywall()">
         <div class="swatch" style="background:linear-gradient(135deg,#1A2A5E,#0D1A3E);box-shadow:inset 0 0 8px rgba(100,150,255,.3);"></div>
         <div class="ocard-name">Bleu Nuit</div><div class="ocard-desc">Mystérieux & élégant</div>
       </div>
-      <div class="ocard" onclick="sel(this,'style','Vert émeraude profond')">
+      <div class="ocard locked" onclick="showFeaturePaywall()">
         <div class="swatch" style="background:linear-gradient(135deg,#1A6B45,#0D4A30);"></div>
         <div class="ocard-name">Vert Émeraude</div><div class="ocard-desc">Intense & naturel</div>
       </div>
-      <div class="ocard" onclick="sel(this,'style','Vert menthe fraîche')">
+      <div class="ocard locked" onclick="showFeaturePaywall()">
         <div class="swatch" style="background:linear-gradient(135deg,#98D8C8,#7BC8B5);"></div>
         <div class="ocard-name">Vert Menthe</div><div class="ocard-desc">Frais & moderne</div>
       </div>
-      <div class="ocard" onclick="sel(this,'style','Violet chrome & noir mat')">
+      <div class="ocard locked" onclick="showFeaturePaywall()">
         <div class="swatch" style="background:linear-gradient(135deg,#5B1A8A,#1A1A2E);box-shadow:inset 0 0 8px rgba(180,100,255,.4);"></div>
         <div class="ocard-name">Violet Chrome</div><div class="ocard-desc">Audacieux & éclat</div>
       </div>
-      <div class="ocard" onclick="sel(this,'style','Noir mat élégant')">
+      <div class="ocard locked" onclick="showFeaturePaywall()">
         <div class="swatch" style="background:linear-gradient(135deg,#1A1A1A,#2D2D2D);"></div>
         <div class="ocard-name">Noir Mat</div><div class="ocard-desc">Audacieux & moderne</div>
       </div>
-      <div class="ocard" onclick="sel(this,'style','Or chrome doré métallique')">
+      <div class="ocard locked" onclick="showFeaturePaywall()">
         <div class="swatch" style="background:linear-gradient(135deg,#D4AF37,#B8860B,#FFD700);"></div>
         <div class="ocard-name">Or Chrome</div><div class="ocard-desc">Métallique & luxe</div>
       </div>
-      <div class="ocard" onclick="sel(this,'style','Rose gold chrome métallique')">
+      <div class="ocard locked" onclick="showFeaturePaywall()">
         <div class="swatch" style="background:linear-gradient(135deg,#E8A0A0,#D4788A,#C06080);"></div>
         <div class="ocard-name">Rose Gold</div><div class="ocard-desc">Cuivré & précieux</div>
       </div>
-      <div class="ocard" onclick="sel(this,'style','Chrome argenté miroir')">
+      <div class="ocard locked" onclick="showFeaturePaywall()">
         <div class="swatch" style="background:linear-gradient(135deg,#B0B8C8,#D8DDE8,#9098A8);box-shadow:inset 0 0 8px rgba(255,255,255,.6);"></div>
         <div class="ocard-name">Chrome Argent</div><div class="ocard-desc">Miroir métallique</div>
       </div>
-      <div class="ocard" onclick="sel(this,'style','Chrome holographique irisé')">
+      <div class="ocard locked" onclick="showFeaturePaywall()">
         <div class="swatch" style="background:linear-gradient(135deg,#FF6B6B,#FFD700,#4ECDC4,#A855F7);"></div>
         <div class="ocard-name">Holo Chrome</div><div class="ocard-desc">Arc-en-ciel irisé</div>
       </div>
-      <div class="ocard" onclick="sel(this,'style','Marbre blanc veines dorées')">
+      <div class="ocard locked" onclick="showFeaturePaywall()">
         <div class="swatch" style="background:#F8F6F2;background-image:repeating-linear-gradient(25deg,transparent,transparent 10px,rgba(212,175,55,.25) 10px,rgba(212,175,55,.25) 11px),repeating-linear-gradient(80deg,transparent,transparent 7px,rgba(200,195,185,.2) 7px,rgba(200,195,185,.2) 8px);"></div>
         <div class="ocard-name">Marbre & Or</div><div class="ocard-desc">Luxe intemporel</div>
       </div>
-      <div class="ocard" onclick="sel(this,'style','Glitter argent pailleté')">
+      <div class="ocard locked" onclick="showFeaturePaywall()">
         <div class="swatch" style="background:linear-gradient(135deg,#C8C8D0,#E0E0E8);background-image:radial-gradient(circle 1px at 20% 30%,rgba(255,255,255,.9) 100%,transparent 0),radial-gradient(circle 1px at 60% 70%,rgba(255,255,255,.9) 100%,transparent 0),radial-gradient(circle 1px at 80% 20%,rgba(255,255,255,.9) 100%,transparent 0);"></div>
         <div class="ocard-name">Glitter Argent</div><div class="ocard-desc">Étincelant & festif</div>
       </div>
-      <div class="ocard" onclick="sel(this,'style','Galaxie étoilée fond noir pailleté')">
+      <div class="ocard locked" onclick="showFeaturePaywall()">
         <div class="swatch" style="background:linear-gradient(135deg,#1A1A2E,#16213E);background-image:radial-gradient(circle 1.5px at 25% 30%,#FFD700 100%,transparent 0),radial-gradient(circle 1px at 60% 20%,#FFD700 100%,transparent 0),radial-gradient(circle 1px at 75% 60%,#C0C0C0 100%,transparent 0),radial-gradient(circle 1.5px at 40% 75%,#FFD700 100%,transparent 0);"></div>
         <div class="ocard-name">Galaxie Étoilée</div><div class="ocard-desc">Mystère & brillance</div>
       </div>
-      <div class="ocard" onclick="sel(this,'style','Brown freestyle animal print')">
+      <div class="ocard locked" onclick="showFeaturePaywall()">
         <div class="swatch" style="background:linear-gradient(135deg,#8B5E3C,#6B3A1F);background-image:radial-gradient(ellipse 6px 4px at 30% 40%,rgba(0,0,0,.3) 0%,transparent 100%),radial-gradient(ellipse 5px 3px at 65% 65%,rgba(0,0,0,.25) 0%,transparent 100%);"></div>
         <div class="ocard-name">Animal Print</div><div class="ocard-desc">Léopard automne</div>
       </div>
-      <div class="ocard" onclick="sel(this,'style','French tip colorée rose vif')">
+      <div class="ocard locked" onclick="showFeaturePaywall()">
         <div class="swatch" style="background:linear-gradient(160deg,#FF6B95 45%,#F5E8E0 45%);border:1.5px solid #eee;"></div>
         <div class="ocard-name">French Colorée</div><div class="ocard-desc">Tips rose vif</div>
       </div>
-      <div class="ocard" onclick="sel(this,'style','French manucure inversée')">
+      <div class="ocard locked" onclick="showFeaturePaywall()">
         <div class="swatch" style="background:linear-gradient(160deg,#F5E8E0 45%,#C8A0B8 45%);border:1.5px solid #eee;"></div>
         <div class="ocard-name">French Inversée</div><div class="ocard-desc">Tendance & moderne</div>
       </div>
-      <div class="ocard" onclick="sel(this,'style','Arabesques dorées sur nude')">
+      <div class="ocard locked" onclick="showFeaturePaywall()">
         <div class="swatch" style="background:#E8D5C0;background-image:repeating-linear-gradient(45deg,transparent,transparent 4px,rgba(212,175,55,.4) 4px,rgba(212,175,55,.4) 5px);"></div>
         <div class="ocard-name">Arabesques Or</div><div class="ocard-desc">Nail art précieux</div>
       </div>
-      <div class="ocard" onclick="sel(this,'style','Nail art géométrique lignes dorées')">
+      <div class="ocard locked" onclick="showFeaturePaywall()">
         <div class="swatch" style="background:#F5EEE6;background-image:linear-gradient(45deg,transparent 40%,rgba(212,175,55,.5) 40%,rgba(212,175,55,.5) 42%,transparent 42%),linear-gradient(-45deg,transparent 55%,rgba(212,175,55,.5) 55%,rgba(212,175,55,.5) 57%,transparent 57%);"></div>
         <div class="ocard-name">Géométrique Or</div><div class="ocard-desc">Lignes fines & luxe</div>
       </div>
-      <div class="ocard" onclick="sel(this,'style','Dualité chaud-froid bleu rouge')">
+      <div class="ocard locked" onclick="showFeaturePaywall()">
         <div class="swatch" style="background:conic-gradient(from 180deg, #1565C0 0deg 170deg, #FFFFFF 170deg 185deg, #E53935 185deg 355deg, #FFFFFF 355deg 360deg);border-radius:50%;box-shadow:0 0 6px rgba(0,0,0,.2);"></div>
         <div class="ocard-name">Chaud-Froid</div><div class="ocard-desc">Bleu & rouge bicolore</div>
       </div>
-      <div class="ocard" onclick="sel(this,'style','Élégance sombre noir mat et feuille or')">
+      <div class="ocard locked" onclick="showFeaturePaywall()">
         <div class="swatch" style="background:linear-gradient(90deg,#0D0D0D 50%,#D4AF37 50%);box-shadow:inset 0 0 0 1px rgba(212,175,55,.3);"></div>
         <div class="ocard-name">Noir & Or</div><div class="ocard-desc">Mat velouté & or craquelé</div>
       </div>
-      <div class="ocard" onclick="sel(this,'style','Douceur printanière lilas et jaune pastel')">
+      <div class="ocard locked" onclick="showFeaturePaywall()">
         <div class="swatch" style="background:linear-gradient(135deg,#C9B8E8 50%,#F9F0A0 50%);"></div>
         <div class="ocard-name">Lilas & Citron</div><div class="ocard-desc">Diagonal pastel glossy</div>
       </div>
-      <div class="ocard" onclick="sel(this,'style','Mystère magnétique vert cat-eye et chrome argent')">
+      <div class="ocard locked" onclick="showFeaturePaywall()">
         <div class="swatch" style="background:linear-gradient(90deg,#1B6B3A 50%,#C0C8D0 50%);box-shadow:inset 2px 0 8px rgba(255,255,255,.3);"></div>
         <div class="ocard-name">Cat-Eye & Chrome</div><div class="ocard-desc">Vert magnétique & miroir</div>
       </div>
-      <div class="ocard" onclick="sel(this,'style','Gourmandise chic nude et chocolat vague')">
+      <div class="ocard locked" onclick="showFeaturePaywall()">
         <div class="swatch" style="background:linear-gradient(to bottom right,#E8D5B8 0%,#E8D5B8 45%,#5C3317 55%,#5C3317 100%);"></div>
         <div class="ocard-name">Nude & Chocolat</div><div class="ocard-desc">Vague fluide & brillant</div>
       </div>
-      <div class="ocard" onclick="sel(this,'style','Rêve océanique bleu marine et paillettes holographiques')">
+      <div class="ocard locked" onclick="showFeaturePaywall()">
         <div class="swatch" style="background:linear-gradient(90deg,#0D2B55 50%,#FFFFFF 50.5%,#7EC8E3 51%);background-image:linear-gradient(90deg,#0D2B55 50%,rgba(255,255,255,.8) 50.3%,#6BA3D6 50.6%,#A8D8F0 55%,#D4EDFF 60%,#C0D8F8 65%,#88C0E8 70%,#B0D0F0 75%,#7EC8E3 80%,#A0C8E8 85%,#D8ECFF 90%,#B8D8F0 100%);"></div>
         <div class="ocard-name">Océan Holo</div><div class="ocard-desc">Bleu marine & paillettes</div>
       </div>
-      <div class="ocard" onclick="sel(this,'style','Contraste électrique rose néon et noir jais')">
+      <div class="ocard locked" onclick="showFeaturePaywall()">
         <div class="swatch" style="background:linear-gradient(90deg,#FF007F 50%,#0A0A0A 50%);box-shadow:0 0 8px rgba(255,0,127,.4);"></div>
         <div class="ocard-name">Néon & Noir</div><div class="ocard-desc">Rose électrique & jais</div>
       </div>
-      <div class="ocard" onclick="sel(this,'style','Glamour classique bordeaux uni et glitter rouge')">
-        <div class="swatch" style="background:linear-gradient(180deg,#6B1A2A 50%,#CC2200 50%);background-image:linear-gradient(180deg,#6B1A2A 50%,#CC2200 50%);"></div>
+      <div class="ocard locked" onclick="showFeaturePaywall()">
+        <div class="swatch" style="background:linear-gradient(180deg,#6B1A2A 50%,#CC2200 50%);"></div>
         <div class="ocard-name">Bordeaux & Glitter</div><div class="ocard-desc">Rouge profond & pailleté</div>
       </div>
-      <div class="ocard" onclick="sel(this,'style','Fraîcheur fruitée orange sanguine et crème mat')">
+      <div class="ocard locked" onclick="showFeaturePaywall()">
         <div class="swatch" style="background:linear-gradient(90deg,#E8521A 50%,#FDF5EC 50%);"></div>
         <div class="ocard-name">Orange & Crème</div><div class="ocard-desc">Estival mat & vif</div>
       </div>
-      <div class="ocard" onclick="sel(this,'style','Minimalisme futuriste gris béton et acier brossé')">
+      <div class="ocard locked" onclick="showFeaturePaywall()">
         <div class="swatch" style="background:linear-gradient(180deg,#7A7A7A 50%,#9EABB8 50%);"></div>
         <div class="ocard-name">Béton & Acier</div><div class="ocard-desc">Gris mat & métal brossé</div>
       </div>
-      <div class="ocard" onclick="sel(this,'style','Magie holo violet profond et poudre holographique')">
+      <div class="ocard locked" onclick="showFeaturePaywall()">
         <div class="swatch" style="background:linear-gradient(135deg,#4B0082 50%,#FF6EC7 50%);background-image:linear-gradient(135deg,#4B0082 50%,#FF6EC7 50.3%,#FFD700 55%,#00FFFF 65%,#FF69B4 75%,#9B59B6 85%,#4B0082 100%);"></div>
         <div class="ocard-name">Violet & Holo</div><div class="ocard-desc">Arc-en-ciel diagonal</div>
       </div>
@@ -694,16 +700,40 @@
   </div>
 </div>
 
-<!-- PAYWALL MODAL -->
+<!-- PAYWALL MODAL — usage limit -->
 <div class="ovl" id="paywall-ovl">
   <div class="sheet" style="text-align:center;">
     <div class="sh-h"></div>
     <div style="font-size:36px;margin-bottom:4px">💅</div>
     <div class="sh-t">Vos 3 essais gratuits sont utilisés</div>
-    <p style="font-size:12px;font-weight:300;color:var(--text-mid);line-height:1.7;margin:8px 0 20px;">Débloquez un accès illimité pour visualiser tous vos styles sans limite.</p>
-    <a href="https://buy.stripe.com/7sY5kF5Craggb6b4Kd9oc00" class="btn-pr" style="display:block;text-decoration:none;text-align:center;margin-bottom:10px;">✦ Je m'abonne — 9,99€/mois</a>
-    <a href="https://buy.stripe.com/9B6aEZ3ujbkk1vB7Wp9oc01" style="display:block;font-size:11px;letter-spacing:.1em;color:var(--text-mid);text-decoration:none;padding:8px 0;text-transform:uppercase;">Je suis prothésiste →</a>
+    <p style="font-size:12px;font-weight:300;color:var(--text-mid);line-height:1.7;margin:8px 0 20px;">Débloquez tous les styles, toutes les formes et des simulations illimitées.</p>
+    <a href="https://buy.stripe.com/7sY5kF5Craggb6b4Kd9oc00" class="btn-pr" style="display:block;text-decoration:none;text-align:center;margin-bottom:10px;">✦ Semaine illimitée — 2,99€</a>
+    <a href="https://buy.stripe.com/7sY5kF5Craggb6b4Kd9oc00" style="display:block;font-size:11px;letter-spacing:.08em;color:var(--text-mid);text-decoration:none;padding:6px 0;">Ou accès à vie — 9,99€ →</a>
     <button onclick="document.getElementById('paywall-ovl').style.display='none'" style="background:none;border:none;color:var(--text-light);font-family:'Jost',sans-serif;font-size:11px;letter-spacing:.12em;cursor:pointer;text-transform:uppercase;padding:6px;margin-top:4px;">Pas maintenant</button>
+  </div>
+</div>
+
+<!-- FEATURE PAYWALL MODAL — style/forme locked -->
+<div class="ovl" id="feature-paywall-ovl" onclick="if(event.target===this)this.style.display='none'">
+  <div class="sheet" style="text-align:center;">
+    <div class="sh-h"></div>
+    <div style="font-size:36px;margin-bottom:4px">🔒</div>
+    <div class="sh-t">Style ou forme Premium</div>
+    <p style="font-size:12px;font-weight:300;color:var(--text-mid);line-height:1.7;margin:8px 0 6px;">Accédez à <strong style="color:var(--terra)">+35 styles</strong> et toutes les formes (Carré, Stiletto, Coffin…) avec l'abonnement.</p>
+    <div style="display:flex;gap:10px;margin:14px 0 10px;">
+      <div style="flex:1;padding:14px 10px;background:var(--nude);border:1px solid var(--nude-dark);border-radius:14px;">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:300;color:var(--text-dark);">2,99€</div>
+        <div style="font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-light);margin-top:2px;">par semaine</div>
+      </div>
+      <div style="flex:1;padding:14px 10px;background:linear-gradient(135deg,rgba(201,168,76,.12),rgba(194,123,74,.06));border:1px solid rgba(201,168,76,.35);border-radius:14px;">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:300;color:var(--text-dark);">9,99€</div>
+        <div style="font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold-dark);margin-top:2px;">à vie ✦</div>
+      </div>
+    </div>
+    <!-- ⚠️ Remplacer les liens Stripe ci-dessous par vos vrais liens -->
+    <a href="https://buy.stripe.com/7sY5kF5Craggb6b4Kd9oc00" class="btn-pr" style="display:block;text-decoration:none;text-align:center;margin-bottom:8px;">✦ Débloquer la semaine — 2,99€</a>
+    <a href="https://buy.stripe.com/7sY5kF5Craggb6b4Kd9oc00" style="display:block;font-size:11px;letter-spacing:.08em;color:var(--text-mid);text-decoration:none;padding:6px 0;">Accès à vie — 9,99€ →</a>
+    <button onclick="document.getElementById('feature-paywall-ovl').style.display='none'" style="background:none;border:none;color:var(--text-light);font-family:'Jost',sans-serif;font-size:11px;letter-spacing:.12em;cursor:pointer;text-transform:uppercase;padding:6px;margin-top:4px;">Pas maintenant</button>
   </div>
 </div>
 
@@ -1009,6 +1039,11 @@ function showPaywall(){
   document.getElementById('paywall-ovl').style.display='flex';
 }
 
+function showFeaturePaywall(){
+  if(_isUnlocked()) return; // déjà débloqué, ne pas afficher
+  document.getElementById('feature-paywall-ovl').style.display='flex';
+}
+
 /* Vérifier le code unlock dans l'URL (retour Stripe) */
 (function(){
   const p=new URLSearchParams(window.location.search);
@@ -1016,8 +1051,66 @@ function showPaywall(){
     localStorage.setItem(_UNLOCK_KEY,'true');
     history.replaceState({},'','/app');
   }
-  document.addEventListener('DOMContentLoaded', _updateUsageInfo);
+  document.addEventListener('DOMContentLoaded', ()=>{
+    _updateUsageInfo();
+    // Si débloqué : rendre toutes les cartes locked cliquables normalement
+    if(_isUnlocked()){
+      document.querySelectorAll('.ocard.locked').forEach(card=>{
+        card.classList.remove('locked');
+        // Reconstruire onclick selon le contexte (forme ou style)
+        const screen = card.closest('.screen');
+        const name = card.querySelector('.ocard-name')?.textContent?.trim();
+        if(!screen || !name) return;
+        if(screen.id==='sforme'){
+          card.onclick=function(){ sel(this,'forme',name); };
+        } else if(screen.id==='sstyle'){
+          // Trouver la valeur réelle dans STYLE_PROMPTS
+          const styleKey = Object.keys(STYLE_PROMPTS).find(k=>
+            k.toLowerCase().includes(name.toLowerCase().split(' ')[0].toLowerCase())
+          );
+          // Pour les styles, on reconstruit depuis le nom affiché → clé
+          card.onclick=(function(n){ return function(){ _selStyleByDisplayName(this,n); }; })(name);
+        }
+      });
+    }
+  });
 })();
+
+/* Map nom affiché → clé style pour unlock */
+const _DISPLAY_TO_STYLE = {
+  'Glazed Donut':'Glazed donut nacré irisé','Aura Nails':'Aura nails nuages pastel',
+  'Floral & Or':'Floral rose & feuilles d or','Floral Cerisier':'Nail art floral cerisier japonais',
+  'Rouge Passion':'Rouge passion profond','Bordeaux':'Bordeaux profond',
+  'Rose Poudré':'Rose poudré','Sunset Ombré':'Dégradé sunset rose orange',
+  'Corail Pêche':'Corail pêche nacré','Terracotta':'Terracotta terre cuite',
+  'Lilas Pastel':'Lilas pastel doux','Bleu Ciel':'Bleu ciel pastel doux',
+  'Bleu Nuit':'Bleu nuit profond nacré','Vert Émeraude':'Vert émeraude profond',
+  'Vert Menthe':'Vert menthe fraîche','Violet Chrome':'Violet chrome & noir mat',
+  'Noir Mat':'Noir mat élégant','Or Chrome':'Or chrome doré métallique',
+  'Rose Gold':'Rose gold chrome métallique','Chrome Argent':'Chrome argenté miroir',
+  'Holo Chrome':'Chrome holographique irisé','Marbre & Or':'Marbre blanc veines dorées',
+  'Glitter Argent':'Glitter argent pailleté','Galaxie Étoilée':'Galaxie étoilée fond noir pailleté',
+  'Animal Print':'Brown freestyle animal print','French Colorée':'French tip colorée rose vif',
+  'French Inversée':'French manucure inversée','Arabesques Or':'Arabesques dorées sur nude',
+  'Géométrique Or':'Nail art géométrique lignes dorées','Chaud-Froid':'Dualité chaud-froid bleu rouge',
+  'Noir & Or':'Élégance sombre noir mat et feuille or','Lilas & Citron':'Douceur printanière lilas et jaune pastel',
+  'Cat-Eye & Chrome':'Mystère magnétique vert cat-eye et chrome argent',
+  'Nude & Chocolat':'Gourmandise chic nude et chocolat vague',
+  'Océan Holo':'Rêve océanique bleu marine et paillettes holographiques',
+  'Néon & Noir':'Contraste électrique rose néon et noir jais',
+  'Bordeaux & Glitter':'Glamour classique bordeaux uni et glitter rouge',
+  'Orange & Crème':'Fraîcheur fruitée orange sanguine et crème mat',
+  'Béton & Acier':'Minimalisme futuriste gris béton et acier brossé',
+  'Violet & Holo':'Magie holo violet profond et poudre holographique',
+  'Carré':'Carré','Arrondi':'Arrondi','Stiletto':'Stiletto','Coffin':'Coffin','Carré arrondi':'Carré arrondi'
+};
+function _selStyleByDisplayName(card, displayName){
+  const val = _DISPLAY_TO_STYLE[displayName] || displayName;
+  sel(card,'style',val);
+}
+function _selFormeByDisplayName(card, displayName){
+  sel(card,'forme',displayName);
+}
 
 async function callReplicate(){
   /* Vérification freemium */
