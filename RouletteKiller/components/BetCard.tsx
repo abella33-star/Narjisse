@@ -27,23 +27,27 @@ function getSectorKey(target: string): SectorKey | null {
 
 export default function BetCard({ result, bankroll, profit }: Props) {
   const status    = result?.status ?? 'WAIT'
-  const isActive  = status === 'PLAY' || status === 'KILLER'
+  const isNoise   = status === 'NOISE'
+  // Show bet UI for PLAY, KILLER, or NOISE when engine has computed real splits
+  const isActive  = status === 'PLAY' || status === 'KILLER' || (isNoise && (r?.splits?.length ?? 0) > 0)
   const isKiller  = status === 'KILLER'
   const isSniper  = result?.phase === 'Sniper'
   const r         = result?.recommendation
 
   // Derive sector info for dynamic display
-  const sectorKey   = isActive && r ? getSectorKey(r.target) : null
+  const sectorKey   = r ? getSectorKey(r.target) : null
   const sectorColor = sectorKey ? SECTOR_COLORS[sectorKey] : '#555'
   const sectorLabel = sectorKey ? SECTOR_LABELS[sectorKey] : r?.target ?? '—'
   const sectorData  = sectorKey && result?.sectors ? result.sectors[sectorKey] : null
 
-  const betColor = isKiller ? 'text-gold' : 'text-neon'
+  const betColor = isKiller ? 'text-gold' : isNoise ? 'text-crimson' : 'text-neon'
   const cardBorder = isKiller
     ? 'border-gold/40 bg-gold/5'
-    : isActive
-      ? 'border-neon/20'
-      : 'border-border'
+    : isNoise && isActive
+      ? 'border-crimson/30 bg-crimson/5'
+      : isActive
+        ? 'border-neon/20'
+        : 'border-border'
 
   return (
     <div
@@ -54,7 +58,7 @@ export default function BetCard({ result, bankroll, profit }: Props) {
       {/* ── Header: label + sector badge + mode ── */}
       <div className="flex items-center justify-between">
         <div className="rk-label" style={{ marginBottom: 0 }}>
-          {isSniper ? '🎯 SMART SPLITS — SNIPER' : 'SMART SPLITS — PRUDENT'}
+          {isSniper ? '🎯 SMART SPLITS — SNIPER' : isNoise ? '⚠️ SMART SPLITS — BRUIT' : 'SMART SPLITS — PRUDENT'}
         </div>
         <div className="flex items-center gap-1.5">
           {isActive && sectorKey && (
@@ -68,8 +72,8 @@ export default function BetCard({ result, bankroll, profit }: Props) {
           {isKiller && (
             <span className="text-[8px] font-black text-gold tracking-widest animate-pulse">⚡ KILLER</span>
           )}
-          {status === 'NOISE' && (
-            <span className="text-[8px] font-black text-crimson tracking-widest">🚫 BRUIT</span>
+          {isNoise && isActive && (
+            <span className="text-[8px] font-black text-crimson tracking-widest">⚠️ BRUIT</span>
           )}
         </div>
       </div>

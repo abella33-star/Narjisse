@@ -218,12 +218,14 @@ export function processData(
   if (offset.detected) confidence = Math.min(100, confidence * 1.30)
   confidence = Math.round(confidence * 10) / 10
 
-  // 5. Noise gate — bypassed when Z > 2.5 (sector anomaly takes priority)
+  // 5. Noise gate — always show best sector even in noise (never return nothing)
   if (noise && confidence < SIGNAL_THRESHOLDS.NOISE_GATE && best.Z <= 2.5) {
+    const strat = getStrategy(bestKey, confidence, bankroll, profit)
     return _out('NOISE', confidence,
-      { target:'NOISE', type:'—', splits:[], bet_per_split:0, bet_value:0, num_bets:0 },
-      `Distributions aléatoires — χ²-col p=${cTest.pValue.toFixed(3)}, χ²-par p=${pTest.pValue.toFixed(3)}`,
-      0, '—', sectors, cTest, pTest, offset, performance.now()-t0)
+      { target: SECTOR_LABELS[bestKey], type: 'Prudent',
+        splits: strat.splits, bet_per_split: strat.bps, bet_value: strat.totalBet, num_bets: strat.n },
+      `BRUIT — ${SECTOR_LABELS[bestKey]} reste dominant · χ²-col p=${cTest.pValue.toFixed(3)}, χ²-par p=${pTest.pValue.toFixed(3)}`,
+      strat.potentialGain, 'Prudent', sectors, cTest, pTest, offset, performance.now()-t0)
   }
 
   // 6. Status
