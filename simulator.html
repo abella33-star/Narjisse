@@ -905,10 +905,10 @@ function drawNailShape(ctx, hl, hw, forme) {
 }
 
 // apply_length: extension factor beyond TIP relative to DIP-TIP distance
-//   S = +10%  |  M = +25%  |  L = +45%
+//   S = +10%  |  M = +30%  |  L = +60%  (L boosted so length is unmistakable)
 function apply_length(longueur) {
-  if (longueur === 'Longue L')  return 0.45;
-  if (longueur === 'Moyenne M') return 0.25;
+  if (longueur === 'Longue L')  return 0.60;
+  if (longueur === 'Moyenne M') return 0.30;
   return 0.10; // Courte S
 }
 
@@ -1073,8 +1073,9 @@ function getStyleRgb(style){
   return C[style]||[215,165,155];
 }
 
-// Canvas-based fallback renderer — per-nail geometry with volume, apex,
-// cuticle shadow, edge darkening, and specular gloss highlight.
+// Canvas-based fallback renderer — premium gel nail simulation.
+// Per-nail offscreen canvas + blurred-mask destination-in for feathered edges.
+// Highlights use shadowBlur (not ctx.filter) for consistent cross-browser rendering.
 async function renderFallback(){
   if(!S.photo) return null;
   refreshMask();
@@ -1091,14 +1092,10 @@ async function renderFallback(){
   const [r,g,b]=getStyleRgb(S.style);
   const extFactor=apply_length(S.longueur);
   const forme=S.forme||'Amande';
-
-  // Lighter and darker variants of the base color for volume shading
-  const lr=Math.min(255,r+Math.round(r*0.42));
-  const lg=Math.min(255,g+Math.round(g*0.42));
-  const lb=Math.min(255,b+Math.round(b*0.42));
-  const dr=Math.round(r*0.58);
-  const dg=Math.round(g*0.58);
-  const db=Math.round(b*0.58);
+  const cl=(c,f)=>Math.min(255,Math.round(c+c*f));
+  const cd=(c,f)=>Math.max(0,Math.round(c*f));
+  const lr=cl(r,0.48), lg=cl(g,0.48), lb=cl(b,0.48);
+  const dr=cd(r,0.50), dg=cd(g,0.50), db=cd(b,0.50);
 
   [[3,4],[7,8],[11,12],[15,16],[19,20]].forEach(([d,t])=>{
     const lm=S._landmarks;
@@ -1106,72 +1103,102 @@ async function renderFallback(){
     const x2=lm[t].x*W, y2=lm[t].y*H;
     const len=Math.sqrt((x2-x1)**2+(y2-y1)**2);
     const angle=Math.atan2(y2-y1,x2-x1);
-    const nw=len*0.9;
-    const ext=len*extFactor;
-    const hl=(len+ext)/2;
-    const hw=nw/2;
+    const nw=len*0.9, ext=len*extFactor;
+    const hl=(len+ext)/2, hw=nw/2;
+    const ncx=(x1+x2)/2+Math.cos(angle)*ext/2;
+    const ncy=(y1+y2)/2+Math.sin(angle)*ext/2;
 
-    ctx.save();
-    ctx.translate((x1+x2)/2+Math.cos(angle)*ext/2,(y1+y2)/2+Math.sin(angle)*ext/2);
-    ctx.rotate(angle);
+    // ── Nail offscreen canvas (no hard clip — blurred mask handles edges) ──
+    const nc=document.createElement('canvas');
+    nc.width=W; nc.height=H;
+    const nctx=nc.getContext('2d');
+    nctx.save();
+    nctx.translate(ncx,ncy);
+    nctx.rotate(angle);
 
-    // ── Clip every layer to the exact nail silhouette ───────────────────
-    drawNailShape(ctx,hl,hw,forme);
-    ctx.clip();
+    // Layer 1: base — opaque fill (96%) so underlying texture is fully covered
+    drawNailShape(nctx,hl,hw,forme);
+    nctx.fillStyle=`rgba(${r},${g},${b},0.96)`;
+    nctx.fill();
 
-    // Layer 1 — Opaque base color (slight transparency keeps skin texture)
-    ctx.globalAlpha=0.88;
-    ctx.fillStyle=`rgb(${r},${g},${b})`;
-    ctx.fillRect(-hl,-hw,hl*2,hw*2);
-    ctx.globalAlpha=1.0;
+    // Layer 2: apex/volume — radial bright center → dark rim
+    const ax=hl*0.06, ay=-hw*0.18;
+    const vol=nctx.createRadialGradient(ax,ay,hw*0.03, ax,ay,hw*1.36);
+    vol.addColorStop(0,    `rgba(${lr},${lg},${lb},0.55)`);
+    vol.addColorStop(0.32, `rgba(${r},${g},${b},0)`);
+    vol.addColorStop(1,    `rgba(${dr},${dg},${db},0.44)`);
+    nctx.fillStyle=vol;
+    nctx.fillRect(-hl,-hw,hl*2,hw*2);
 
-    // Layer 2 — Apex/volume: bright center-top fading to dark edges
-    const apexX=hl*0.08, apexY=-hw*0.22;
-    const vol=ctx.createRadialGradient(apexX,apexY,hw*0.04, apexX,apexY,hw*1.35);
-    vol.addColorStop(0,  `rgba(${lr},${lg},${lb},0.62)`);
-    vol.addColorStop(0.38,`rgba(${r},${g},${b},0)`);
-    vol.addColorStop(1,  `rgba(${dr},${dg},${db},0.48)`);
-    ctx.fillStyle=vol;
-    ctx.fillRect(-hl,-hw,hl*2,hw*2);
+    // Layer 3: cuticle shadow
+    const cs=nctx.createLinearGradient(-hl,0,-hl+hw*0.80,0);
+    cs.addColorStop(0,   'rgba(0,0,0,0.28)');
+    cs.addColorStop(0.5, 'rgba(0,0,0,0.06)');
+    cs.addColorStop(1,   'rgba(0,0,0,0)');
+    nctx.fillStyle=cs;
+    nctx.fillRect(-hl,-hw,hl*2,hw*2);
 
-    // Layer 3 — Cuticle shadow: nail is darker where it meets the skin
-    const cuticle=ctx.createLinearGradient(-hl,0,-hl+hw*0.9,0);
-    cuticle.addColorStop(0,  'rgba(0,0,0,0.32)');
-    cuticle.addColorStop(0.55,'rgba(0,0,0,0.07)');
-    cuticle.addColorStop(1,  'rgba(0,0,0,0)');
-    ctx.fillStyle=cuticle;
-    ctx.fillRect(-hl,-hw,hl*2,hw*2);
+    // Layer 4: side-wall edge darkening
+    const sw=nctx.createRadialGradient(ax,0,hw*0.50, ax,0,hw*1.12);
+    sw.addColorStop(0,   'rgba(0,0,0,0)');
+    sw.addColorStop(0.70,'rgba(0,0,0,0)');
+    sw.addColorStop(1,   'rgba(0,0,0,0.28)');
+    nctx.fillStyle=sw;
+    nctx.fillRect(-hl,-hw,hl*2,hw*2);
 
-    // Layer 4 — Side-wall darkening: edges curve away from light
-    const edge=ctx.createRadialGradient(apexX,0,hw*0.52, apexX,0,hw*1.18);
-    edge.addColorStop(0,  'rgba(0,0,0,0)');
-    edge.addColorStop(0.72,'rgba(0,0,0,0)');
-    edge.addColorStop(1,  'rgba(0,0,0,0.30)');
-    ctx.fillStyle=edge;
-    ctx.fillRect(-hl,-hw,hl*2,hw*2);
+    // Layer 5: gloss crescent — thin precise bright stripe, upper third
+    // Use shadowBlur (consistent on iOS Safari) instead of ctx.filter
+    const ghy=-hw*0.36, ghx=hl*0.34, ghrx=hl*0.42, ghry=hw*0.10;
+    nctx.save();
+    nctx.shadowBlur=hw*0.22;
+    nctx.shadowColor='rgba(255,255,255,0.70)';
+    const ggl=nctx.createLinearGradient(ghx,ghy-ghry*2,ghx,ghy+ghry*2);
+    ggl.addColorStop(0,   'rgba(255,255,255,0)');
+    ggl.addColorStop(0.38,'rgba(255,255,255,0.95)');
+    ggl.addColorStop(0.62,'rgba(255,255,255,0.60)');
+    ggl.addColorStop(1,   'rgba(255,255,255,0)');
+    nctx.fillStyle=ggl;
+    nctx.beginPath();
+    nctx.ellipse(ghx,ghy,ghrx,ghry,0,0,Math.PI*2);
+    nctx.fill();
+    nctx.shadowBlur=0;
+    nctx.restore();
 
-    // Layer 5 — Specular gloss: bright elliptical streak in upper third
-    const gx1=-hl*0.04, gx2=hl*0.74, gy=-hw*0.35;
-    const gmx=(gx1+gx2)/2, gspan=(gx2-gx1)*0.52;
-    const gloss=ctx.createRadialGradient(gmx,gy,0, gmx,gy,gspan);
-    gloss.addColorStop(0,  'rgba(255,255,255,0.80)');
-    gloss.addColorStop(0.32,'rgba(255,255,255,0.38)');
-    gloss.addColorStop(1,  'rgba(255,255,255,0)');
-    ctx.fillStyle=gloss;
-    ctx.beginPath();
-    ctx.ellipse(gmx,gy,gspan,hw*0.19,0,0,Math.PI*2);
-    ctx.fill();
+    // Layer 6: micro-shine pinpoint at apex
+    nctx.save();
+    nctx.shadowBlur=hw*0.12;
+    nctx.shadowColor='rgba(255,255,255,0.80)';
+    const ms=nctx.createRadialGradient(ax,ay,0, ax,ay,hw*0.20);
+    ms.addColorStop(0,   'rgba(255,255,255,0.82)');
+    ms.addColorStop(0.50,'rgba(255,255,255,0.22)');
+    ms.addColorStop(1,   'rgba(255,255,255,0)');
+    nctx.fillStyle=ms;
+    nctx.beginPath();
+    nctx.ellipse(ax,ay,hw*0.20,hw*0.10,0,0,Math.PI*2);
+    nctx.fill();
+    nctx.shadowBlur=0;
+    nctx.restore();
 
-    // Layer 6 — Secondary micro-highlight: tiny intense spot at apex
-    const spot=ctx.createRadialGradient(apexX,apexY,0, apexX,apexY,hw*0.28);
-    spot.addColorStop(0,  'rgba(255,255,255,0.50)');
-    spot.addColorStop(1,  'rgba(255,255,255,0)');
-    ctx.fillStyle=spot;
-    ctx.beginPath();
-    ctx.ellipse(apexX,apexY,hw*0.28,hw*0.14,0,0,Math.PI*2);
-    ctx.fill();
+    nctx.restore();
 
-    ctx.restore();
+    // ── Soft-edge mask: blurred silhouette → feathers into skin naturally ──
+    const mc=document.createElement('canvas');
+    mc.width=W; mc.height=H;
+    const mctx=mc.getContext('2d');
+    const blurPx=Math.max(1,Math.round(hw*0.06));
+    try{ mctx.filter=`blur(${blurPx}px)`; }catch(e){}
+    mctx.save();
+    mctx.translate(ncx,ncy);
+    mctx.rotate(angle);
+    drawNailShape(mctx,hl,hw,forme);
+    mctx.fillStyle='white';
+    mctx.fill();
+    mctx.restore();
+
+    nctx.globalCompositeOperation='destination-in';
+    nctx.drawImage(mc,0,0);
+
+    ctx.drawImage(nc,0,0);
   });
 
   return canvas.toDataURL('image/jpeg',0.93);
