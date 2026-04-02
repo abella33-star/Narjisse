@@ -905,10 +905,10 @@ function drawNailShape(ctx, hl, hw, forme) {
 }
 
 // apply_length: extension factor beyond TIP relative to DIP-TIP distance
-//   S = +10%  |  M = +25%  |  L = +45%
+//   S = +10%  |  M = +30%  |  L = +60%  (L boosted so length is unmistakable)
 function apply_length(longueur) {
-  if (longueur === 'Longue L')  return 0.45;
-  if (longueur === 'Moyenne M') return 0.25;
+  if (longueur === 'Longue L')  return 0.60;
+  if (longueur === 'Moyenne M') return 0.30;
   return 0.10; // Courte S
 }
 
@@ -1073,11 +1073,9 @@ function getStyleRgb(style){
   return C[style]||[215,165,155];
 }
 
-// Canvas-based fallback renderer.
-// Each nail is rendered to an isolated offscreen canvas so a blurred mask
-// can feather the edge into the skin (no hard pasted-on look).
-// Layers: base color → apex/volume gradient → cuticle shadow → side darkening
-//         → gloss crescent (blurred) → micro-shine pinpoint
+// Canvas-based fallback renderer — premium gel nail simulation.
+// Per-nail offscreen canvas + blurred-mask destination-in for feathered edges.
+// Highlights use shadowBlur (not ctx.filter) for consistent cross-browser rendering.
 async function renderFallback(){
   if(!S.photo) return null;
   refreshMask();
@@ -1094,12 +1092,10 @@ async function renderFallback(){
   const [r,g,b]=getStyleRgb(S.style);
   const extFactor=apply_length(S.longueur);
   const forme=S.forme||'Amande';
-
-  // Precompute lighter/darker variants once
   const cl=(c,f)=>Math.min(255,Math.round(c+c*f));
   const cd=(c,f)=>Math.max(0,Math.round(c*f));
-  const lr=cl(r,0.45), lg=cl(g,0.45), lb=cl(b,0.45); // highlight color
-  const dr=cd(r,0.52), dg=cd(g,0.52), db=cd(b,0.52); // shadow color
+  const lr=cl(r,0.48), lg=cl(g,0.48), lb=cl(b,0.48);
+  const dr=cd(r,0.50), dg=cd(g,0.50), db=cd(b,0.50);
 
   [[3,4],[7,8],[11,12],[15,16],[19,20]].forEach(([d,t])=>{
     const lm=S._landmarks;
@@ -1107,16 +1103,12 @@ async function renderFallback(){
     const x2=lm[t].x*W, y2=lm[t].y*H;
     const len=Math.sqrt((x2-x1)**2+(y2-y1)**2);
     const angle=Math.atan2(y2-y1,x2-x1);
-    const nw=len*0.9;
-    const ext=len*extFactor;
-    const hl=(len+ext)/2; // half-length in local frame
-    const hw=nw/2;        // half-width in local frame
-    // Global coords of the nail center (shifted forward by ext/2)
+    const nw=len*0.9, ext=len*extFactor;
+    const hl=(len+ext)/2, hw=nw/2;
     const ncx=(x1+x2)/2+Math.cos(angle)*ext/2;
     const ncy=(y1+y2)/2+Math.sin(angle)*ext/2;
 
-    // ── 1. Nail offscreen canvas ─────────────────────────────────────
-    // Draw WITHOUT clip so the blurred mask can feather past the hard edge.
+    // ── Nail offscreen canvas (no hard clip — blurred mask handles edges) ──
     const nc=document.createElement('canvas');
     nc.width=W; nc.height=H;
     const nctx=nc.getContext('2d');
@@ -1124,77 +1116,76 @@ async function renderFallback(){
     nctx.translate(ncx,ncy);
     nctx.rotate(angle);
 
-    // Base: fill only the nail silhouette path (90% opacity)
+    // Layer 1: base — opaque fill (96%) so underlying texture is fully covered
     drawNailShape(nctx,hl,hw,forme);
-    nctx.fillStyle=`rgba(${r},${g},${b},0.90)`;
+    nctx.fillStyle=`rgba(${r},${g},${b},0.96)`;
     nctx.fill();
 
-    // Volume / apex: bright center-top fading to darker rim
-    const ax=hl*0.08, ay=-hw*0.20;
-    const vol=nctx.createRadialGradient(ax,ay,hw*0.04, ax,ay,hw*1.40);
-    vol.addColorStop(0,    `rgba(${lr},${lg},${lb},0.58)`);
-    vol.addColorStop(0.35, `rgba(${r},${g},${b},0)`);
-    vol.addColorStop(1,    `rgba(${dr},${dg},${db},0.52)`);
+    // Layer 2: apex/volume — radial bright center → dark rim
+    const ax=hl*0.06, ay=-hw*0.18;
+    const vol=nctx.createRadialGradient(ax,ay,hw*0.03, ax,ay,hw*1.36);
+    vol.addColorStop(0,    `rgba(${lr},${lg},${lb},0.55)`);
+    vol.addColorStop(0.32, `rgba(${r},${g},${b},0)`);
+    vol.addColorStop(1,    `rgba(${dr},${dg},${db},0.44)`);
     nctx.fillStyle=vol;
     nctx.fillRect(-hl,-hw,hl*2,hw*2);
 
-    // Cuticle shadow: darker where nail meets skin at base
-    const cs=nctx.createLinearGradient(-hl,0,-hl+hw*0.85,0);
-    cs.addColorStop(0,   'rgba(0,0,0,0.30)');
-    cs.addColorStop(0.45,'rgba(0,0,0,0.07)');
+    // Layer 3: cuticle shadow
+    const cs=nctx.createLinearGradient(-hl,0,-hl+hw*0.80,0);
+    cs.addColorStop(0,   'rgba(0,0,0,0.28)');
+    cs.addColorStop(0.5, 'rgba(0,0,0,0.06)');
     cs.addColorStop(1,   'rgba(0,0,0,0)');
     nctx.fillStyle=cs;
     nctx.fillRect(-hl,-hw,hl*2,hw*2);
 
-    // Side-wall darkening: edges curve away from light source
-    const sw=nctx.createRadialGradient(ax,0,hw*0.48, ax,0,hw*1.14);
+    // Layer 4: side-wall edge darkening
+    const sw=nctx.createRadialGradient(ax,0,hw*0.50, ax,0,hw*1.12);
     sw.addColorStop(0,   'rgba(0,0,0,0)');
-    sw.addColorStop(0.68,'rgba(0,0,0,0)');
-    sw.addColorStop(1,   'rgba(0,0,0,0.32)');
+    sw.addColorStop(0.70,'rgba(0,0,0,0)');
+    sw.addColorStop(1,   'rgba(0,0,0,0.28)');
     nctx.fillStyle=sw;
     nctx.fillRect(-hl,-hw,hl*2,hw*2);
 
-    // ── Gloss crescent (soft blur via filter) ───────────────────────
-    // Thin bright stripe in the upper third of the nail — simulates gel shine
+    // Layer 5: gloss crescent — thin precise bright stripe, upper third
+    // Use shadowBlur (consistent on iOS Safari) instead of ctx.filter
+    const ghy=-hw*0.36, ghx=hl*0.34, ghrx=hl*0.42, ghry=hw*0.10;
     nctx.save();
-    const blurG=Math.max(1,Math.round(hw*0.14))+'px';
-    try{ nctx.filter='blur('+blurG+')'; }catch(e){}
-    const gy=-hw*0.33, gx=-hl*0.02, gw=hl*0.76, gh=hw*0.14;
-    const ggl=nctx.createLinearGradient(gx,gy-gh*1.2,gx,gy+gh*1.8);
+    nctx.shadowBlur=hw*0.22;
+    nctx.shadowColor='rgba(255,255,255,0.70)';
+    const ggl=nctx.createLinearGradient(ghx,ghy-ghry*2,ghx,ghy+ghry*2);
     ggl.addColorStop(0,   'rgba(255,255,255,0)');
-    ggl.addColorStop(0.30,'rgba(255,255,255,0.90)');
-    ggl.addColorStop(0.58,'rgba(255,255,255,0.55)');
+    ggl.addColorStop(0.38,'rgba(255,255,255,0.95)');
+    ggl.addColorStop(0.62,'rgba(255,255,255,0.60)');
     ggl.addColorStop(1,   'rgba(255,255,255,0)');
     nctx.fillStyle=ggl;
     nctx.beginPath();
-    nctx.ellipse(gx+gw*0.5,gy,gw*0.5,gh,0,0,Math.PI*2);
+    nctx.ellipse(ghx,ghy,ghrx,ghry,0,0,Math.PI*2);
     nctx.fill();
-    try{ nctx.filter='none'; }catch(e){}
+    nctx.shadowBlur=0;
     nctx.restore();
 
-    // ── Micro-shine pinpoint at apex (soft glow) ────────────────────
+    // Layer 6: micro-shine pinpoint at apex
     nctx.save();
-    const blurS=Math.max(1,Math.round(hw*0.08))+'px';
-    try{ nctx.filter='blur('+blurS+')'; }catch(e){}
-    const ms=nctx.createRadialGradient(ax,ay,0, ax,ay,hw*0.26);
-    ms.addColorStop(0,   'rgba(255,255,255,0.72)');
-    ms.addColorStop(0.45,'rgba(255,255,255,0.28)');
+    nctx.shadowBlur=hw*0.12;
+    nctx.shadowColor='rgba(255,255,255,0.80)';
+    const ms=nctx.createRadialGradient(ax,ay,0, ax,ay,hw*0.20);
+    ms.addColorStop(0,   'rgba(255,255,255,0.82)');
+    ms.addColorStop(0.50,'rgba(255,255,255,0.22)');
     ms.addColorStop(1,   'rgba(255,255,255,0)');
     nctx.fillStyle=ms;
     nctx.beginPath();
-    nctx.ellipse(ax,ay,hw*0.26,hw*0.13,0,0,Math.PI*2);
+    nctx.ellipse(ax,ay,hw*0.20,hw*0.10,0,0,Math.PI*2);
     nctx.fill();
-    try{ nctx.filter='none'; }catch(e){}
+    nctx.shadowBlur=0;
     nctx.restore();
 
-    nctx.restore(); // back to global (unrotated) coords
+    nctx.restore();
 
-    // ── 2. Soft-edge mask ────────────────────────────────────────────
-    // Blur the nail silhouette so pixels feather into surrounding skin.
+    // ── Soft-edge mask: blurred silhouette → feathers into skin naturally ──
     const mc=document.createElement('canvas');
     mc.width=W; mc.height=H;
     const mctx=mc.getContext('2d');
-    const blurPx=Math.max(1,Math.round(hw*0.09));
+    const blurPx=Math.max(1,Math.round(hw*0.06));
     try{ mctx.filter=`blur(${blurPx}px)`; }catch(e){}
     mctx.save();
     mctx.translate(ncx,ncy);
@@ -1204,12 +1195,9 @@ async function renderFallback(){
     mctx.fill();
     mctx.restore();
 
-    // Apply blurred mask: keeps nail pixels only where mask is opaque,
-    // softly fading to transparent at the silhouette edge.
     nctx.globalCompositeOperation='destination-in';
     nctx.drawImage(mc,0,0);
 
-    // ── 3. Composite nail onto photo ─────────────────────────────────
     ctx.drawImage(nc,0,0);
   });
 
