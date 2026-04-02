@@ -1073,62 +1073,108 @@ function getStyleRgb(style){
   return C[style]||[215,165,155];
 }
 
-// Canvas-based fallback renderer. Blends the selected style color onto the
-// nail mask area and adds a subtle gloss highlight so the result is always
-// a real visual, never an error screen.
+// Canvas-based fallback renderer — per-nail geometry with volume, apex,
+// cuticle shadow, edge darkening, and specular gloss highlight.
 async function renderFallback(){
   if(!S.photo) return null;
   refreshMask();
-  const maskUrl=getMask();
 
-  const [img,maskImg]=await Promise.all([
-    new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.src=S.photo;}),
-    new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.src=maskUrl;}),
-  ]);
-
+  const img=await new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.src=S.photo;});
   const W=img.naturalWidth, H=img.naturalHeight;
   const canvas=document.createElement('canvas');
   canvas.width=W; canvas.height=H;
   const ctx=canvas.getContext('2d');
   ctx.drawImage(img,0,0);
 
-  // Read pixels
-  const photoData=ctx.getImageData(0,0,W,H);
-  const mc=document.createElement('canvas');
-  mc.width=W; mc.height=H;
-  const mctx=mc.getContext('2d');
-  mctx.drawImage(maskImg,0,0);
-  const maskData=mctx.getImageData(0,0,W,H);
+  if(!S._landmarks) return canvas.toDataURL('image/jpeg',0.92);
 
   const [r,g,b]=getStyleRgb(S.style);
-  for(let i=0;i<photoData.data.length;i+=4){
-    const m=maskData.data[i]/255;
-    if(m>0.05){
-      const a=0.74*m;
-      photoData.data[i]  =Math.round(photoData.data[i]  *(1-a)+r*a);
-      photoData.data[i+1]=Math.round(photoData.data[i+1]*(1-a)+g*a);
-      photoData.data[i+2]=Math.round(photoData.data[i+2]*(1-a)+b*a);
-    }
-  }
-  ctx.putImageData(photoData,0,0);
+  const extFactor=apply_length(S.longueur);
+  const forme=S.forme||'Amande';
 
-  // Gloss highlight: white gradient clipped to nail mask, blended with screen
-  const gloss=document.createElement('canvas');
-  gloss.width=W; gloss.height=H;
-  const gctx=gloss.getContext('2d');
-  gctx.drawImage(maskImg,0,0);
-  gctx.globalCompositeOperation='source-in';
-  const grad=gctx.createLinearGradient(0,0,0,H*0.6);
-  grad.addColorStop(0,'rgba(255,255,255,0.42)');
-  grad.addColorStop(0.35,'rgba(255,255,255,0.22)');
-  grad.addColorStop(1,'rgba(255,255,255,0)');
-  gctx.fillStyle=grad;
-  gctx.fillRect(0,0,W,H);
-  ctx.globalCompositeOperation='screen';
-  ctx.drawImage(gloss,0,0);
-  ctx.globalCompositeOperation='source-over';
+  // Lighter and darker variants of the base color for volume shading
+  const lr=Math.min(255,r+Math.round(r*0.42));
+  const lg=Math.min(255,g+Math.round(g*0.42));
+  const lb=Math.min(255,b+Math.round(b*0.42));
+  const dr=Math.round(r*0.58);
+  const dg=Math.round(g*0.58);
+  const db=Math.round(b*0.58);
 
-  return canvas.toDataURL('image/jpeg',0.92);
+  [[3,4],[7,8],[11,12],[15,16],[19,20]].forEach(([d,t])=>{
+    const lm=S._landmarks;
+    const x1=lm[d].x*W, y1=lm[d].y*H;
+    const x2=lm[t].x*W, y2=lm[t].y*H;
+    const len=Math.sqrt((x2-x1)**2+(y2-y1)**2);
+    const angle=Math.atan2(y2-y1,x2-x1);
+    const nw=len*0.9;
+    const ext=len*extFactor;
+    const hl=(len+ext)/2;
+    const hw=nw/2;
+
+    ctx.save();
+    ctx.translate((x1+x2)/2+Math.cos(angle)*ext/2,(y1+y2)/2+Math.sin(angle)*ext/2);
+    ctx.rotate(angle);
+
+    // ── Clip every layer to the exact nail silhouette ───────────────────
+    drawNailShape(ctx,hl,hw,forme);
+    ctx.clip();
+
+    // Layer 1 — Opaque base color (slight transparency keeps skin texture)
+    ctx.globalAlpha=0.88;
+    ctx.fillStyle=`rgb(${r},${g},${b})`;
+    ctx.fillRect(-hl,-hw,hl*2,hw*2);
+    ctx.globalAlpha=1.0;
+
+    // Layer 2 — Apex/volume: bright center-top fading to dark edges
+    const apexX=hl*0.08, apexY=-hw*0.22;
+    const vol=ctx.createRadialGradient(apexX,apexY,hw*0.04, apexX,apexY,hw*1.35);
+    vol.addColorStop(0,  `rgba(${lr},${lg},${lb},0.62)`);
+    vol.addColorStop(0.38,`rgba(${r},${g},${b},0)`);
+    vol.addColorStop(1,  `rgba(${dr},${dg},${db},0.48)`);
+    ctx.fillStyle=vol;
+    ctx.fillRect(-hl,-hw,hl*2,hw*2);
+
+    // Layer 3 — Cuticle shadow: nail is darker where it meets the skin
+    const cuticle=ctx.createLinearGradient(-hl,0,-hl+hw*0.9,0);
+    cuticle.addColorStop(0,  'rgba(0,0,0,0.32)');
+    cuticle.addColorStop(0.55,'rgba(0,0,0,0.07)');
+    cuticle.addColorStop(1,  'rgba(0,0,0,0)');
+    ctx.fillStyle=cuticle;
+    ctx.fillRect(-hl,-hw,hl*2,hw*2);
+
+    // Layer 4 — Side-wall darkening: edges curve away from light
+    const edge=ctx.createRadialGradient(apexX,0,hw*0.52, apexX,0,hw*1.18);
+    edge.addColorStop(0,  'rgba(0,0,0,0)');
+    edge.addColorStop(0.72,'rgba(0,0,0,0)');
+    edge.addColorStop(1,  'rgba(0,0,0,0.30)');
+    ctx.fillStyle=edge;
+    ctx.fillRect(-hl,-hw,hl*2,hw*2);
+
+    // Layer 5 — Specular gloss: bright elliptical streak in upper third
+    const gx1=-hl*0.04, gx2=hl*0.74, gy=-hw*0.35;
+    const gmx=(gx1+gx2)/2, gspan=(gx2-gx1)*0.52;
+    const gloss=ctx.createRadialGradient(gmx,gy,0, gmx,gy,gspan);
+    gloss.addColorStop(0,  'rgba(255,255,255,0.80)');
+    gloss.addColorStop(0.32,'rgba(255,255,255,0.38)');
+    gloss.addColorStop(1,  'rgba(255,255,255,0)');
+    ctx.fillStyle=gloss;
+    ctx.beginPath();
+    ctx.ellipse(gmx,gy,gspan,hw*0.19,0,0,Math.PI*2);
+    ctx.fill();
+
+    // Layer 6 — Secondary micro-highlight: tiny intense spot at apex
+    const spot=ctx.createRadialGradient(apexX,apexY,0, apexX,apexY,hw*0.28);
+    spot.addColorStop(0,  'rgba(255,255,255,0.50)');
+    spot.addColorStop(1,  'rgba(255,255,255,0)');
+    ctx.fillStyle=spot;
+    ctx.beginPath();
+    ctx.ellipse(apexX,apexY,hw*0.28,hw*0.14,0,0,Math.PI*2);
+    ctx.fill();
+
+    ctx.restore();
+  });
+
+  return canvas.toDataURL('image/jpeg',0.93);
 }
 
 async function generate(){
