@@ -960,6 +960,7 @@ function initMask(){
     try{
       const lm=await detectNails(S.photo);
       if(lm){
+        S._landmarks=lm; S._maskW=cvs.width; S._maskH=cvs.height;
         drawNailsFromLandmarks(ctx,lm,cvs.width,cvs.height);
         title.textContent='Ongles détectés ✓';
         sub.textContent='Vérifiez la sélection. Vous pouvez peindre manuellement pour ajuster.';
@@ -1020,18 +1021,139 @@ function getMask(){
   return mc.toDataURL('image/png');
 }
 
+// Redraws the auto-detected nail regions with the current longueur + forme,
+// replacing any previous auto-mask (manual strokes are intentionally cleared
+// so the final geometry is always coherent with user selections).
+function refreshMask(){
+  if(!S._landmarks) return;
+  const cvs=document.getElementById('mask-cvs');
+  const ctx=cvs.getContext('2d');
+  ctx.clearRect(0,0,cvs.width,cvs.height);
+  drawNailsFromLandmarks(ctx,S._landmarks,S._maskW||cvs.width,S._maskH||cvs.height);
+}
+
+// Maps style names to [R,G,B] base colors for the canvas fallback renderer.
+function getStyleRgb(style){
+  const C={
+    'French manucure classique':[240,220,220],
+    'Blanc laiteux nacré':[248,244,240],
+    'Baby boomer dégradé nude':[230,200,195],
+    'Nude rosé naturel':[210,165,155],
+    'Nude taupe minimaliste':[195,175,160],
+    'Floral rose & feuilles d or':[235,190,185],
+    'Rouge passion profond':[190,25,50],
+    'Bordeaux profond':[110,35,45],
+    'Brown freestyle animal print':[150,90,60],
+    'Violet chrome & noir mat':[90,40,110],
+    'Rose poudré':[210,155,155],
+    'Noir mat élégant':[25,25,25],
+    'Or chrome doré métallique':[212,175,55],
+    'Corail pêche nacré':[255,130,110],
+    'Lilas pastel doux':[190,170,210],
+    'Vert émeraude profond':[40,120,60],
+    'Arabesques dorées sur nude':[210,185,150],
+    'Bleu nuit profond nacré':[25,45,105],
+    'Glazed donut nacré irisé':[240,215,220],
+    'Aura nails nuages pastel':[210,185,220],
+    'Marbre blanc veines dorées':[245,240,230],
+    'Chrome holographique irisé':[200,185,215],
+    'Rose gold chrome métallique':[210,155,130],
+    'Chrome argenté miroir':[190,195,200],
+    'Terracotta terre cuite':[195,85,55],
+    'Bleu ciel pastel doux':[135,200,230],
+    'Vert menthe fraîche':[140,215,175],
+    'Dégradé sunset rose orange':[235,130,85],
+    'French tip colorée rose vif':[230,80,130],
+    'French manucure inversée':[240,220,210],
+    'Nail art géométrique lignes dorées':[215,200,175],
+    'Nail art floral cerisier japonais':[240,195,200],
+    'Galaxie étoilée fond noir pailleté':[20,15,55],
+    'Glitter argent pailleté':[200,205,215],
+  };
+  return C[style]||[215,165,155];
+}
+
+// Canvas-based fallback renderer. Blends the selected style color onto the
+// nail mask area and adds a subtle gloss highlight so the result is always
+// a real visual, never an error screen.
+async function renderFallback(){
+  if(!S.photo) return null;
+  refreshMask();
+  const maskUrl=getMask();
+
+  const [img,maskImg]=await Promise.all([
+    new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.src=S.photo;}),
+    new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.src=maskUrl;}),
+  ]);
+
+  const W=img.naturalWidth, H=img.naturalHeight;
+  const canvas=document.createElement('canvas');
+  canvas.width=W; canvas.height=H;
+  const ctx=canvas.getContext('2d');
+  ctx.drawImage(img,0,0);
+
+  // Read pixels
+  const photoData=ctx.getImageData(0,0,W,H);
+  const mc=document.createElement('canvas');
+  mc.width=W; mc.height=H;
+  const mctx=mc.getContext('2d');
+  mctx.drawImage(maskImg,0,0);
+  const maskData=mctx.getImageData(0,0,W,H);
+
+  const [r,g,b]=getStyleRgb(S.style);
+  for(let i=0;i<photoData.data.length;i+=4){
+    const m=maskData.data[i]/255;
+    if(m>0.05){
+      const a=0.74*m;
+      photoData.data[i]  =Math.round(photoData.data[i]  *(1-a)+r*a);
+      photoData.data[i+1]=Math.round(photoData.data[i+1]*(1-a)+g*a);
+      photoData.data[i+2]=Math.round(photoData.data[i+2]*(1-a)+b*a);
+    }
+  }
+  ctx.putImageData(photoData,0,0);
+
+  // Gloss highlight: white gradient clipped to nail mask, blended with screen
+  const gloss=document.createElement('canvas');
+  gloss.width=W; gloss.height=H;
+  const gctx=gloss.getContext('2d');
+  gctx.drawImage(maskImg,0,0);
+  gctx.globalCompositeOperation='source-in';
+  const grad=gctx.createLinearGradient(0,0,0,H*0.6);
+  grad.addColorStop(0,'rgba(255,255,255,0.42)');
+  grad.addColorStop(0.35,'rgba(255,255,255,0.22)');
+  grad.addColorStop(1,'rgba(255,255,255,0)');
+  gctx.fillStyle=grad;
+  gctx.fillRect(0,0,W,H);
+  ctx.globalCompositeOperation='screen';
+  ctx.drawImage(gloss,0,0);
+  ctx.globalCompositeOperation='source-over';
+
+  return canvas.toDataURL('image/jpeg',0.92);
+}
+
 async function generate(){
   go('sl');
+  // Always redraw mask with the user's actual longueur + forme before reading it
+  refreshMask();
+  let url=null;
   try{
-    const url=await callReplicate();
-    if(url){
-      _incUsage();
-      _updateUsageInfo();
-      showResult(url);
-    } else showError();
+    url=await callReplicate();
   }catch(err){
-    console.error(err);
+    console.error('Replicate error:',err.message);
     window._lastError=err.message;
+  }
+  if(url){
+    _incUsage(); _updateUsageInfo();
+    showResult(url);
+    return;
+  }
+  // API unavailable or quota exceeded → canvas fallback (never show error screen)
+  try{
+    const fallback=await renderFallback();
+    if(fallback){ _incUsage(); _updateUsageInfo(); showResult(fallback); }
+    else showError();
+  }catch(e2){
+    console.error('Fallback error:',e2);
     showError();
   }
 }
