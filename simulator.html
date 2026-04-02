@@ -815,26 +815,130 @@ async function detectNails(photoUrl){
   });
 }
 
-function drawNailsFromLandmarks(ctx,lm,w,h){
+// ── Geometry transformation layer ──────────────────────────────────────────
+// Draws the precise nail silhouette for a given shape in the rotated local
+// frame where x+ = toward tip, hl = half-length, hw = half-width.
+function drawNailShape(ctx, hl, hw, forme) {
+  const br = hw * 0.18; // base corner rounding
+  ctx.beginPath();
+  switch (forme) {
+    case 'Carré': {
+      // Flat tip, 90° corners at tip, rounded only at base
+      ctx.moveTo(-hl + br, -hw);
+      ctx.lineTo(hl, -hw);
+      ctx.lineTo(hl, hw);
+      ctx.lineTo(-hl + br, hw);
+      ctx.arcTo(-hl, hw, -hl, hw - br, br);
+      ctx.lineTo(-hl, -hw + br);
+      ctx.arcTo(-hl, -hw, -hl + br, -hw, br);
+      break;
+    }
+    case 'Arrondi': {
+      // Straight sides, perfect semicircle tip
+      const tipR = hw;
+      ctx.moveTo(-hl + br, -hw);
+      ctx.lineTo(hl - tipR, -hw);
+      ctx.arc(hl - tipR, 0, tipR, -Math.PI / 2, Math.PI / 2);
+      ctx.lineTo(-hl + br, hw);
+      ctx.arcTo(-hl, hw, -hl, hw - br, br);
+      ctx.lineTo(-hl, -hw + br);
+      ctx.arcTo(-hl, -hw, -hl + br, -hw, br);
+      break;
+    }
+    case 'Amande': {
+      // Both sides taper inward to a narrow soft rounded point
+      ctx.moveTo(-hl + br, -hw);
+      ctx.bezierCurveTo(0, -hw, hl * 0.72, -hw * 0.18, hl, 0);
+      ctx.bezierCurveTo(hl * 0.72, hw * 0.18, 0, hw, -hl + br, hw);
+      ctx.arcTo(-hl, hw, -hl, hw - br, br);
+      ctx.lineTo(-hl, -hw + br);
+      ctx.arcTo(-hl, -hw, -hl + br, -hw, br);
+      break;
+    }
+    case 'Stiletto': {
+      // Aggressively tapers to a sharp point
+      ctx.moveTo(-hl + br, -hw);
+      ctx.bezierCurveTo(hl * 0.1, -hw, hl * 0.82, -hw * 0.08, hl, 0);
+      ctx.bezierCurveTo(hl * 0.82, hw * 0.08, hl * 0.1, hw, -hl + br, hw);
+      ctx.arcTo(-hl, hw, -hl, hw - br, br);
+      ctx.lineTo(-hl, -hw + br);
+      ctx.arcTo(-hl, -hw, -hl + br, -hw, br);
+      break;
+    }
+    case 'Coffin': {
+      // Tapered sides, narrow flat tip (trapezoid)
+      const cW = hw * 0.35;
+      ctx.moveTo(-hl + br, -hw);
+      ctx.bezierCurveTo(hl * 0.25, -hw, hl * 0.65, -cW, hl, -cW);
+      ctx.lineTo(hl, cW);
+      ctx.bezierCurveTo(hl * 0.65, cW, hl * 0.25, hw, -hl + br, hw);
+      ctx.arcTo(-hl, hw, -hl, hw - br, br);
+      ctx.lineTo(-hl, -hw + br);
+      ctx.arcTo(-hl, -hw, -hl + br, -hw, br);
+      break;
+    }
+    case 'Carré arrondi': {
+      // Mostly flat tip with subtly rounded corners
+      const tipR = hw * 0.28;
+      ctx.moveTo(-hl + br, -hw);
+      ctx.lineTo(hl - tipR, -hw);
+      ctx.arcTo(hl, -hw, hl, -hw + tipR, tipR);
+      ctx.lineTo(hl, hw - tipR);
+      ctx.arcTo(hl, hw, hl - tipR, hw, tipR);
+      ctx.lineTo(-hl + br, hw);
+      ctx.arcTo(-hl, hw, -hl, hw - br, br);
+      ctx.lineTo(-hl, -hw + br);
+      ctx.arcTo(-hl, -hw, -hl + br, -hw, br);
+      break;
+    }
+    default: {
+      // Fallback: generic rounded rectangle
+      const r = hw * 0.5;
+      ctx.moveTo(-hl + r, -hw); ctx.lineTo(hl - r, -hw);
+      ctx.arcTo(hl, -hw, hl, -hw + r, r); ctx.lineTo(hl, hw - r);
+      ctx.arcTo(hl, hw, hl - r, hw, r); ctx.lineTo(-hl + r, hw);
+      ctx.arcTo(-hl, hw, -hl, hw - r, r); ctx.lineTo(-hl, -hw + r);
+      ctx.arcTo(-hl, -hw, -hl + r, -hw, r);
+    }
+  }
+  ctx.closePath();
+}
+
+// apply_length: extension factor beyond TIP relative to DIP-TIP distance
+//   S = +10%  |  M = +25%  |  L = +45%
+function apply_length(longueur) {
+  if (longueur === 'Longue L')  return 0.45;
+  if (longueur === 'Moyenne M') return 0.25;
+  return 0.10; // Courte S
+}
+
+function drawNailsFromLandmarks(ctx, lm, w, h) {
   // DIP→TIP pairs for each finger: thumb, index, middle, ring, pinky
-  [[3,4],[7,8],[11,12],[15,16],[19,20]].forEach(([d,t])=>{
-    const x1=lm[d].x*w, y1=lm[d].y*h, x2=lm[t].x*w, y2=lm[t].y*h;
-    const len=Math.sqrt((x2-x1)**2+(y2-y1)**2);
-    const angle=Math.atan2(y2-y1,x2-x1);
-    const nw=len*0.9, ext=len*0.45;
+  const extFactor = apply_length(S.longueur);
+  const forme = S.forme || 'Amande';
+
+  [[3,4],[7,8],[11,12],[15,16],[19,20]].forEach(([d, t]) => {
+    const x1 = lm[d].x * w, y1 = lm[d].y * h;
+    const x2 = lm[t].x * w, y2 = lm[t].y * h;
+    const len   = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+    const angle = Math.atan2(y2 - y1, x2 - x1);
+    const nw  = len * 0.9;
+    const ext = len * extFactor; // length-driven extension beyond TIP
+
     ctx.save();
-    ctx.translate((x1+x2)/2+Math.cos(angle)*ext/2,(y1+y2)/2+Math.sin(angle)*ext/2);
+    // Shift center forward by half the extension so base stays at DIP
+    ctx.translate(
+      (x1 + x2) / 2 + Math.cos(angle) * ext / 2,
+      (y1 + y2) / 2 + Math.sin(angle) * ext / 2
+    );
     ctx.rotate(angle);
-    ctx.fillStyle='rgba(255,80,160,0.62)';
-    ctx.strokeStyle='rgba(255,80,160,0.62)';
-    ctx.lineJoin='round'; ctx.lineCap='round';
-    const hl=(len+ext)/2, hw=nw/2, r=hw*0.5;
-    ctx.beginPath();
-    ctx.moveTo(-hl+r,-hw); ctx.lineTo(hl-r,-hw);
-    ctx.arcTo(hl,-hw,hl,-hw+r,r); ctx.lineTo(hl,hw-r);
-    ctx.arcTo(hl,hw,hl-r,hw,r); ctx.lineTo(-hl+r,hw);
-    ctx.arcTo(-hl,hw,-hl,hw-r,r); ctx.lineTo(-hl,-hw+r);
-    ctx.arcTo(-hl,-hw,-hl+r,-hw,r); ctx.closePath();
+
+    ctx.fillStyle  = 'rgba(255,80,160,0.62)';
+    ctx.strokeStyle = 'rgba(255,80,160,0.62)';
+    ctx.lineJoin = 'round';
+    ctx.lineCap  = 'round';
+
+    drawNailShape(ctx, (len + ext) / 2, nw / 2, forme);
     ctx.fill();
     ctx.restore();
   });
